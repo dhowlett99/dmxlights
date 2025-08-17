@@ -292,6 +292,8 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 		this.EditPatternMode = false
 		for function := range this.Functions {
 			this.Functions[sequenceNumber][function].State = false
+			this.Functions[sequenceNumber][function].State2 = false
+			this.Functions[sequenceNumber][common.Function4_Bounce].Position = 0
 		}
 	}
 }

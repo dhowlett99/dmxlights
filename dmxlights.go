@@ -348,6 +348,8 @@ func main() {
 				SequenceNumber: sequenceNumber,
 				Number:         function,
 				State:          false,
+				State2:         false,
+				Position:       0,
 				Label:          this.FunctionLabels[function],
 			}
 			this.Functions[sequenceNumber] = append(this.Functions[sequenceNumber], newFunction)

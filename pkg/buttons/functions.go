@@ -18,11 +18,16 @@ package buttons
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
+
+const FORWARD int = -1
+const REVERSE int = 0
+const BOUNCE int = 1
 
 func ShowFunctionButtons(this *CurrentState, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
 
@@ -34,18 +39,42 @@ func ShowFunctionButtons(this *CurrentState, eventsForLauchpad chan common.ALigh
 	// Loop through the available functions for this sequence
 	for index, function := range this.Functions[this.TargetSequence] {
 		if debug {
-			fmt.Printf("ShowFunctionButtons: function %s state %t\n", function.Name, function.State)
+			fmt.Printf("ShowFunctionButtons: function %s state %t state2 %t\n", function.Name, function.State, function.State2)
 		}
-		if !function.State && this.SelectedMode[this.DisplaySequence] != CHASER_FUNCTION { // Cyan
+		name, _ := strconv.Atoi(function.Name)
+		if !function.State && !function.State2 && this.SelectedMode[this.DisplaySequence] != CHASER_FUNCTION { // Cyan
 			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+			if name == common.Function4_Bounce {
+				common.LabelButton(index, this.DisplaySequence, "Forward", guiButtons)
+			} else {
+				common.LabelButton(index, this.DisplaySequence, function.Label, guiButtons)
+			}
 		}
-		if !function.State && this.SelectedMode[this.DisplaySequence] == CHASER_FUNCTION { // Yellow
+		if !function.State && !function.State2 && this.SelectedMode[this.DisplaySequence] == CHASER_FUNCTION { // Yellow
 			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, colors.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+			if name == common.Function4_Bounce {
+				common.LabelButton(index, this.DisplaySequence, "Forward", guiButtons)
+			} else {
+				common.LabelButton(index, this.DisplaySequence, function.Label, guiButtons)
+			}
 		}
-		if function.State { // Magenta
+		if function.State && !function.State2 { // Magenta
 			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, colors.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+			if name == common.Function4_Bounce {
+				common.LabelButton(index, this.DisplaySequence, "Bounce", guiButtons)
+			} else {
+				common.LabelButton(index, this.DisplaySequence, function.Label, guiButtons)
+			}
 		}
-		common.LabelButton(index, this.DisplaySequence, function.Label, guiButtons)
+		if !function.State && function.State2 { // Blue
+			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, colors.Pink, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+			if name == common.Function4_Bounce {
+				common.LabelButton(index, this.DisplaySequence, "Reverse", guiButtons)
+			} else {
+				common.LabelButton(index, this.DisplaySequence, function.Label, guiButtons)
+			}
+		}
+
 	}
 }
 
@@ -223,59 +252,97 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 		return
 	}
 
-	// Function 4 Bounce - Toggle bounce feature on.
-	if X == common.Function4_Bounce && !this.Functions[this.TargetSequence][common.Function4_Bounce].State {
+	// Function 4 Bounce and Direction Controls.
+	if X == common.Function4_Bounce {
 
-		if debug {
-			fmt.Printf("Seq%d: Mode:%d common.Function4_Bounce On \n", this.TargetSequence, this.SelectedMode[this.TargetSequence])
+		switch this.Functions[this.TargetSequence][common.Function4_Bounce].Position {
+
+		case FORWARD:
+
+			if debug {
+				fmt.Printf("Seq%d: Mode:%d Forward On \n", this.TargetSequence, this.SelectedMode[this.TargetSequence])
+			}
+
+			// Set the  state to forward.
+			this.Functions[this.TargetSequence][common.Function4_Bounce].State = false
+			this.Functions[this.TargetSequence][common.Function4_Bounce].State2 = false
+
+			// Set the bounce off and direction to forward.
+			cmd := common.Command{
+				Action: common.UpdateBounce,
+				Args: []common.Arg{
+					{Name: "Bounce", Value: false},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+			cmd = common.Command{
+				Action: common.UpdateDirection,
+				Args: []common.Arg{
+					{Name: "Forward", Value: false},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+			ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
+
+		case REVERSE:
+
+			if debug {
+				fmt.Printf("Seq%d: Mode:%d Reverse On \n", this.TargetSequence, this.SelectedMode[this.TargetSequence])
+			}
+
+			// Set the next state to reverse
+			this.Functions[this.TargetSequence][common.Function4_Bounce].State = false
+			this.Functions[this.TargetSequence][common.Function4_Bounce].State2 = true
+
+			// Set direction to reverse.
+			cmd := common.Command{
+				Action: common.UpdateDirection,
+				Args: []common.Arg{
+					{Name: "Forward", Value: true},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+			ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
+
+		case BOUNCE:
+
+			if debug {
+				fmt.Printf("Seq%d: Mode:%d Bounce On \n", this.TargetSequence, this.SelectedMode[this.TargetSequence])
+			}
+
+			// Set the state to bounce.
+			this.Functions[this.TargetSequence][common.Function4_Bounce].State = true
+			this.Functions[this.TargetSequence][common.Function4_Bounce].State2 = false
+
+			cmd := common.Command{
+				Action: common.UpdateDirection,
+				Args: []common.Arg{
+					{Name: "Forward", Value: false},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+			// Send the bounce on.
+			cmd = common.Command{
+				Action: common.UpdateBounce,
+				Args: []common.Arg{
+					{Name: "Bounce", Value: true},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+			ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
+
 		}
 
-		this.Functions[this.TargetSequence][common.Function4_Bounce].State = true
-
-		cmd := common.Command{
-			Action: common.UpdateBounce,
-			Args: []common.Arg{
-				{Name: "Bounce", Value: true},
-			},
+		// Increment the position counter and check position.
+		this.Functions[this.TargetSequence][common.Function4_Bounce].Position++
+		if this.Functions[this.TargetSequence][common.Function4_Bounce].Position > BOUNCE {
+			this.Functions[this.TargetSequence][common.Function4_Bounce].Position = FORWARD
 		}
-		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
-
-		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
-		if this.SelectedMode[this.DisplaySequence] == CHASER_FUNCTION {
-			// Jump straight to showing the shutter chaser.
-			this.DisplayChaserShortCut = true
-		}
-
-		return
-	}
-	// Function 4 Bounce - Toggle bounce feature off.
-	if X == common.Function4_Bounce && this.Functions[this.TargetSequence][common.Function4_Bounce].State {
-
-		if debug {
-			fmt.Printf("Seq%d: Mode:%d common.Function4_Bounce Off \n", this.TargetSequence, this.SelectedMode[this.TargetSequence])
-		}
-
-		this.Functions[this.TargetSequence][common.Function4_Bounce].State = false
-
-		cmd := common.Command{
-			Action: common.UpdateBounce,
-			Args: []common.Arg{
-				{Name: "Bounce", Value: false},
-			},
-		}
-		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
-
-		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
-		if this.SelectedMode[this.DisplaySequence] == CHASER_FUNCTION {
-			// Jump straight to showing the shutter chaser.
-			this.DisplayChaserShortCut = true
-		}
-
-		return
 	}
 
 	// Map Function 5 RGB - Go straight into RGB color edit mode, don't wait for a another select press.

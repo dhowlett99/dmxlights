@@ -478,6 +478,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Bounce = command.Args[STATE].Value.(bool)
 		return sequence
 
+	case common.UpdateDirection:
+		const STATE = 0
+		if debug {
+			fmt.Printf("%d: Command Update Direction to %t\n", mySequenceNumber, command.Args[STATE].Value)
+		}
+		sequence.Reverse = command.Args[STATE].Value.(bool)
+		return sequence
+
 	case common.UpdateStatic: // Update Static will force the sequence to play the static scene.
 		const STATIC = 0
 		if debug {

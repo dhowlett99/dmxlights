@@ -123,7 +123,7 @@ func TestCalculateRGB3FixturesPositions(t *testing.T) {
 			scanner: false,
 			sequence: common.Sequence{
 				Bounce:                false,
-				ScannerReverse:        false,
+				Reverse:               false,
 				FadeUp:                []int{0, 50, 255},
 				FadeDown:              []int{255, 50, 0},
 				Optimisation:          false,
@@ -289,7 +289,7 @@ func TestCalculateRGBPositionsWithShift(t *testing.T) {
 			scanner: false,
 			sequence: common.Sequence{
 				Bounce:                false,
-				ScannerReverse:        false,
+				Reverse:               false,
 				FadeUp:                []int{0, 50, 255},
 				FadeDown:              []int{255, 50, 0},
 				Optimisation:          false,
@@ -426,7 +426,7 @@ func TestCalculatRGBBouncePositions(t *testing.T) {
 			scanner: false,
 			sequence: common.Sequence{
 				Bounce:                true,
-				ScannerReverse:        false,
+				Reverse:               false,
 				FadeUp:                []int{0, 50, 255},
 				FadeDown:              []int{255, 50, 0},
 				Optimisation:          false,
@@ -654,12 +654,12 @@ func TestApplyRGBChaseWithOnlyThreeEnabled(t *testing.T) {
 
 			scanner: false,
 			sequence: common.Sequence{
-				Type:           "rgb",
-				Bounce:         false,
-				ScannerReverse: false,
-				FadeUp:         []int{0, 50, 255},
-				FadeDown:       []int{255, 50, 0},
-				Optimisation:   true,
+				Type:         "rgb",
+				Bounce:       false,
+				Reverse:      false,
+				FadeUp:       []int{0, 50, 255},
+				FadeDown:     []int{255, 50, 0},
+				Optimisation: true,
 				FixtureState: map[int]common.FixtureState{
 					0: {
 						Enabled: true,
@@ -1049,13 +1049,13 @@ func TestApplyRGBChaseWithOnlyFourEnabledBounce(t *testing.T) {
 
 			scanner: false,
 			sequence: common.Sequence{
-				Type:           "rgb",
-				Bounce:         true,
-				ScannerReverse: false,
-				FadeUp:         []int{0, 5, 25, 50, 75, 100, 125, 150, 175, 255},
-				FadeDown:       []int{255, 175, 125, 100, 75, 50, 25, 50, 25, 0},
-				RGBShift:       5,
-				Optimisation:   true,
+				Type:         "rgb",
+				Bounce:       true,
+				Reverse:      false,
+				FadeUp:       []int{0, 5, 25, 50, 75, 100, 125, 150, 175, 255},
+				FadeDown:     []int{255, 175, 125, 100, 75, 50, 25, 50, 25, 0},
+				RGBShift:     5,
+				Optimisation: true,
 				FixtureState: map[int]common.FixtureState{
 					0: {
 						Enabled: true,
@@ -1755,7 +1755,7 @@ func TestCalculateRGBNoBounceRGBInvertedPositions(t *testing.T) {
 			sequence: common.Sequence{
 				Type:                  "rgb",
 				Bounce:                false,
-				ScannerReverse:        false,
+				Reverse:               false,
 				FadeUp:                []int{0, 50, 255},
 				FadeDown:              []int{255, 50, 0},
 				Optimisation:          false,
@@ -4906,7 +4906,7 @@ func TestCalculateRGBMulticoloredPatten(t *testing.T) {
 				scanner: false,
 				sequence: common.Sequence{
 					Bounce:                false,
-					ScannerReverse:        false,
+					Reverse:               false,
 					FadeUp:                []int{255},
 					Optimisation:          false,
 					FixtureState:          allFixturesEnabled,
@@ -5362,7 +5362,7 @@ func TestCalculateRGBShift1(t *testing.T) {
 					Bounce:                false,
 					RGBInvert:             false,
 					RGBShift:              8, // Eight is reversed so creates a shift of 2.
-					ScannerReverse:        false,
+					Reverse:               false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 4,
 					NumberFixtures:        4,
@@ -6586,7 +6586,7 @@ func Test_calculateScannerRGBInvertedCase(t *testing.T) {
 				scanner: true,
 				sequence: common.Sequence{
 					Bounce:                false,
-					ScannerReverse:        true,
+					Reverse:               true,
 					FadeUp:                []int{255},
 					FadeDown:              []int{0},
 					Optimisation:          false,
@@ -6665,7 +6665,7 @@ func Test_calculateScannerRGBInvertedBounceCase(t *testing.T) {
 				scanner: true,
 				sequence: common.Sequence{
 					Bounce:                true,
-					ScannerReverse:        true,
+					Reverse:               true,
 					FadeUp:                []int{255},
 					FadeDown:              []int{0},
 					Optimisation:          false,

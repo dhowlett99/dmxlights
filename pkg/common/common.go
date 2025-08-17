@@ -441,6 +441,7 @@ const (
 	UpdateStatic
 	UpdateFlashAllStaticColorButtons
 	UpdateBounce
+	UpdateDirection
 	UpdateAllStaticColor
 	UpdateStaticColor
 	UpdateASingeSequenceColor
@@ -617,7 +618,7 @@ type Sequence struct {
 	ScannerShift                int                         // Used for shifting scanners patterns apart.
 	ScannerGobo                 map[int]int                 // Eight scanners per sequence, each can have their own gobo.
 	ScannerChaser               bool                        // Chase the scanner shutters instead of allways being on.
-	ScannerReverse              bool                        // Reverse the scanner, i.e scan in the opposite direction.
+	Reverse                     bool                        // Reverse the sequence, i.e scan in the opposite direction.
 	ScannerColor                map[int]int                 // Eight scanners per sequence, each can have their own color.
 	ScannerCoordinates          []int                       // Number of scanner coordinates.
 	ScannerSelectedCoordinates  int                         // index into scanner coordinates.
@@ -643,6 +644,8 @@ type Function struct {
 	SequenceNumber int
 	Number         int
 	State          bool
+	State2         bool
+	Position       int
 	Flash          bool
 	Label          string
 }
@@ -793,7 +796,7 @@ type Trigger struct {
 	Channel chan Command
 }
 
-// Define the function keys.
+// Define the function keys. These match the launch pad X coordinate.
 const (
 	Function1_Pattern       = 0 // Set pattern mode.
 	Function2_Auto_Color    = 1 // Auto Color change.

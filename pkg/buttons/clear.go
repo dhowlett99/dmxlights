@@ -215,6 +215,8 @@ func FullClear(this *CurrentState, sequences []*common.Sequence, fixturesConfig 
 			this.Functions[sequenceNumber][common.Function2_Auto_Color].State = false
 			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = false
 			this.Functions[sequenceNumber][common.Function4_Bounce].State = false
+			this.Functions[sequenceNumber][common.Function4_Bounce].State2 = false
+			this.Functions[sequenceNumber][common.Function4_Bounce].Position = 0
 			this.Functions[sequenceNumber][common.Function5_Color].State = false
 			this.Functions[sequenceNumber][common.Function6_Static_Gobo].State = false
 			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = false

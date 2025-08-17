@@ -90,7 +90,7 @@ func calculateScannerPositions(sequence *common.Sequence, steps []common.Step) m
 		sequence.Optimisation = true
 
 		// Pass through the inverted / reverse flag.
-		sequence.ScannerReverse = sequence.FixtureState[fixture].ScannerPatternReversed
+		sequence.Reverse = sequence.FixtureState[fixture].ScannerPatternReversed
 		// Calulate positions for each scanner fixture.
 		fadeColors, totalNumberOfSteps := position.CalculatePositions(steps, *sequence, common.IS_SCANNER)
 		positions, numberSteps := position.AssemblePositions(fadeColors, sequence.NumberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)

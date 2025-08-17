@@ -53,7 +53,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 		steps = stepsIn
 	}
 
-	if !sequence.ScannerReverse {
+	if !sequence.Reverse {
 		// Steps forward.
 		for stepNumber, step := range steps {
 			if debug {
@@ -111,7 +111,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 		}
 	}
 
-	if sequence.Bounce || sequence.ScannerReverse {
+	if sequence.Bounce || sequence.Reverse {
 		if debug {
 			fmt.Printf("<<<<<<<<<<<<<<<<<<<<<<<<< START BOUNCE >>>>>>>>>>>>>>>>>>>>>>>>>\n")
 		}
@@ -174,7 +174,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 		}
 	}
 
-	if sequence.Bounce && sequence.ScannerReverse {
+	if sequence.Bounce && sequence.Reverse {
 		// Steps forward.
 		for stepNumber, step := range steps {
 			if debug {

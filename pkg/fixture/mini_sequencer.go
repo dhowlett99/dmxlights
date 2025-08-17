@@ -941,7 +941,7 @@ func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position,
 	}
 
 	sequence := common.Sequence{
-		ScannerReverse:       false,
+		Reverse:              false,
 		RGBInvert:            false,
 		Bounce:               false,
 		ScannerChaser:        true,
