@@ -138,7 +138,7 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 		return fadeColors
 	}
 
-	// RULE #4 - If color is different from last color and color is a black.
+	// RULE #4 - If color is different from last color and color is a black and we're not at the start.
 	if thisFixture.Color != lastFixture.Color && thisFixture.Color == colors.Black && !start {
 
 		if debug {

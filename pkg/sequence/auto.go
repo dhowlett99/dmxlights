@@ -155,7 +155,9 @@ func scannerAutoColor(steps []common.Step, sequence *common.Sequence) []common.S
 				if sequence.ScannerGobo[fixtureNumber] > totalGobosForThisFixture {
 					sequence.ScannerGobo[fixtureNumber] = 0
 				}
-				fmt.Printf("scannerAutoColor: Fixture %d Gobo %d\n", fixtureNumber, sequence.ScannerGobo[fixtureNumber])
+				if debug {
+					fmt.Printf("scannerAutoColor: Fixture %d Gobo %d\n", fixtureNumber, sequence.ScannerGobo[fixtureNumber])
+				}
 			}
 
 			// First check that this fixture has some colors configured.
@@ -171,13 +173,17 @@ func scannerAutoColor(steps []common.Step, sequence *common.Sequence) []common.S
 						sequence.ScannerColor[fixture.Number-1] = 0
 					}
 					scannerLastColor++
-					fmt.Printf("scannerAutoColor: Color %d\n", sequence.ScannerColor[fixtureNumber])
+					if debug {
+						fmt.Printf("scannerAutoColor: Color %d\n", sequence.ScannerColor[fixtureNumber])
+					}
 					continue
 				}
 			}
 		}
 	}
 
-	fmt.Printf("scannerAutoColor Ends\n")
+	if debug {
+		fmt.Printf("scannerAutoColor Ends\n")
+	}
 	return steps
 }

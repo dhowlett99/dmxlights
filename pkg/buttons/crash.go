@@ -71,19 +71,21 @@ func handleLaunchPadCrash(sequences []*common.Sequence, X int, Y int, this *Curr
 			common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
 		}
 
-		// Select last selected switch.
-		// Send a message to the sequence for it to show the current switch state.
-		cmd = common.Command{
-			Action: common.UpdateSwitch,
-			Args: []common.Arg{
-				{Name: "SwitchNumber", Value: this.LastSelectedSwitch},
-				{Name: "SwitchPosition", Value: this.SwitchPosition[this.LastSelectedSwitch]},
-				{Name: "Step", Value: false}, // Step the switch state.
-				{Name: "Focus", Value: true}, // Focus the switch lamp.
-			},
+		// Select last selected switch if its set.
+		if this.LastSelectedSwitch != common.NOT_SELECTED {
+			// Send a message to the sequence for it to show the current switch state.
+			cmd = common.Command{
+				Action: common.UpdateSwitch,
+				Args: []common.Arg{
+					{Name: "SwitchNumber", Value: this.LastSelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPosition[this.LastSelectedSwitch]},
+					{Name: "Step", Value: false}, // Step the switch state.
+					{Name: "Focus", Value: true}, // Focus the switch lamp.
+				},
+			}
+			// Send a message to the switch sequence.
+			common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
 		}
-		// Send a message to the switch sequence.
-		common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
 
 		// Show the presets again.
 		presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
