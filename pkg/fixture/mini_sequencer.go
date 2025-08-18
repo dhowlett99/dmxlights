@@ -437,9 +437,9 @@ func newMiniSequencer(fixture *Fixture,
 		if fixtureHasChannel(fixture, "Gobo") {
 			if override.Gobo > 0 {
 				cfg.Gobo = GetADMXValue(fixture, override.Gobo, "Gobo")
-				//if debug_mini {
-				fmt.Printf("Override is set so Gobo is %d DMX Vaue %d\n", override.Rotate, cfg.Gobo)
-				//}
+				if debug_mini {
+					fmt.Printf("Override is set so Gobo is %d DMX Vaue %d\n", override.Rotate, cfg.Gobo)
+				}
 			}
 		}
 
@@ -924,7 +924,7 @@ func newMiniSequencer(fixture *Fixture,
 						} else {
 							actualMaster = master
 						}
-						MapFixtures(false, false, false, mySequenceNumber, myFixtureNumber, thisFixture.Color, thisFixture.BaseColor, cfg.Pan, cfg.Tilt, cfg.Shutter, cfg.RotateSpeed, 0, cfg.Gobo, 0, 0, fixturesConfig, blackout, brightness, actualMaster, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
+						MapFixtures(false, false, false, mySequenceNumber, myFixtureNumber, thisFixture.Color, thisFixture.BaseColor, cfg.Pan, cfg.Tilt, cfg.Shutter, cfg.RotateSpeed, cfg.Program, cfg.ProgramSpeed, cfg.Gobo, cfg.ScannerColor, fixturesConfig, blackout, brightness, actualMaster, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 					}
 
 					rotateCounter++

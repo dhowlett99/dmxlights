@@ -4671,8 +4671,8 @@ fixtures:
       programspeed: ""
       strobe: ""
       strobespeed: ""
-      gobo: Open
-      gobospeed: ""
+      gobo: Auto
+      gobospeed: Medium
     flash: false
   - name: Sound
     number: 15
