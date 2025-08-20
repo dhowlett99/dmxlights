@@ -142,7 +142,7 @@ func newMiniSequencer(fixture *Fixture,
 			if debug {
 				fmt.Printf("Action OFF fade to black\n")
 			}
-			fadeDownValues := common.GetFadeValues(64, float64(master), 1, true)
+			fadeDownValues := common.GetFadeValues(64, float64(master), common.MIN_DMX_BRIGHTNESS, 1, true)
 			for _, fade := range fadeDownValues {
 				// Listen for stop command.
 				select {
@@ -455,8 +455,8 @@ func newMiniSequencer(fixture *Fixture,
 
 		// Soft start
 		// Calulate the steps
-		fadeUpValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 1, false)
-		fadeDownValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 1, true)
+		fadeUpValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), common.MIN_DMX_BRIGHTNESS, 1, false)
+		fadeDownValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), common.MIN_DMX_BRIGHTNESS, 1, true)
 
 		// Now Fade up
 		go func(lastColor common.LastColor) {
@@ -478,9 +478,14 @@ func newMiniSequencer(fixture *Fixture,
 						time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.Fade))))
 					}
 					// Fade down complete, set lastColor to empty in the fixture.
+					empty := common.LastColor{
+						RGBColor:     colors.EmptyColor,
+						ScannerColor: 0,
+						Brightness:   common.MIN_DMX_BRIGHTNESS,
+					}
 					command := common.FixtureCommand{
 						Type:      "lastColor",
-						LastColor: colors.EmptyColor,
+						LastColor: empty,
 					}
 					select {
 					case fixtureStepChannel <- command:
@@ -503,7 +508,7 @@ func newMiniSequencer(fixture *Fixture,
 				// Fade up complete, set lastColor up in the fixture.
 				command := common.FixtureCommand{
 					Type:      "lastColor",
-					LastColor: color,
+					LastColor: lastColor,
 				}
 				select {
 				case fixtureStepChannel <- command:
@@ -549,7 +554,7 @@ func newMiniSequencer(fixture *Fixture,
 			if debug {
 				fmt.Printf("Action Chase STARTUP: fade down to black from %+v\n", lastColor)
 			}
-			fadeDownValues := common.GetFadeValues(64, float64(master), 1, true)
+			fadeDownValues := common.GetFadeValues(64, float64(master), common.MIN_DMX_BRIGHTNESS, 1, true)
 			for _, fade := range fadeDownValues {
 				// Listen for stop command.
 				select {

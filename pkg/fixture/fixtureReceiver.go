@@ -67,8 +67,9 @@ func FixtureReceiver(
 
 		if cmd.Blackout {
 			// Soft fade downs should be disabled for blackout.
-			lastColor.RGBColor = cmd.LastColor
+			lastColor.RGBColor = cmd.LastColor.RGBColor
 			lastColor.ScannerColor = 0
+			lastColor.Brightness = cmd.Master
 			// Make sure we are blacked out.
 			cmd.Master = 0
 		}
@@ -101,10 +102,9 @@ func FixtureReceiver(
 
 		case cmd.Type == "lastColor":
 			if debug {
-				fmt.Printf("%d:%d LastColor set to %s\n", cmd.SequenceNumber, myFixtureNumber, common.GetColorNameByRGB(cmd.LastColor))
+				fmt.Printf("%d:%d LastColor set to %s\n", cmd.SequenceNumber, myFixtureNumber, common.GetColorNameByRGB(cmd.LastColor.RGBColor))
 			}
-			lastColor.RGBColor = cmd.LastColor
-			lastColor.ScannerColor = 0
+			lastColor = cmd.LastColor
 			continue
 
 		case cmd.Type == "switch":

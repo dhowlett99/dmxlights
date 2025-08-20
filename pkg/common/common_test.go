@@ -79,6 +79,7 @@ func Test_getFadeValues(t *testing.T) {
 	type args struct {
 		nocoordinates int
 		size          float64
+		too           int
 		fade          int
 		reverse       bool
 	}
@@ -93,6 +94,7 @@ func Test_getFadeValues(t *testing.T) {
 				nocoordinates: 10,
 				size:          255,
 				fade:          1,
+				too:           0,
 				reverse:       false, // Fade up
 			},
 			want: []int{0, 44, 87, 127, 163, 195, 220, 239, 251, 255},
@@ -103,6 +105,7 @@ func Test_getFadeValues(t *testing.T) {
 				nocoordinates: 10,
 				size:          255,
 				fade:          1,
+				too:           0,
 				reverse:       true, // Fade down
 			},
 			want: []int{255, 251, 239, 220, 195, 163, 127, 87, 44, 0},
@@ -113,6 +116,7 @@ func Test_getFadeValues(t *testing.T) {
 				nocoordinates: 10,
 				size:          255,
 				fade:          2,
+				too:           0,
 				reverse:       false, // Fade up
 			},
 			want: []int{0, 18, 51, 90, 131, 170, 205, 232, 249, 255},
@@ -123,6 +127,7 @@ func Test_getFadeValues(t *testing.T) {
 				nocoordinates: 10,
 				size:          255,
 				fade:          2,
+				too:           0,
 				reverse:       true, // Fade up
 			},
 			want: []int{255, 249, 232, 205, 170, 131, 90, 51, 18, 0},
@@ -133,6 +138,7 @@ func Test_getFadeValues(t *testing.T) {
 				nocoordinates: 10,
 				size:          255,
 				fade:          3,
+				too:           0,
 				reverse:       false, // Fade up
 			},
 			want: []int{0, 7, 29, 63, 105, 149, 191, 225, 247, 255},
@@ -143,6 +149,7 @@ func Test_getFadeValues(t *testing.T) {
 				nocoordinates: 10,
 				size:          255,
 				fade:          4,
+				too:           0,
 				reverse:       false, // Fade up
 			},
 			want: []int{0, 1, 10, 31, 67, 114, 165, 211, 243, 255},
@@ -153,6 +160,7 @@ func Test_getFadeValues(t *testing.T) {
 				nocoordinates: 10,
 				size:          255,
 				fade:          5,
+				too:           0,
 				reverse:       false, // Fade up
 			},
 			want: []int{0, 0, 3, 15, 43, 87, 143, 198, 239, 255},
@@ -163,6 +171,7 @@ func Test_getFadeValues(t *testing.T) {
 				nocoordinates: 10,
 				size:          255,
 				fade:          6,
+				too:           0,
 				reverse:       false, // Fade up
 			},
 			want: []int{0, 0, 1, 7, 27, 67, 124, 186, 236, 255},
@@ -173,6 +182,7 @@ func Test_getFadeValues(t *testing.T) {
 				nocoordinates: 10,
 				size:          255,
 				fade:          7,
+				too:           0,
 				reverse:       false, // Fade up
 			},
 			want: []int{0, 0, 0, 1, 11, 39, 93, 164, 229, 255},
@@ -183,6 +193,7 @@ func Test_getFadeValues(t *testing.T) {
 				nocoordinates: 10,
 				size:          255,
 				fade:          8,
+				too:           0,
 				reverse:       false, // Fade up
 			},
 			want: []int{0, 0, 0, 0, 3, 17, 60, 136, 218, 255},
@@ -192,6 +203,7 @@ func Test_getFadeValues(t *testing.T) {
 			args: args{
 				nocoordinates: 10,
 				size:          255,
+				too:           0,
 				fade:          9,
 				reverse:       false, // Fade up
 			},
@@ -202,6 +214,7 @@ func Test_getFadeValues(t *testing.T) {
 			args: args{
 				nocoordinates: 10,
 				size:          255,
+				too:           0,
 				fade:          10,
 				reverse:       false, // Fade up
 			},
@@ -212,15 +225,27 @@ func Test_getFadeValues(t *testing.T) {
 			args: args{
 				nocoordinates: 10,
 				size:          255,
+				too:           0,
 				fade:          10,
 				reverse:       true, // Fade down
 			},
 			want: []int{255, 161, 39, 3, 0, 0, 0, 0, 0, 0},
 		},
+		{
+			name: "Fade from 255 to 39",
+			args: args{
+				nocoordinates: 10,
+				size:          255,
+				fade:          10,
+				too:           39,
+				reverse:       true, // Fade down
+			},
+			want: []int{255, 161, 39},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetFadeValues(tt.args.nocoordinates, tt.args.size, tt.args.fade, tt.args.reverse); !reflect.DeepEqual(got, tt.want) {
+			if got := GetFadeValues(tt.args.nocoordinates, tt.args.size, tt.args.too, tt.args.fade, tt.args.reverse); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got %+v", got)
 				t.Errorf("want %+v", tt.want)
 			}

@@ -180,6 +180,7 @@ func MapFixtures(iAmAChaserSequence bool, iAmARunningChaserSequence bool, scanne
 
 	lastColor.RGBColor = color
 	lastColor.ScannerColor = scannerColor
+	lastColor.Brightness = master
 
 	return lastColor
 }

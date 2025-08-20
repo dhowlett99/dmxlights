@@ -156,6 +156,7 @@ type ALight struct {
 type LastColor struct {
 	RGBColor     color.RGBA
 	ScannerColor int
+	Brightness   int // Color is different if its at a different intensity.
 }
 
 type ColorPicker struct {
@@ -686,7 +687,7 @@ type FixtureCommand struct {
 	Label          string
 	SequenceNumber int
 	FixtureState   FixtureState
-	LastColor      color.RGBA
+	LastColor      LastColor
 
 	// Common commands.
 	Hidden         bool
@@ -1713,13 +1714,13 @@ func Reverse12(in int) int {
 
 // CalculateFadeValues - calculate fade curve values.
 func CalculateFadeValues(sequence *Sequence) {
-	sequence.FadeUp = GetFadeValues(sequence.RGBNumberStepsInFade, MAX_DMX_BRIGHTNESS, sequence.RGBFade, false)
+	sequence.FadeUp = GetFadeValues(sequence.RGBNumberStepsInFade, MAX_DMX_BRIGHTNESS, MIN_DMX_BRIGHTNESS, sequence.RGBFade, false)
 	sequence.FadeOn = GetFadeOnValues(MAX_DMX_BRIGHTNESS, sequence.RGBSize)
-	sequence.FadeDown = GetFadeValues(sequence.RGBNumberStepsInFade, MAX_DMX_BRIGHTNESS, sequence.RGBFade, true)
+	sequence.FadeDown = GetFadeValues(sequence.RGBNumberStepsInFade, MAX_DMX_BRIGHTNESS, MIN_DMX_BRIGHTNESS, sequence.RGBFade, true)
 	sequence.FadeOff = GetFadeOnValues(MIN_DMX_BRIGHTNESS, sequence.RGBSize)
 }
 
-func GetFadeValues(noCoordinates int, size float64, fade int, reverse bool) (out []int) {
+func GetFadeValues(noCoordinates int, from float64, too int, fade int, reverse bool) (out []int) {
 
 	var x float64
 	var counter float64
@@ -1756,14 +1757,17 @@ func GetFadeValues(noCoordinates int, size float64, fade int, reverse bool) (out
 		for counter = 0; counter <= coordinates-1; counter++ {
 			x = (counter / 2) / (coordinates - 1)
 			y := math.Pow(math.Sin(x*math.Pi), slope)
-			dmx := int(size * y)
+			dmx := int(from * y)
 			out = append(out, dmx)
 		}
 	} else {
 		for counter = coordinates - 1; counter >= 0; counter-- {
 			x = (counter / 2) / (coordinates - 1)
 			y := math.Pow(math.Sin(x*math.Pi), slope)
-			dmx := int(size * y)
+			dmx := int(from * y)
+			if dmx < too {
+				return out
+			}
 			out = append(out, dmx)
 		}
 	}
