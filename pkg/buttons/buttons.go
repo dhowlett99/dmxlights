@@ -155,7 +155,7 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function1_Pattern].State &&
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
-		!this.Static[this.EditWhichStaticSequence] &&
+		!this.Static[Y] &&
 		!this.ShowRGBColorPicker &&
 		!this.ShowStaticColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
