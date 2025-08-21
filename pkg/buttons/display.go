@@ -26,18 +26,24 @@ import (
 
 // Select modes.
 const (
-	NORMAL                int = iota // Normal RGB or Scanner Rotation display.
-	NORMAL_STATIC                    // Normal RGB in edit all static fixtures.
-	FUNCTION                         // Show the RGB or Scanner functions.
-	CHASER_DISPLAY                   //  Show the scanner shutter display.
-	CHASER_DISPLAY_STATIC            //  Shutter chaser in edit all fixtures mode.
-	CHASER_FUNCTION                  // Show the scammer shutter chaser functions.
-	STATUS                           // Show the fixture status states.
+	NORMAL                 int = iota // Normal RGB or Scanner Rotation display.
+	EDIT_STATIC                       // Normal RGB in edit individual static fixtures.
+	EDIT_ALL_STATIC                   // Normal RGB in edit all static fixtures.
+	FUNCTION                          // Show the RGB or Scanner functions.
+	CHASER_DISPLAY                    //  Show the scanner shutter display.
+	CHASER_EDIT_STATIC                //  Shutter chaser in edit all fixtures mode.
+	CHASER_EDIT_ALL_STATIC            //  Shutter chaser in edit all fixtures mode.
+	CHASER_FUNCTION                   // Show the scammer shutter chaser functions.
+	STATUS                            // Show the fixture status states.
 )
 
 func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	debug := false
+
+	if debug {
+		fmt.Printf("displayMode %s\n", printMode(mode))
+	}
 
 	// Show this sequence running status in the start/stop button.
 	common.ShowRunningStatus(this.Running[sequenceNumber], eventsForLaunchpad, guiButtons)
@@ -63,6 +69,13 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			this.WasStatic[sequenceNumber] = false
 		}
 
+		// Start any static scene in this sequence.
+		if sequences[sequenceNumber].Static {
+			this.Static[sequenceNumber] = true
+			this.WasStatic[sequenceNumber] = true
+			common.StartStaticSequence(sequenceNumber, commandChannels)
+		}
+
 		// Make sure we hide the shutter chaser.
 		if this.SequenceType[sequenceNumber] == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
@@ -82,18 +95,42 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		return
 
-	case mode == NORMAL_STATIC:
+	case mode == EDIT_STATIC:
 
 		if debug {
-			fmt.Printf("%d: DisplayMode: NORMAL STATIC\n", sequenceNumber)
+			fmt.Printf("%d: DisplayMode: EDIT_STATIC\n", sequenceNumber)
 		}
 
-		// Start the static scene in this sequence.
-		if sequences[sequenceNumber].Static {
-			this.Static[sequenceNumber] = true
-			this.WasStatic[sequenceNumber] = true
-			common.StartStaticSequence(sequenceNumber, commandChannels)
+		// Select individual fixtures.
+		this.SelectAllStaticFixtures = false
+
+		// Make sure we hide the shutter chaser.
+		if this.SequenceType[sequenceNumber] == "scanner" {
+			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
+
+		common.RevealSequence(sequenceNumber, commandChannels)
+
+		// Label the select button to let you know your in edit individual static mode.
+		if this.SelectedSequence < 3 {
+			if this.SelectedSequence == sequenceNumber {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			} else {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			}
+			common.LabelButton(8, this.SelectedSequence, "Edit Static", guiButtons)
+		}
+
+		return
+
+	case mode == EDIT_ALL_STATIC:
+
+		if debug {
+			fmt.Printf("%d: DisplayMode: EDIT_ALL_STATIC \n", sequenceNumber)
+		}
+
+		// Select all fixtures.
+		this.SelectAllStaticFixtures = true
 
 		if sequences[sequenceNumber].Type == "scanner" {
 			// Make sure we hide any rotates and show chaser.
@@ -104,14 +141,14 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			common.RevealSequence(sequenceNumber, commandChannels)
 		}
 
-		// Label the select button to let you know your in static mode.
+		// Label the select button to let you know your in edit all static mode.
 		if this.SelectedSequence < 3 {
 			if this.SelectedSequence == sequenceNumber {
 				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			} else {
 				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			}
-			common.LabelButton(8, this.SelectedSequence, "Static >", guiButtons)
+			common.LabelButton(8, this.SelectedSequence, "Edit Static All >", guiButtons)
 		}
 
 		return
@@ -140,10 +177,37 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		return
 
-	case mode == CHASER_DISPLAY_STATIC:
+	case mode == CHASER_EDIT_STATIC:
 
 		if debug {
-			fmt.Printf("%d: DisplayMode: CHASER_DISPLAY_STATIC\n", sequenceNumber)
+			fmt.Printf("%d: DisplayMode: CHASER_EDIT_STATIC\n", sequenceNumber)
+		}
+
+		// Hide the selected sequence.
+		common.HideSequence(sequenceNumber, commandChannels)
+
+		// Reveal the chaser sequence.
+		common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
+
+		// Select individual fixtures.
+		this.SelectAllStaticFixtures = false
+
+		// Label the select button to let you know your in chaser mode.
+		if this.SelectedSequence < 3 {
+			if this.SelectedSequence == sequenceNumber {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			} else {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			}
+			common.LabelButton(8, this.SelectedSequence, "Edit Static", guiButtons)
+		}
+
+		return
+
+	case mode == CHASER_EDIT_ALL_STATIC:
+
+		if debug {
+			fmt.Printf("%d: DisplayMode: CHASER_EDIT_ALL_STATIC\n", sequenceNumber)
 		}
 
 		// Hide the selected sequence.
@@ -162,7 +226,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			} else {
 				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			}
-			common.LabelButton(8, this.SelectedSequence, "Chaser >", guiButtons)
+			common.LabelButton(8, this.SelectedSequence, "Edit Static All >", guiButtons)
 		}
 
 		return
@@ -259,15 +323,22 @@ func printMode(mode int) string {
 	if mode == NORMAL {
 		return "    NORMAL     "
 	}
-	if mode == NORMAL_STATIC {
-		return "    STATIC     "
+	if mode == EDIT_STATIC {
+		return "  EDITSTATIC   "
+	}
+	if mode == EDIT_ALL_STATIC {
+		return " EDITALLSTATIC "
 	}
 	if mode == CHASER_DISPLAY {
 		return "    CHASER     "
 	}
-	if mode == CHASER_DISPLAY_STATIC {
-		return " CHASER_STATIC "
+	if mode == CHASER_EDIT_STATIC {
+		return " CHASER_EDIT_ALL_STATIC "
 	}
+	if mode == CHASER_EDIT_ALL_STATIC {
+		return " FUNCTION "
+	}
+
 	if mode == FUNCTION {
 		return "   FUNCTION    "
 	}

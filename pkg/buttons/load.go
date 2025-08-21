@@ -118,11 +118,7 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 		this.ShowRGBColorPicker = false
 
 		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
-		if this.Static[sequenceNumber] {
-			// So adjust the mode to be NORMAL_STATIC
-			this.SelectedMode[sequenceNumber] = NORMAL_STATIC
-		}
-
+		// TODO
 		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
 		if this.SequenceType[sequenceNumber] == "scanner" && this.ScannerChaser[this.ScannerSequenceNumber] {
 			// So adjust the mode to be CHASER_DISPLAY

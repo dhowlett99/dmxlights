@@ -83,7 +83,8 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 	debug := false
 
 	if this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY ||
-		this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY_STATIC ||
+		this.SelectedMode[this.SelectedSequence] == CHASER_EDIT_STATIC ||
+		this.SelectedMode[this.SelectedSequence] == CHASER_EDIT_ALL_STATIC ||
 		this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION {
 
 		this.TargetSequence = this.ChaserSequenceNumber

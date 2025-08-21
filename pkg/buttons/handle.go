@@ -181,12 +181,26 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 	// If selected show the static sequence.
 	if this.Static[this.TargetSequence] {
-		if this.SelectedMode[this.DisplaySequence] == NORMAL_STATIC || this.SelectedMode[this.DisplaySequence] == CHASER_DISPLAY_STATIC {
-			this.StaticFlashing[this.TargetSequence] = true
-			this.SelectAllStaticFixtures = true
-		} else {
+
+		if this.SelectedMode[this.DisplaySequence] == NORMAL ||
+			this.SelectedMode[this.DisplaySequence] == CHASER_DISPLAY {
+
 			this.StaticFlashing[this.TargetSequence] = false
 			this.SelectAllStaticFixtures = false
+		}
+
+		if this.SelectedMode[this.DisplaySequence] == EDIT_STATIC ||
+			this.SelectedMode[this.DisplaySequence] == CHASER_EDIT_STATIC {
+
+			this.StaticFlashing[this.TargetSequence] = false
+			this.SelectAllStaticFixtures = false
+		}
+
+		if this.SelectedMode[this.DisplaySequence] == EDIT_ALL_STATIC ||
+			this.SelectedMode[this.DisplaySequence] == CHASER_EDIT_ALL_STATIC {
+
+			this.StaticFlashing[this.TargetSequence] = true
+			this.SelectAllStaticFixtures = true
 		}
 		common.ShowStaticButtons(sequences[this.TargetSequence], this.StaticFlashing[this.TargetSequence], eventsForLaunchpad, guiButtons)
 	}
@@ -283,7 +297,9 @@ func removeColorPicker(this *CurrentState, sequences []*common.Sequence, eventsF
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
-			this.SelectedMode[sequenceNumber] = NORMAL
+			// Don't change modes so we can continue to edit
+			// fixtures in the static scene.
+			// this.SelectedMode[sequenceNumber] = NORMAL
 
 			if this.Static[sequenceNumber] {
 				common.ShowStaticButtons(sequence, false, eventsForLaunchpad, guiButtons)

@@ -530,10 +530,10 @@ func ProcessButtons(X int, Y int,
 		Y != -1 &&
 		!this.EditFixtureSelectionMode &&
 		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
-		(this.SelectedMode[this.SelectedSequence] == NORMAL ||
-			this.SelectedMode[this.SelectedSequence] == NORMAL_STATIC ||
-			this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY ||
-			this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY_STATIC) && // Not in function Mode
+		(this.SelectedMode[this.SelectedSequence] == EDIT_STATIC ||
+			this.SelectedMode[this.SelectedSequence] == EDIT_ALL_STATIC ||
+			this.SelectedMode[this.SelectedSequence] == CHASER_EDIT_STATIC ||
+			this.SelectedMode[this.SelectedSequence] == CHASER_EDIT_ALL_STATIC) && // Not in function Mode
 		!this.ShowStaticColorPicker && // Not In Color Picker Mode.
 		getStatic(this) { // Static Function On in any sequence
 
