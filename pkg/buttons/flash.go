@@ -19,6 +19,7 @@ package buttons
 
 import (
 	"fmt"
+	"image/color"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
@@ -27,24 +28,24 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
-func flashOn(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *fixture.Fixtures, dmxController *ft232.DMXController) {
+func flashOn(sequence common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *fixture.Fixtures, dmxController *ft232.DMXController) {
 
 	// If we press a fixture button that doesn't have a real fixture behind it, then give up.
-	if X == sequences[Y].NumberFixtures {
+	if X == sequence.NumberFixtures {
 		return
 	}
 
-	this.SelectedType = sequences[Y].Type
+	this.SelectedType = sequence.Type
 
 	if debug {
-		fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d Target Seq %d Fixtures=%d\n", X, Y, this.TargetSequence, sequences[Y].NumberFixtures)
+		fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d Target Seq %d Fixtures=%d\n", X, Y, this.TargetSequence, sequence.NumberFixtures)
 	}
 
 	colorPattern := 5
 	flashSequence := common.Sequence{
 		Pattern: common.Pattern{
 			Name:  "colors",
-			Steps: sequences[Y].RGBAvailablePatterns[colorPattern].Steps, // Use the color pattern for flashing.
+			Steps: sequence.RGBAvailablePatterns[colorPattern].Steps, // Use the color pattern for flashing.
 		},
 	}
 
@@ -59,24 +60,44 @@ func flashOn(sequences []*common.Sequence, X int, Y int, this *CurrentState, eve
 	programSpeed := flashSequence.Pattern.Steps[X].Fixtures[X].ProgramSpeed
 
 	if this.SelectedType == "rgb" {
-		common.LightLamp(common.Button{X: X, Y: Y}, color, this.MasterBrightness[this.TargetSequence], eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(false, false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness[this.TargetSequence], this.MasterBrightness[this.TargetSequence], music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
+		common.LightLamp(common.Button{X: X, Y: Y}, color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+		fixture.MapFixtures(false, false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, common.MAX_DMX_BRIGHTNESS, common.MAX_DMX_BRIGHTNESS, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 	}
 	if this.SelectedType == "scanner" {
 		common.LightLamp(common.Button{X: X, Y: Y}, colors.White, this.MasterBrightness[this.TargetSequence], eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(false, false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness[this.TargetSequence], this.MasterBrightness[this.TargetSequence], music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
+		fixture.MapFixtures(false, false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, common.MAX_DMX_BRIGHTNESS, common.MAX_DMX_BRIGHTNESS, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 	}
 
 	if this.GUI {
 		time.Sleep(200 * time.Millisecond)
-		brightness := 0
-		master := 0
-		common.LightLamp(common.Button{X: X, Y: Y}, colors.Black, common.MIN_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+		fixtureColor, master, brightness := handleStatic(sequence, Y, X)
+		common.LightLamp(common.Button{X: X, Y: Y}, fixtureColor, brightness, eventsForLaunchpad, guiButtons)
 		fixture.MapFixtures(false, false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, brightness, master, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 	}
 }
 
-func flashOff(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *fixture.Fixtures, dmxController *ft232.DMXController) {
+func handleStatic(sequence common.Sequence, sequenceNumber int, fixtureNumber int) (color.RGBA, int, int) {
+
+	var master int
+	var brightness int
+	var fixtureColor color.RGBA
+
+	// Check for any static color for this fixture.
+	if sequence.Static {
+		// Restore the static color.
+		master = 255
+		brightness = sequence.Master
+		fixtureColor = sequence.StaticColors[fixtureNumber].Color
+	} else {
+		// Switch off.
+		master = 0
+		brightness = 0
+		fixtureColor = colors.Black
+	}
+	return fixtureColor, master, brightness
+}
+
+func flashOff(sequence common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *fixture.Fixtures, dmxController *ft232.DMXController) {
 
 	if debug {
 		fmt.Printf("Flash OFF Fixture Pressed X:%d Y:%d\n", X, Y)
@@ -95,6 +116,9 @@ func flashOff(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.A
 	brightness := 0
 	master := 0
 
-	common.LightLamp(common.Button{X: X, Y: Y}, colors.Black, common.MIN_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-	fixture.MapFixtures(false, false, false, Y, X, colors.Black, colors.Black, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, brightness, master, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
+	// Check for static.
+	fixtureColor, master, brightness := handleStatic(sequence, Y, X)
+
+	common.LightLamp(common.Button{X: X, Y: Y}, fixtureColor, brightness, eventsForLaunchpad, guiButtons)
+	fixture.MapFixtures(false, false, false, Y, X, fixtureColor, fixtureColor, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, brightness, master, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 }

@@ -153,16 +153,14 @@ func ProcessButtons(X int, Y int,
 		Y >= 0 &&
 		Y < 4 &&
 		!this.Functions[Y][common.Function1_Pattern].State &&
-		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
-		!this.Static[Y] &&
 		!this.ShowRGBColorPicker &&
 		!this.ShowStaticColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		(this.SelectedMode[Y] == NORMAL || this.SelectedMode[Y] == CHASER_DISPLAY) { // As long as we're in normal or shutter chaser mode for this sequence.
 
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		flashOn(sequences, X, Y, this, eventsForLaunchpad, guiButtons, fixturesConfig, dmxController)
+		flashOn(*sequences[Y], X, Y, this, eventsForLaunchpad, guiButtons, fixturesConfig, dmxController)
 		return
 	}
 
@@ -172,15 +170,14 @@ func ProcessButtons(X int, Y int,
 		X >= 100 && X < 117 &&
 		Y >= 0 && Y < 4 &&
 		!this.Functions[Y][common.Function1_Pattern].State &&
-		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
 		!this.ShowRGBColorPicker &&
 		!this.ShowStaticColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
-		this.SelectedMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
+		(this.SelectedMode[Y] == NORMAL || this.SelectedMode[Y] == CHASER_DISPLAY) { // As long as we're in normal or shutter chaser mode for this sequence.
 
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		flashOff(X, Y, this, eventsForLaunchpad, guiButtons, fixturesConfig, dmxController)
+		flashOff(*sequences[Y], X, Y, this, eventsForLaunchpad, guiButtons, fixturesConfig, dmxController)
 		return
 	}
 
