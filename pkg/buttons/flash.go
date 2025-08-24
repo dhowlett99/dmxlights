@@ -70,13 +70,13 @@ func flashOn(sequence common.Sequence, X int, Y int, this *CurrentState, eventsF
 
 	if this.GUI {
 		time.Sleep(200 * time.Millisecond)
-		fixtureColor, master, brightness := handleStatic(sequence, Y, X)
+		fixtureColor, master, brightness := handleStatic(sequence, X)
 		common.LightLamp(common.Button{X: X, Y: Y}, fixtureColor, brightness, eventsForLaunchpad, guiButtons)
 		fixture.MapFixtures(false, false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, brightness, master, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 	}
 }
 
-func handleStatic(sequence common.Sequence, sequenceNumber int, fixtureNumber int) (color.RGBA, int, int) {
+func handleStatic(sequence common.Sequence, fixtureNumber int) (color.RGBA, int, int) {
 
 	var master int
 	var brightness int
@@ -117,7 +117,7 @@ func flashOff(sequence common.Sequence, X int, Y int, this *CurrentState, events
 	master := 0
 
 	// Check for static.
-	fixtureColor, master, brightness := handleStatic(sequence, Y, X)
+	fixtureColor, master, brightness := handleStatic(sequence, X)
 
 	common.LightLamp(common.Button{X: X, Y: Y}, fixtureColor, brightness, eventsForLaunchpad, guiButtons)
 	fixture.MapFixtures(false, false, false, Y, X, fixtureColor, fixtureColor, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, brightness, master, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)

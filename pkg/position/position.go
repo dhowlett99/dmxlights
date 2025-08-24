@@ -253,7 +253,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	return fadeColors, totalNumberOfSteps
 }
 
-func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures int, totalNumberOfSteps int, fixtureState map[int]common.FixtureState, optimisation bool) (map[int]common.Position, int) {
+func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures int, totalNumberOfSteps int, fixtureState []common.FixtureState, optimisation bool) (map[int]common.Position, int) {
 
 	if debug {
 		fmt.Printf("assemblePositions\n")
@@ -356,7 +356,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 	return positionsOut, len(positionsOut)
 }
 
-func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colorsIn []color.RGBA, fixtureState map[int]common.FixtureState) []common.Step {
+func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colorsIn []color.RGBA, fixtureState []common.FixtureState) []common.Step {
 
 	var insertColor int
 	numberColors := len(colorsIn)
@@ -429,7 +429,7 @@ func hasColor(color color.RGBA) bool {
 // steps that have no enabled fixtures AND also disabling in the fixture package. If we only disable here we don't
 // catch steps that have more than one fixture alight in any one step.
 // So make sure you also turn off the fixture in the fixture receiver.
-func ApplyFixtureState(patternIn common.Pattern, scannerState map[int]common.FixtureState) common.Pattern {
+func ApplyFixtureState(patternIn common.Pattern, scannerState []common.FixtureState) common.Pattern {
 
 	generatedSteps := patternIn.Steps
 

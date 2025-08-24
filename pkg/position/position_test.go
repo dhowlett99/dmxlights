@@ -28,7 +28,7 @@ import (
 
 const full int = 255
 
-var allFixturesEnabled = map[int]common.FixtureState{
+var allFixturesEnabled = []common.FixtureState{
 	0: {
 		Enabled: true,
 	},
@@ -55,7 +55,7 @@ var allFixturesEnabled = map[int]common.FixtureState{
 	},
 }
 
-var threeFixturesRGBInverted = map[int]common.FixtureState{
+var threeFixturesRGBInverted = []common.FixtureState{
 	0: {
 		Enabled:     true,
 		RGBInverted: true,
@@ -70,7 +70,7 @@ var threeFixturesRGBInverted = map[int]common.FixtureState{
 	},
 }
 
-var allFixturesRGBInverted = map[int]common.FixtureState{
+var allFixturesRGBInverted = []common.FixtureState{
 	0: {
 		Enabled:     true,
 		RGBInverted: true,
@@ -660,7 +660,7 @@ func TestApplyRGBChaseWithOnlyThreeEnabled(t *testing.T) {
 				FadeUp:       []int{0, 50, 255},
 				FadeDown:     []int{255, 50, 0},
 				Optimisation: true,
-				FixtureState: map[int]common.FixtureState{
+				FixtureState: []common.FixtureState{
 					0: {
 						Enabled: true,
 					},
@@ -1056,7 +1056,7 @@ func TestApplyRGBChaseWithOnlyFourEnabledBounce(t *testing.T) {
 				FadeDown:     []int{255, 175, 125, 100, 75, 50, 25, 50, 25, 0},
 				RGBShift:     5,
 				Optimisation: true,
-				FixtureState: map[int]common.FixtureState{
+				FixtureState: []common.FixtureState{
 					0: {
 						Enabled: true,
 					},
@@ -1910,7 +1910,7 @@ func TestAssemblePositions(t *testing.T) {
 	tests := []struct {
 		name               string
 		fadeColors         map[int][]common.FixtureBuffer
-		fixtureState       map[int]common.FixtureState
+		fixtureState       []common.FixtureState
 		numberFixtures     int
 		totalNumberOfSteps int
 		want               map[int]common.Position
@@ -2274,7 +2274,7 @@ func TestAssemblePositionsOnlyThreeEnabled(t *testing.T) {
 	tests := []struct {
 		name               string
 		fadeColors         map[int][]common.FixtureBuffer
-		fixtureState       map[int]common.FixtureState
+		fixtureState       []common.FixtureState
 		numberFixtures     int
 		totalNumberOfSteps int
 		optimisation       bool
@@ -2285,7 +2285,7 @@ func TestAssemblePositionsOnlyThreeEnabled(t *testing.T) {
 			optimisation:       false,
 			numberFixtures:     3,
 			totalNumberOfSteps: 18,
-			fixtureState: map[int]common.FixtureState{
+			fixtureState: []common.FixtureState{
 				0: {
 					Enabled: true,
 				},
@@ -3011,7 +3011,7 @@ func TestCalculatePositionsOnlyFourEnabledBounceAndShiftOfFive(t *testing.T) {
 		optimisation       bool
 		want               map[int]common.Position
 		want1              int
-		fixtureState       map[int]common.FixtureState
+		fixtureState       []common.FixtureState
 	}{
 		{
 			name:               "Eight Fitures but only four enabled, bounce and shift on",
@@ -3019,7 +3019,7 @@ func TestCalculatePositionsOnlyFourEnabledBounceAndShiftOfFive(t *testing.T) {
 			numberFixtures:     8,
 			totalNumberOfSteps: 70,
 			want1:              70,
-			fixtureState: map[int]common.FixtureState{
+			fixtureState: []common.FixtureState{
 				0: {
 					Enabled: true,
 				},
@@ -6748,7 +6748,7 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 		steps          []common.Step
 		colors         []color.RGBA
 		numberFixtures int
-		fixtureState   map[int]common.FixtureState
+		fixtureState   []common.FixtureState
 	}
 	tests := []struct {
 		name string
@@ -6837,7 +6837,7 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 func TestApplyScannerState2And4Disabled(t *testing.T) {
 	type args struct {
 		steps        []common.Step
-		scannerState map[int]common.FixtureState
+		scannerState []common.FixtureState
 	}
 	tests := []struct {
 		name string
@@ -6945,7 +6945,7 @@ func TestApplyScannerState2And4Disabled(t *testing.T) {
 						},
 					},
 				},
-				scannerState: map[int]common.FixtureState{
+				scannerState: []common.FixtureState{
 					0: {
 						Enabled: true,
 					},
@@ -7079,7 +7079,7 @@ func TestApplyScannerState2And4Disabled(t *testing.T) {
 func TestApplyScannerState4Enabled4Disabled(t *testing.T) {
 	type args struct {
 		steps        []common.Step
-		scannerState map[int]common.FixtureState
+		scannerState []common.FixtureState
 	}
 	tests := []struct {
 		name string
@@ -7187,7 +7187,7 @@ func TestApplyScannerState4Enabled4Disabled(t *testing.T) {
 						},
 					},
 				},
-				scannerState: map[int]common.FixtureState{
+				scannerState: []common.FixtureState{
 					0: {
 						Enabled: true,
 					},
@@ -7284,7 +7284,7 @@ func TestApplyScannerState4Enabled4Disabled(t *testing.T) {
 func TestApplyScannerStateAllEnabled(t *testing.T) {
 	type args struct {
 		steps        []common.Step
-		scannerState map[int]common.FixtureState
+		scannerState []common.FixtureState
 	}
 	tests := []struct {
 		name string
@@ -7308,7 +7308,7 @@ func TestApplyScannerStateAllEnabled(t *testing.T) {
 						},
 					},
 				},
-				scannerState: map[int]common.FixtureState{
+				scannerState: []common.FixtureState{
 					0: {
 						Enabled: true,
 					},
@@ -7351,7 +7351,7 @@ func TestApplyScannerStateAllEnabled(t *testing.T) {
 func TestApplyScannerStateFirst4Disabled(t *testing.T) {
 	type args struct {
 		steps        []common.Step
-		scannerState map[int]common.FixtureState
+		scannerState []common.FixtureState
 	}
 	tests := []struct {
 		name string
@@ -7460,7 +7460,7 @@ func TestApplyScannerStateFirst4Disabled(t *testing.T) {
 						},
 					},
 				},
-				scannerState: map[int]common.FixtureState{
+				scannerState: []common.FixtureState{
 					0: {
 						Enabled: false, // Disabled.
 					},

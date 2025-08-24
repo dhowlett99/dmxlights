@@ -59,7 +59,7 @@ func InvertAllFixtures(sequenceNumber int, commandChannels []chan common.Command
 
 }
 
-func GetFixtureStatus(selectedSequence int, commandChannels []chan common.Command, updateChannels []chan common.Sequence) map[int]common.FixtureState {
+func GetFixtureStatus(selectedSequence int, commandChannels []chan common.Command, updateChannels []chan common.Sequence) []common.FixtureState {
 
 	// Get an upto date copy of the sequence.
 	sequence := common.RefreshSequence(selectedSequence, commandChannels, updateChannels)

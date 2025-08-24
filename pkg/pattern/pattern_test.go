@@ -97,7 +97,7 @@ func Test_circleGenerator(t *testing.T) {
 
 func Test_generateScannerPattern(t *testing.T) {
 
-	allFixturesEnabled := map[int]common.FixtureState{
+	allFixturesEnabled := []common.FixtureState{
 		0: {
 			Enabled: true,
 		},
@@ -129,7 +129,7 @@ func Test_generateScannerPattern(t *testing.T) {
 		fixtures     int
 		shift        int
 		chase        bool
-		scannerState map[int]common.FixtureState
+		scannerState []common.FixtureState
 		Coordinates  []Coordinate
 		want         common.Pattern
 	}{

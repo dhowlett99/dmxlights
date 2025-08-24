@@ -624,7 +624,7 @@ type Sequence struct {
 	ScannerSelectedCoordinates  int                         // index into scanner coordinates.
 	ScannerOffsetPan            int                         // Offset for pan values.
 	ScannerOffsetTilt           int                         // Offset for tilt values.
-	FixtureState                map[int]FixtureState        // Map of fixtures which are disabled.
+	FixtureState                []FixtureState              // Map of fixtures which are disabled.
 	DisableOnce                 map[int]bool                // Map used to play disable only once.
 	UpdateSize                  bool                        // Command to update size.
 	UpdateShift                 bool                        // Command to update the shift.

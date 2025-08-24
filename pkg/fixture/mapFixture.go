@@ -270,13 +270,15 @@ func SetMaster(channel Channel, fixture Fixture, channelNumber int, master int, 
 
 }
 
-func SetColorByNumber(channel Channel, fixture Fixture, channelNumber int, color int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func SetColorByNumber(channel Channel, fixture Fixture, channelNumber int, color int, dmxController *ft232.DMXController, dmxInterfacePresent bool) (int16, int) {
 	for _, setting := range channel.Settings {
-		if setting.Number == color {
+		if setting.Number == color+1 {
 			v, _ := strconv.Atoi(setting.Value)
 			SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+			return fixture.Address + int16(channelNumber), v
 		}
 	}
+	return 0, 0
 }
 
 func SetColorByName(channel Channel, fixture Fixture, channelNumber int, colorName string, dmxController *ft232.DMXController, dmxInterfacePresent bool) {

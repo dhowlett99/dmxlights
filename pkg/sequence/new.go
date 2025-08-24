@@ -90,7 +90,7 @@ func NewSequence(
 	// Enable all the defined fixtures.
 	// RGB Invert set to false
 	// Scanner Pattern not reversed.
-	fixtureState := make(map[int]common.FixtureState, numberFixtures) // Make space for the fixture states.
+	fixtureState := make([]common.FixtureState, numberFixtures) // Make space for the fixture states.
 	for fixtureNumber := 0; fixtureNumber < numberFixtures; fixtureNumber++ {
 		newFixture := common.FixtureState{}
 		newFixture.Enabled = true

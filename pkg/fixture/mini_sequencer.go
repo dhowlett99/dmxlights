@@ -970,7 +970,7 @@ func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position,
 	common.CalculateFadeValues(&sequence)
 	// Calulate positions for each RGB fixture.
 	sequence.Optimisation = false
-	sequence.FixtureState = map[int]common.FixtureState{
+	sequence.FixtureState = []common.FixtureState{
 		0: {
 			Enabled: true,
 		},

@@ -95,7 +95,7 @@ type scanner struct {
 
 // GenerateScannerPattern takes an array of Coordinates and turns them into a pattern
 // which is the starting point for all scanner sequence steps.
-func GenerateScannerPattern(Coordinates []Coordinate, NumberFixtures int, requestedShift int, chase bool, scannerState map[int]common.FixtureState) common.Pattern {
+func GenerateScannerPattern(Coordinates []Coordinate, NumberFixtures int, requestedShift int, chase bool, scannerState []common.FixtureState) common.Pattern {
 
 	NumberCoordinates := len(Coordinates)
 
@@ -228,7 +228,7 @@ type Coordinate struct {
 	Pan  int
 }
 
-func GetNumberEnabledScanners(scannerState map[int]common.FixtureState, numberOfFixtures int) int {
+func GetNumberEnabledScanners(scannerState []common.FixtureState, numberOfFixtures int) int {
 
 	var getNumberEnabledScanners int
 	for fixture := 0; fixture < numberOfFixtures; fixture++ {

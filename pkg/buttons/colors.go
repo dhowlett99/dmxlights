@@ -165,7 +165,7 @@ func selectScannerColor(sequences []*common.Sequence, X int, Y int, this *Curren
 	}
 	common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
-	// Add the selected color to the sequence.
+	// Add the selected color to the chaser sequence.
 	if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
 		cmd := common.Command{
 			Action: common.UpdateScannerColor,
