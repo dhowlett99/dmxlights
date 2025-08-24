@@ -36,13 +36,17 @@ func Clear(this *CurrentState, sequences []*common.Sequence, fixturesConfig *fix
 	}
 
 	if debug {
+		fmt.Printf("Selected Mode %s\n", printMode(this.SelectedMode[this.TargetSequence]))
 		fmt.Printf("Target Sequence %d\n", this.TargetSequence)
 		fmt.Printf("Display Sequence %d\n", this.DisplaySequence)
 		fmt.Printf("Which Static Sequnece are we Editing %d\n", this.EditWhichStaticSequence)
+		fmt.Printf("ShowRGBColorPicker %t\n", this.ShowRGBColorPicker)
+		fmt.Printf("ClearPressed %t\n", this.ClearPressed[this.TargetSequence])
+		fmt.Printf("Static Which %d %t\n", this.EditWhichStaticSequence, this.Static[this.EditWhichStaticSequence])
 	}
 
 	// Shortcut to clear rgb chase colors. We want to clear a color selection for a selected sequence.
-	if this.ShowRGBColorPicker && !this.ClearPressed[this.TargetSequence] && this.SelectedMode[this.TargetSequence] != NORMAL {
+	if this.ShowRGBColorPicker && !this.ClearPressed[this.TargetSequence] {
 
 		if debug {
 			fmt.Printf("Shortcut to clear rgb chase colors\n")
