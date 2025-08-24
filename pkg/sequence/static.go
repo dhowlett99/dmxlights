@@ -114,6 +114,7 @@ func stopStatic(mySequenceNumber int, sequence *common.Sequence, channels common
 		ScannerChaser:     sequence.ScannerChaser,
 		RGBStaticOff:      true,
 		RGBStaticColors:   sequence.StaticColors,
+		RGBStaticFadeUp:   false,
 		RGBFade:           sequence.RGBFade,
 		ScannerOffsetPan:  sequence.ScannerOffsetPan,
 		ScannerOffsetTilt: sequence.ScannerOffsetTilt,

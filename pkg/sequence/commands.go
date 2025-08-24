@@ -23,14 +23,13 @@ import (
 )
 
 func processCommands(sequence *common.Sequence, channels common.Channels, fixtureStepChannels []chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
-
 	// Clear all fixtures.
-	if sequence.Clear {
+	if sequence.ClearAllFixtures {
 		if debug {
 			fmt.Printf("%d: Clear\n", sequence.Number)
 		}
 		clearSequence(sequence.Number, sequence, fixtureStepChannels)
-		sequence.Clear = false
+		sequence.ClearAllFixtures = false
 	}
 
 	// Show all switches.

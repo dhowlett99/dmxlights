@@ -129,9 +129,13 @@ func updateRGBSteps(steps []common.Step, availablePatterns []common.Pattern, seq
 	return steps
 }
 
-func clearFixture(fixtureNumber int, fixtureStepChannels []chan common.FixtureCommand) {
+func stepClearFixture(fixtureNumber int, fixtureStepChannels []chan common.FixtureCommand) {
+	if debug {
+		fmt.Printf("stepClearFixture number %d\n", fixtureNumber)
+	}
+
 	command := common.FixtureCommand{
-		Clear: true,
+		ClearFixture: true,
 	}
 	// Start the fixture group.
 	fixtureStepChannels[fixtureNumber] <- command

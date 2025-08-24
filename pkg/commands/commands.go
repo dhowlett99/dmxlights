@@ -71,7 +71,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Stop the sequence.
 		sequence.MusicTrigger = false
 		sequence.Run = false
-		sequence.Clear = true
+		sequence.ClearAllFixtures = true
 		// Remove the hidden flag.
 		sequence.Hidden = false
 		// Clear the sequence colors.
@@ -172,13 +172,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.StepSwitch = true
 			sequence.FocusSwitch = false
 		}
-		return sequence
-
-	case common.Clear:
-		if debug {
-			fmt.Printf("%d: Command Clear\n", mySequenceNumber)
-		}
-		sequence.Clear = true
 		return sequence
 
 	case common.Hide:

@@ -298,16 +298,16 @@ func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastC
 func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 
 	if debug {
-		fmt.Printf("staticOff Fixture No %d", fixtureNumber)
+		fmt.Printf("staticOff Fixture No %d lastColor %v\n", fixtureNumber, lastColor.RGBColor)
 	}
 
 	go func() {
 		var master int
-		fadeDownValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), common.MIN_DMX_BRIGHTNESS, 1, true)
+		fadeDownValues := common.GetFadeValues(64, float64(cmd.Master), common.MIN_DMX_BRIGHTNESS, 1, true)
 		if lastColor.RGBColor != colors.Black {
 
 			if debug {
-				fmt.Printf("Fixture:%d =====>   RGB Static OFF -> Fade Down from LastColor %+v\n", fixtureNumber, lastColor)
+				fmt.Printf("Fixture:%d =====>   RGB Static OFF -> Fade Down from LastColor %+v fadeDownValues %v\n", fixtureNumber, lastColor, fadeDownValues)
 			}
 
 			var sequenceNumber int

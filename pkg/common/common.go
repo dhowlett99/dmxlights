@@ -437,7 +437,6 @@ const (
 // Valid Command Actions.
 const (
 	Actions int = iota
-	Clear
 	Reset
 	UpdateStatic
 	UpdateFlashAllStaticColorButtons
@@ -587,7 +586,7 @@ type Sequence struct {
 	Chase                       bool                        // Tells sequnece if we're in sequence (chase) or static (static colors) mode.
 	SaveChase                   bool                        // Save the state of chase in flood.
 	StaticColors                []StaticColorButton         // Used in static color editing
-	Clear                       bool                        // Clear all fixtures in this sequence.
+	ClearAllFixtures            bool                        // Clear all fixtures in this sequence.
 	LoadNewFixtures             bool                        // Load all fixtures for this sequence.
 	LoadPatterns                bool                        // Load RGB Patterns for this sequence.
 	Static                      bool                        // We're a static sequence.
@@ -696,7 +695,7 @@ type FixtureCommand struct {
 	Master         int
 	MasterChanging bool
 	Blackout       bool
-	Clear          bool
+	ClearFixture   bool
 
 	StartFlood bool
 	StopFlood  bool

@@ -131,15 +131,15 @@ func StartSequence(sequence common.Sequence,
 				// Listen for any commands during chase so inside sequence steps loop, time out for the next step at the speed of the chase.
 				// or additionally timeout when get a beat that also triggers the next step.
 				sequence = commands.ListenCommandChannelAndWait(sequence.Number, speed, sequence, channels, fixturesConfig)
-				if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood ||
+				if !sequence.Run || sequence.ClearAllFixtures || sequence.StartFlood || sequence.StopFlood ||
 					sequence.Static || sequence.UpdateShift || sequence.StartPattern || sequence.UpdateColors || sequence.UpdateSize {
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
-						clearFixture(fixtureNumber, fixtureStepChannels)
+						stepClearFixture(fixtureNumber, fixtureStepChannels)
 					}
 					if debug {
 						fmt.Printf("%d: Break\n", sequence.Number)
 						fmt.Printf("%d: Run %t \n", sequence.Number, sequence.Run)
-						fmt.Printf("%d: Clear %t \n", sequence.Number, sequence.Clear)
+						fmt.Printf("%d: ClearAllFixtures %t \n", sequence.Number, sequence.ClearAllFixtures)
 						fmt.Printf("%d: StartFlood %t\n", sequence.Number, sequence.StartFlood)
 						fmt.Printf("%d: StopFlood %t\n", sequence.Number, sequence.StopFlood)
 						fmt.Printf("%d: Statics %t\n", sequence.Number, sequence.Static)

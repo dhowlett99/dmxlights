@@ -51,6 +51,8 @@ func FixtureReceiver(
 	stopFadeUp := make(chan bool)
 	stopFadeDown := make(chan bool)
 
+	var I_AM_IN_FLOOD_MODE bool = false
+
 	// Loop waiting for configuration.
 	for {
 
@@ -114,35 +116,43 @@ func FixtureReceiver(
 			lastColor = MapSwitchFixture(cmd.SwiTch, cmd.State, cmd.Override, cmd.RGBFade, dmxController, fixturesConfig, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, lastColor, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			continue
 
-		case cmd.Clear:
+		case cmd.ClearFixture:
 			if debug {
-				fmt.Printf("%d:%d Clear %t Blackout %t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Clear, cmd.Blackout)
+				fmt.Printf("%d:%d ClearFixture %t Blackout %t\n", cmd.SequenceNumber, myFixtureNumber, cmd.ClearFixture, cmd.Blackout)
 			}
 			lastColor = clearFixture(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixturesConfig, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.StartFlood:
-			if debug {
-				fmt.Printf("%d:%d StartFlood\n", cmd.SequenceNumber, myFixtureNumber)
+			// Only start flood if not already running.
+			if !I_AM_IN_FLOOD_MODE {
+				if debug {
+					fmt.Printf("%d:%d StartFlood\n", cmd.SequenceNumber, myFixtureNumber)
+				}
+				// Stop any running fade ups.
+				select {
+				case stopFadeUp <- true:
+				case <-time.After(100 * time.Millisecond):
+				}
+				// Stop any running fade downs.
+				select {
+				case stopFadeDown <- true:
+				case <-time.After(100 * time.Millisecond):
+				}
+				lastColor = startFlood(myFixtureNumber, cmd, fixturesConfig, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+				I_AM_IN_FLOOD_MODE = true
 			}
-			// Stop any running fade ups.
-			select {
-			case stopFadeUp <- true:
-			case <-time.After(100 * time.Millisecond):
-			}
-			// Stop any running fade downs.
-			select {
-			case stopFadeDown <- true:
-			case <-time.After(100 * time.Millisecond):
-			}
-			lastColor = startFlood(myFixtureNumber, cmd, fixturesConfig, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.StopFlood:
-			if debug {
-				fmt.Printf("%d:%d StopFlood\n", cmd.SequenceNumber, myFixtureNumber)
+			// Only stop flood if in flood mode.
+			if I_AM_IN_FLOOD_MODE {
+				if debug {
+					fmt.Printf("%d:%d StopFlood\n", cmd.SequenceNumber, myFixtureNumber)
+				}
+				lastColor = stopFlood(myFixtureNumber, cmd, fixturesConfig, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+				I_AM_IN_FLOOD_MODE = false
 			}
-			lastColor = stopFlood(myFixtureNumber, cmd, fixturesConfig, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.RGBStaticOn:
@@ -162,7 +172,7 @@ func FixtureReceiver(
 
 		case cmd.RGBStaticOff:
 			if debug {
-				fmt.Printf("%d:%d Static Off Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
+				fmt.Printf("%d:%d Static Off Hidden=%t lastColor %v\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden, lastColor)
 			}
 			// staticOff doesn't return a lastColor, instead it sends a message directly to the fixture to set lastColor once it's finished fading down.
 			staticOff(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixturesConfig, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)

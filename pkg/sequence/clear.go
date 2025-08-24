@@ -36,7 +36,7 @@ func clearSequence(mySequenceNumber int, sequence *common.Sequence, fixtureStepC
 		Type:           sequence.Type,
 		Label:          sequence.Label,
 		SequenceNumber: sequence.Number,
-		Clear:          sequence.Clear,
+		ClearFixture:   sequence.ClearAllFixtures,
 	}
 
 	// Now tell all the fixtures what they need to do.

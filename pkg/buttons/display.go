@@ -70,8 +70,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		}
 
 		// Start any static scene in this sequence.
-		if sequences[sequenceNumber].Static {
-			this.Static[sequenceNumber] = true
+		if this.Static[sequenceNumber] {
 			this.WasStatic[sequenceNumber] = true
 			common.StartStaticSequence(sequenceNumber, commandChannels)
 		}
