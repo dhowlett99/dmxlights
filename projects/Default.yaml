@@ -4031,7 +4031,7 @@ fixtures:
     - name: Show0
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4051,10 +4051,10 @@ fixtures:
     buttoncolor: Orange
     master: 0
     actions:
-    - name: New
+    - name: Show1
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4074,10 +4074,10 @@ fixtures:
     buttoncolor: Orange
     master: 0
     actions:
-    - name: New
+    - name: Show2
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4097,10 +4097,10 @@ fixtures:
     buttoncolor: Orange
     master: 0
     actions:
-    - name: New
+    - name: Show3
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4123,7 +4123,7 @@ fixtures:
     - name: Show4
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4146,7 +4146,7 @@ fixtures:
     - name: Show5
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4169,7 +4169,7 @@ fixtures:
     - name: Show6
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4192,14 +4192,14 @@ fixtures:
     - name: Show7
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
       speed: ""
       rotate: ""
       rotatespeed: ""
-      program: Show8
+      program: Show7
       programspeed: ""
       strobe: ""
       strobespeed: ""
@@ -4444,7 +4444,7 @@ fixtures:
     - name: Show0
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4467,7 +4467,7 @@ fixtures:
     - name: Show1
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4487,10 +4487,10 @@ fixtures:
     buttoncolor: Orange
     master: 0
     actions:
-    - name: New
+    - name: Show2
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4510,10 +4510,10 @@ fixtures:
     buttoncolor: Orange
     master: 0
     actions:
-    - name: New
+    - name: Show3
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4536,7 +4536,7 @@ fixtures:
     - name: Show4
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4559,7 +4559,7 @@ fixtures:
     - name: Show5
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4582,7 +4582,7 @@ fixtures:
     - name: Show6
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
@@ -4605,14 +4605,14 @@ fixtures:
     - name: Show7
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
       speed: ""
       rotate: ""
       rotatespeed: ""
-      program: Show8
+      program: Show7
       programspeed: ""
       strobe: ""
       strobespeed: ""
@@ -4628,7 +4628,7 @@ fixtures:
     - name: Show8
       number: 1
       colors: []
-      dimmer: ""
+      dimmer: Static
       mode: Control
       fade: ""
       size: ""
