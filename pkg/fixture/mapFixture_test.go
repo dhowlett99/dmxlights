@@ -70,19 +70,14 @@ func TestSetColorByNumber(t *testing.T) {
 				},
 				fixture: Fixture{
 					Address: 100,
-					Channels: []Channel{
-						{
-							Name: "Color",
-						},
-					},
 				},
 				channelNumber:       0,
-				color:               0,
+				color:               1,
 				dmxController:       nil,
 				dmxInterfacePresent: false,
 			},
 			want:  100,
-			want1: 0,
+			want1: 0, // DMX for White
 		},
 		{
 			name: "Color is 1 want Red",
@@ -116,12 +111,12 @@ func TestSetColorByNumber(t *testing.T) {
 					Address: 100,
 				},
 				channelNumber:       0,
-				color:               1,
+				color:               2,
 				dmxController:       nil,
 				dmxInterfacePresent: false,
 			},
 			want:  100,
-			want1: 8,
+			want1: 8, // DMX for Red.
 		},
 	}
 	for _, tt := range tests {

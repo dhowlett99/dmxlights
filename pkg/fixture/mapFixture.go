@@ -162,7 +162,10 @@ func MapFixtures(iAmAChaserSequence bool, iAmARunningChaserSequence bool, scanne
 						}
 						if !iAmARunningChaserSequence {
 							if strings.Contains(channel.Name, "Color") {
-								SetColorByNumber(channel, fixture, channelNumber, scannerColor, dmxController, dmxInterfacePresent)
+								// Not a chaser and Not running, means I an the sequence kicking out step commands.
+								// Color Wheel is indexed starting at 1 and the sequencer uses colors starting at 0,
+								// So we add one to the scannerColor so it selected the correct color.
+								SetColorByNumber(channel, fixture, channelNumber, scannerColor+1, dmxController, dmxInterfacePresent)
 							}
 						}
 						if strings.Contains(channel.Name, "Strobe") {
@@ -272,7 +275,7 @@ func SetMaster(channel Channel, fixture Fixture, channelNumber int, master int, 
 
 func SetColorByNumber(channel Channel, fixture Fixture, channelNumber int, color int, dmxController *ft232.DMXController, dmxInterfacePresent bool) (int16, int) {
 	for _, setting := range channel.Settings {
-		if setting.Number == color+1 {
+		if setting.Number == color {
 			v, _ := strconv.Atoi(setting.Value)
 			SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 			return fixture.Address + int16(channelNumber), v

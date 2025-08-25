@@ -68,6 +68,9 @@ func FixtureReceiver(
 		}
 
 		if cmd.Blackout {
+			if debug {
+				fmt.Printf("Fixture %d Blackout\n", myFixtureNumber)
+			}
 			// Soft fade downs should be disabled for blackout.
 			lastColor.RGBColor = cmd.LastColor.RGBColor
 			lastColor.ScannerColor = 0
