@@ -82,7 +82,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		// Reset the gobo function key.
-		this.Functions[this.TargetSequence][common.Function5_Color].State = false
+		this.Functions[this.ScannerSequenceNumber][common.Function5_Color].State = false
 
 		// Editing gobo is over for this sequence.
 		this.EditScannerColorsMode = false
@@ -95,7 +95,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		// Reset the gobo function key.
-		this.Functions[this.TargetSequence][common.Function6_Static_Gobo].State = false
+		this.Functions[this.ScannerSequenceNumber][common.Function6_Static_Gobo].State = false
 
 		// Editing gobo is over for this sequence.
 		this.EditGoboSelectionMode = false
