@@ -741,11 +741,11 @@ func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, this *buttons
 				this.ProjectName = result[0]
 				myWindow.SetTitle("DMX Lights:" + this.ProjectName)
 
-				// Populate the fixture info.
-				fixture.PopulateFixturesInfo(fixturesConfig)
-
 				// Copy the newFixtures into the old pointer to the fixtures config.
 				fixturesConfig.Fixtures = newFixturesConfig.Fixtures
+
+				// Populate the fixture info.
+				fixture.PopulateFixturesInfo(fixturesConfig)
 
 				// Create a new set of overrides.
 				override.CreateOverrides(this.SwitchSequenceNumber, fixturesConfig, this.SwitchOverrides)

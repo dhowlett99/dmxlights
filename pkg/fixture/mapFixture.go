@@ -190,6 +190,10 @@ func MapFixtures(iAmAChaserSequence bool, iAmARunningChaserSequence bool, scanne
 
 func SetRGBChannels(channel Channel, fixture Fixture, displayFixture int, channelNumber int, Red float64, Green float64, Blue float64, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 
+	if debug {
+		fmt.Printf("Set RGB as normal Channel=%s\n", channel.Name)
+	}
+
 	// If we are trying to generate White and the fixture has a white channel
 	// then use this value as a white.
 	//fmt.Printf("Red %f Green %f Blue %f HasWhite %t\n", Red, Green, Blue, fixture.FixtureInfo.HasWhiteChannel)
