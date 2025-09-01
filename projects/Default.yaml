@@ -4660,7 +4660,7 @@ fixtures:
       - Purple
       - Pink
       - White
-      dimmer: ""
+      dimmer: Chase
       mode: Chase
       fade: Soft
       size: Medium
@@ -4680,7 +4680,7 @@ fixtures:
     buttoncolor: White
     master: 0
     actions:
-    - name: Auto
+    - name: Sound
       number: 1
       colors:
       - Red
@@ -4693,7 +4693,7 @@ fixtures:
       - Pink
       - White
       - Black
-      dimmer: Static
+      dimmer: Chase
       mode: Chase
       fade: Soft
       size: Short
