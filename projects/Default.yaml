@@ -1915,31 +1915,6 @@ fixtures:
       number: 3
       value: 64-95
       selectedvalue: ""
-    - name: Open
-      label: Open
-      number: 4
-      value: "96"
-      selectedvalue: ""
-    - name: Pulse
-      label: Pulse
-      number: 5
-      value: "128"
-      selectedvalue: ""
-    - name: Open
-      label: Open
-      number: 6
-      value: "160"
-      selectedvalue: ""
-    - name: Random
-      label: Random
-      number: 7
-      value: "192"
-      selectedvalue: ""
-    - name: Open
-      label: Open
-      number: 8
-      value: "224"
-      selectedvalue: ""
   - number: 3
     name: Color
     value: 0
@@ -4660,7 +4635,7 @@ fixtures:
       - Purple
       - Pink
       - White
-      dimmer: Chase
+      dimmer: Static
       mode: Chase
       fade: Soft
       size: Medium
@@ -4699,12 +4674,12 @@ fixtures:
       size: Short
       speed: Music
       rotate: Auto
-      rotatespeed: Medium
+      rotatespeed: Slow
       program: ""
       programspeed: ""
       strobe: ""
       strobespeed: ""
       gobo: Auto
-      gobospeed: Fast
+      gobospeed: Slow
     flash: false
   use_fixture: helix

@@ -257,20 +257,25 @@ func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastC
 			return
 		case <-time.After(10 * time.Millisecond):
 		}
+
+		// If we are a RGB chaser used as a shutter chasser apply fade values to the scanner's master dimmer channel because
+		// scanners doesn't have a rgb color mixing capability so the wheel has to be faded using the master.
 		var iAmAChaserSequence bool
+		var master int
 		if cmd.Label == "chaser" {
 			iAmAChaserSequence = true
-			// If we are a RGB chaser used as a shutter chasser apply fade values to the scanner's master dimmer channel because
-			// scanners doesn't have a rgb color mixing capability so the wheel has to be faded using the master.
-			cmd.Master = int(float64(cmd.Master) / 100 * (float64(fade) / 2.55))
+			master = int(float64(cmd.Master) / 100 * (float64(fade) / 2.55))
 		} else {
 			iAmAChaserSequence = false
+			master = cmd.Master
 		}
+
+		// Now play out the fade up commands.
 		if !cmd.Hidden {
-			fade := applyMasterToFade(fade, cmd.Master)
+			fade := applyMasterToFade(fade, master)
 			common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, lamp.Color, fade, eventsForLaunchpad, guiButtons)
 		}
-		lastColor = MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, lamp.Color, lamp.Color, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, cmd.Master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+		lastColor = MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, lamp.Color, lamp.Color, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 
 		// Control how long the fade take with the speed control.
 		time.Sleep((5 * time.Millisecond) * (time.Duration(cmd.RGBFade)))

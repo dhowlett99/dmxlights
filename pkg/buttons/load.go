@@ -118,11 +118,27 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 		this.ShowRGBColorPicker = false
 
 		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
-		// TODO
-		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
-		if this.SequenceType[sequenceNumber] == "scanner" && this.ScannerChaser[this.ScannerSequenceNumber] {
+		if this.SequenceType[sequenceNumber] == "scanner" &&
+			this.ScannerChaser[this.ScannerSequenceNumber] {
 			// So adjust the mode to be CHASER_DISPLAY
 			this.SelectedMode[sequenceNumber] = CHASER_DISPLAY
+		}
+
+		// or if the chaser is in static mode.
+		if this.SequenceType[sequenceNumber] == "scanner" &&
+			this.ScannerChaser[this.ScannerSequenceNumber] && sequenceNumber == this.ChaserSequenceNumber {
+			// So adjust the mode to be CHASER_DISPLAY
+			this.SelectedMode[sequenceNumber] = CHASER_DISPLAY
+		}
+
+		// If we are a scanner and the scanner and chaser sequence aren't running.
+		// TODO check scanner and chaser status.
+		// Turn off the scanners by issuing a reset to the scanner sequence.
+		if sequences[sequenceNumber].Type == "scanner" {
+			cmd := common.Command{
+				Action: common.Reset,
+			}
+			common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
 		}
 
 		// Restore the functions states from the sequence.

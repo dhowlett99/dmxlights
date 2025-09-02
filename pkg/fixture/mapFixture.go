@@ -160,7 +160,8 @@ func MapFixtures(iAmAChaserSequence bool, iAmARunningChaserSequence bool, scanne
 								SetGobo(channel, fixture, channelNumber, selectedGobo, dmxController, dmxInterfacePresent)
 							}
 						}
-						if !iAmARunningChaserSequence {
+						// I am a scanner sequence running rotate sequence.
+						if scannerRotateIsRunning && !iAmARunningChaserSequence {
 							if strings.Contains(channel.Name, "Color") {
 								// Not a chaser and Not running, means I an the sequence kicking out step commands.
 								// Color Wheel is indexed starting at 1 and the sequencer uses colors starting at 0,

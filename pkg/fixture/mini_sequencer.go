@@ -929,6 +929,9 @@ func newMiniSequencer(fixture *Fixture,
 						} else {
 							actualMaster = master
 						}
+						// Makw sure program is off.
+						cfg.Program = 0
+						cfg.ProgramSpeed = 0
 						MapFixtures(false, false, false, mySequenceNumber, myFixtureNumber, thisFixture.Color, thisFixture.BaseColor, cfg.Pan, cfg.Tilt, cfg.Shutter, cfg.RotateSpeed, cfg.Program, cfg.ProgramSpeed, cfg.Gobo, cfg.ScannerColor, fixturesConfig, blackout, brightness, actualMaster, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 					}
 
