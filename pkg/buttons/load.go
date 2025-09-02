@@ -132,11 +132,13 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 		}
 
 		// If we are a scanner and the scanner and chaser sequence aren't running.
-		// TODO check scanner and chaser status.
-		// Turn off the scanners by issuing a reset to the scanner sequence.
-		if sequences[sequenceNumber].Type == "scanner" {
+		// Turn off the scanners by issuing a clear all fixtures command to the scanner sequence.
+		if sequences[sequenceNumber].Type == "scanner" &&
+			!this.Running[sequenceNumber] &&
+			!this.ScannerChaser[sequenceNumber] {
+
 			cmd := common.Command{
-				Action: common.Reset,
+				Action: common.ClearAllFixtures,
 			}
 			common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
 		}

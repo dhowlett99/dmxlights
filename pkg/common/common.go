@@ -438,6 +438,7 @@ const (
 const (
 	Actions int = iota
 	Reset
+	ClearAllFixtures
 	UpdateStatic
 	UpdateFlashAllStaticColorButtons
 	UpdateBounce

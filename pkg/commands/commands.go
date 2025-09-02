@@ -174,6 +174,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		return sequence
 
+	case common.ClearAllFixtures:
+		if debug {
+			fmt.Printf("%d: Command ClearAllFixtures\n", mySequenceNumber)
+		}
+		sequence.ClearAllFixtures = true
+		return sequence
+
 	case common.Hide:
 		if debug {
 			fmt.Printf("%d: Command Hide\n", mySequenceNumber)
