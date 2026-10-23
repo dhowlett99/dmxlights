@@ -32,6 +32,7 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
 * Sound card and sequence startup debug messages removed.
 * MapFixture rewritten for clarity.
 * Master Dimmer has been replaced with Dimmer controls that now controls the brightness of selected sequences or switch fixtures.
+* Changes to Makefile so will build on ARM64 architectures.
 
 ## Known Problems
 
