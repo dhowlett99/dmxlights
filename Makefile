@@ -7,22 +7,24 @@ VERSION := "3.0"
 export PKG_CONFIG_PATH=/usr/local/Cellar/portaudio/19.7.0/lib/pkgconfig
 # Set Architecture
 ARCH ?= $(shell uname -m)
-export GOHOSTARCH=$(ARCH)
 ifeq ($(ARCH),x86_64)
-    GOARCH = amd64
+    export GOARCH = amd64
+	export GOHOSTARCH=amd64
 else ifeq ($(ARCH),arm64)
-    GOARCH = arm64
+    export GOARCH = arm64
+	export GOHOSTARCH=arm64
 else
     GOARCH = $(ARCH)
 endif
+
 export CGO_ENABLED=1
 # Set Deployment Target
 ifeq ($(ARCH),arm64)
-	MACOSX_DEPLOYMENT_TARGET ?= 26 // M5 
+	export MACOSX_DEPLOYMENT_TARGET = 26
 	export CGO_CFLAGS="-I/opt/homebrew/include" 
 	export CGO_LDFLAGS="-L/opt/homebrew/lib"
 else ifeq ($(ARCH),x86_64)
-	MACOSX_DEPLOYMENT_TARGET ?= 10.15
+	expoert MACOSX_DEPLOYMENT_TARGET = 1015
 else
 	$(error Unknown Architecture: $(ARCH))
 endif
