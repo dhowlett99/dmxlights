@@ -5,20 +5,29 @@ COVERAGE = -coverprofile=../c.out -covermode=atomic
 SHELL := /usr/bin/env bash
 VERSION := "3.0"
 export PKG_CONFIG_PATH=/usr/local/Cellar/portaudio/19.7.0/lib/pkgconfig
+# Set Architecture
 ARCH ?= $(shell uname -m)
 export GOHOSTARCH=$(ARCH)
-export GOARCH=$(ARCH)
+ifeq ($(ARCH),x86_64)
+    GOARCH = amd64
+else ifeq ($(ARCH),arm64)
+    GOARCH = arm64
+else
+    GOARCH = $(ARCH)
+endif
 export CGO_ENABLED=1
+# Set Deployment Target
 ifeq ($(ARCH),arm64)
 	MACOSX_DEPLOYMENT_TARGET ?= 26 // M5 
+	export CGO_CFLAGS="-I/opt/homebrew/include" 
+	export CGO_LDFLAGS="-L/opt/homebrew/lib"
 else ifeq ($(ARCH),x86_64)
 	MACOSX_DEPLOYMENT_TARGET ?= 10.15
 else
 	$(error Unknown Architecture: $(ARCH))
 endif
 
-export CGO_CFLAGS="-I/opt/homebrew/include" 
-export CGO_LDFLAGS="-L/opt/homebrew/lib"
+
 
 # The name of the application
 APP_NAME="dmxlights"
