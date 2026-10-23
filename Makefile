@@ -5,6 +5,20 @@ COVERAGE = -coverprofile=../c.out -covermode=atomic
 SHELL := /usr/bin/env bash
 VERSION := "3.0"
 export PKG_CONFIG_PATH=/usr/local/Cellar/portaudio/19.7.0/lib/pkgconfig
+ARCH ?= $(shell uname -m)
+export GOHOSTARCH=$(ARCH)
+export GOARCH=$(ARCH)
+export CGO_ENABLED=1
+ifeq ($(ARCH),arm64)
+	MACOSX_DEPLOYMENT_TARGET ?= 26 // M5 
+else ifeq ($(ARCH),x86_64)
+	MACOSX_DEPLOYMENT_TARGET ?= 10.15
+else
+	$(error Unknown Architecture: $(ARCH))
+endif
+
+export CGO_CFLAGS="-I/opt/homebrew/include" 
+export CGO_LDFLAGS="-L/opt/homebrew/lib"
 
 # The name of the application
 APP_NAME="dmxlights"
@@ -71,7 +85,7 @@ deploy: installer certificate
 	rm -rf dmxlights.app/
 	codesign --remove-signature /usr/local/opt/portaudio/lib/libportaudio.2.dylib
 	codesign --force --deep --entitlements entitlements.plist --sign ${CERT} -i ${APP_ID} /usr/local/opt/portaudio/lib/libportaudio.2.dylib
-	$(GOPATH)/bin/fyne package --appVersion ${VERSION} --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png -use-raw-icon
+	$(GOPATH)/bin/fyne package --appVersion ${VERSION} --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png
 	# fix the Info.plist
 	./fix.sh dmxlights.app/Contents/Info.plist > /tmp/file
 	mv /tmp/file dmxlights.app/Contents/Info.plist
