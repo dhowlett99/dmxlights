@@ -296,6 +296,7 @@ func main() {
 
 		if newSequence.Label == "chaser" {
 			this.ChaserSequenceNumber = sequenceNumber
+			newSequence.ChaserSequenceNumber = sequenceNumber
 		}
 
 		if newSequence.Type == "scanner" {
