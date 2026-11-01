@@ -89,6 +89,28 @@ func Test_getFadeValues(t *testing.T) {
 		want []int
 	}{
 		{
+			name: "Fade from 0 to 145",
+			args: args{
+				nocoordinates: 64,
+				fade:          1,
+				from:          1,
+				too:           145,
+				reverse:       false, // Fade up
+			},
+			want: []int{1, 5, 8, 12, 15, 19, 22, 26, 30, 33, 37, 40, 43, 47, 50, 54, 57, 60, 63, 67, 70, 73, 76, 79, 82, 85, 88, 91, 94, 96, 99, 102, 104, 107, 109, 111, 114, 116, 118, 120, 122, 124, 126, 127, 129, 131, 132, 134, 135, 136, 138, 139, 140, 141, 141, 142, 143, 143, 144, 144, 145, 145, 145, 145},
+		},
+		{
+			name: "Sequence Fade Up 0 to 255",
+			args: args{
+				nocoordinates: 64,
+				fade:          1,
+				from:          0,
+				too:           255,
+				reverse:       false, // Fade up
+			},
+			want: []int{0, 6, 12, 19, 25, 31, 38, 44, 50, 56, 62, 69, 75, 81, 87, 93, 99, 104, 110, 116, 121, 127, 132, 138, 143, 148, 153, 158, 163, 168, 173, 178, 182, 186, 191, 195, 199, 203, 207, 210, 214, 217, 220, 223, 226, 229, 232, 234, 237, 239, 241, 243, 245, 247, 248, 249, 251, 252, 253, 253, 254, 254, 254, 255},
+		},
+		{
 			name: "Fade up 1",
 			args: args{
 				nocoordinates: 10,
@@ -240,7 +262,7 @@ func Test_getFadeValues(t *testing.T) {
 				too:           39,
 				reverse:       true, // Fade down
 			},
-			want: []int{255, 161, 39},
+			want: []int{255, 255, 255, 255, 255, 255, 252, 222, 119, 39},
 		},
 		{
 			name: "Fade from 145 to 255",
@@ -262,7 +284,7 @@ func Test_getFadeValues(t *testing.T) {
 				too:           0,
 				reverse:       true,
 			},
-			want: []int{145, 127, 87, 44, 0},
+			want: []int{145, 120, 95, 73, 52, 34, 19, 9, 2, 0},
 		},
 	}
 	for _, tt := range tests {

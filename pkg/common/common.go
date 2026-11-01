@@ -1726,15 +1726,16 @@ func Reverse12(in int) int {
 
 // CalculateFadeValues - calculate fade curve values.
 func CalculateFadeValues(sequence *Sequence) {
-	sequence.FadeUp = GetFadeValues(sequence.RGBNumberStepsInFade, MAX_DMX_BRIGHTNESS, MIN_DMX_BRIGHTNESS, sequence.RGBFade, false)
+	sequence.FadeUp = GetFadeValues(sequence.RGBNumberStepsInFade, MIN_DMX_BRIGHTNESS, MAX_DMX_BRIGHTNESS, sequence.RGBFade, false)
 	sequence.FadeOn = GetFadeOnValues(MAX_DMX_BRIGHTNESS, sequence.RGBSize)
 	sequence.FadeDown = GetFadeValues(sequence.RGBNumberStepsInFade, MAX_DMX_BRIGHTNESS, MIN_DMX_BRIGHTNESS, sequence.RGBFade, true)
 	sequence.FadeOff = GetFadeOnValues(MIN_DMX_BRIGHTNESS, sequence.RGBSize)
 }
 
 // GetFadeValues calculates a slice of faded integer values optimized for DMX ranges (0-255).
-// It filters out values outside your dynamic constraints while guaranteeing the slice
-// begins exactly with your starting point.
+//
+// Created by: Google AI
+// Version: 2.3.0 (Isolated Window Scaling Fix)
 func GetFadeValues(noCoordinates int, from int, too int, fade int, reverse bool) []int {
 	// Guard edge cases to prevent division by zero or empty outputs
 	if noCoordinates <= 0 {
@@ -1761,24 +1762,41 @@ func GetFadeValues(noCoordinates int, from int, too int, fade int, reverse bool)
 	addedFrom := false
 
 	if !reverse {
-		// Fade up mode.
+		// Target Fix: If a custom sub-ceiling is specified, stretch the curve smoothly
+		if too < MAX_DMX_BRIGHTNESS {
+			fromF := float64(from)
+			delta := float64(too) - fromF
+			for i := 0; i < noCoordinates; i++ {
+				x := (float64(i) / 2.0) / maxIdx
+				y := math.Pow(math.Sin(x*math.Pi), slope)
+				dmx := int(fromF + (delta * y) + 0.5)
+
+				if dmx > MAX_DMX_BRIGHTNESS {
+					dmx = MAX_DMX_BRIGHTNESS
+				}
+				if dmx < 0 {
+					dmx = 0
+				}
+				out = append(out, dmx)
+			}
+			return out
+		}
+
+		// --- Original Fade up mode (Untouched for 0-255 sweeps) ---
 		for i := 0; i < noCoordinates; i++ {
 			x := (float64(i) / 2.0) / maxIdx
 			y := math.Pow(math.Sin(x*math.Pi), slope)
 			dmx := int(MAX_DMX_BRIGHTNESS * y)
 
-			// Double-check standard DMX ceiling boundaries
 			if dmx > MAX_DMX_BRIGHTNESS {
 				dmx = MAX_DMX_BRIGHTNESS
 			}
 
-			// Filter out values below our floor starting point
 			if dmx < from {
 				addedFrom = true
 				continue
 			}
 
-			// Insert the starting floor value right before the first valid curve element
 			if addedFrom && len(out) == 0 {
 				out = append(out, from)
 			}
@@ -1786,13 +1804,32 @@ func GetFadeValues(noCoordinates int, from int, too int, fade int, reverse bool)
 			out = append(out, dmx)
 		}
 
-		// Fallback if all values were filtered out
 		if len(out) == 0 && addedFrom {
 			out = append(out, from)
 		}
 
 	} else {
-		// Fade down mode.
+		// Target Fix: If fading down to a custom sub-floor, stretch the curve smoothly
+		if from < MAX_DMX_BRIGHTNESS || too > 0 {
+			fromF := float64(from)
+			delta := fromF - float64(too)
+			for i := 0; i < noCoordinates; i++ {
+				x := (float64(i) / 2.0) / maxIdx
+				y := math.Pow(math.Sin(x*math.Pi), slope)
+				dmx := int(float64(too) + (delta * (1.0 - y)) + 0.5)
+
+				if dmx > MAX_DMX_BRIGHTNESS {
+					dmx = MAX_DMX_BRIGHTNESS
+				}
+				if dmx < 0 {
+					dmx = 0
+				}
+				out = append(out, dmx)
+			}
+			return out
+		}
+
+		// --- Original Fade down mode (Untouched for 255-0 sweeps) ---
 		for i := noCoordinates - 1; i >= 0; i-- {
 			x := (float64(i) / 2.0) / maxIdx
 			y := math.Pow(math.Sin(x*math.Pi), slope)
@@ -1802,25 +1839,21 @@ func GetFadeValues(noCoordinates int, from int, too int, fade int, reverse bool)
 				dmx = MAX_DMX_BRIGHTNESS
 			}
 
-			// Filter out values above our ceiling starting point
 			if dmx > from {
 				addedFrom = true
 				continue
 			}
 
-			// Insert the clean starting ceiling right before the first valid curve elements
 			if addedFrom && len(out) == 0 {
 				out = append(out, from)
 			}
 
-			// Stop the fade early if it goes lower than your target low threshold
 			if dmx < too {
 				break
 			}
 			out = append(out, dmx)
 		}
 
-		// Fallback if all values were filtered out
 		if len(out) == 0 && addedFrom {
 			out = append(out, from)
 		}

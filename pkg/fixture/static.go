@@ -255,8 +255,7 @@ func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fixtu
 	}
 
 	// Calulate the steps
-	// HERE lastColor.Brightness is not getting set ?????
-	fadeUpValues := common.GetFadeValues(64, lastColor.Brightness, common.MAX_DMX_BRIGHTNESS, 1, false)
+	fadeUpValues := common.GetFadeValues(64, lastColor.Brightness, nextColor.Brightness, 1, false)
 	if debug && fixtureNumber == 0 {
 		fmt.Printf("fadeup: Fadeup values %+v\n", fadeUpValues)
 	}
