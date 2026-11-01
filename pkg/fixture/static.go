@@ -181,13 +181,9 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, nextColor common.FixtureColor, stopFadeDown chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.FixtureColor {
 
 	if debug && fixtureNumber == 0 {
-		fmt.Printf("fadeDown fixture number %d \n", fixtureNumber)
+		fmt.Printf("fadeDown fixture number %d sequence Number %d\n", fixtureNumber, cmd.SequenceNumber)
 		fmt.Printf("Last Color %+v Last Brightnes %d\n", lastColor.RGBColor, lastColor.Brightness)
 		fmt.Printf("Next Color %+v Next Brightnes %d\n", nextColor.RGBColor, nextColor.Brightness)
-	}
-	//}
-	if debug && fixtureNumber == 0 {
-		fmt.Printf("From %d To %d\n", lastColor.Brightness, nextColor.Brightness)
 	}
 	fadeDownValues := common.GetFadeValues(64, lastColor.Brightness, nextColor.Brightness, 1, true)
 	if debug && fixtureNumber == 0 {
@@ -218,7 +214,7 @@ func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fix
 			iAmAChaserSequence = true
 			// If we are a RGB chaser used as a shutter chasser apply fade values to the scanner's master dimmer channel because
 			// scanners doesn't have a rgb color mixing capability so the wheel has to be faded using the master.
-			cmd.Master = int(float64(cmd.Master) / 100 * (float64(fade) / 2.55))
+			cmd.Master = fade
 		} else {
 			iAmAChaserSequence = false
 		}
@@ -243,7 +239,7 @@ func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fix
 	}
 
 	if debug && fixtureNumber == 0 {
-		fmt.Printf("End of Fade down LastColor was %+v\n", lastColor)
+		fmt.Printf("fadeDown: End of Fade Down LastColor was %+v Master %d\n", lastColor, cmd.Master)
 	}
 
 	return lastColor
@@ -298,7 +294,7 @@ func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fixtu
 		var master int
 		if cmd.Label == "chaser" {
 			iAmAChaserSequence = true
-			master = int(float64(cmd.Master) / 100 * (float64(fade) / 2.55))
+			master = fade
 		} else {
 			iAmAChaserSequence = false
 			master = cmd.Master
@@ -315,10 +311,6 @@ func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fixtu
 		time.Sleep((5 * time.Millisecond) * (time.Duration(cmd.RGBFade)))
 	}
 
-	if debug && fixtureNumber == 0 {
-		fmt.Printf("Fade up complete, set lastColor up in the fixture lastColor is %v\n", lastColor)
-	}
-
 	lastColor.Brightness = nextColor.Brightness
 
 	// Fade up complete, set lastColor up in the fixture.
@@ -332,7 +324,7 @@ func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fixtu
 	}
 
 	if debug && fixtureNumber == 0 {
-		fmt.Printf("End of Fade up LastColor was %+v\n", lastColor)
+		fmt.Printf("fadeUp: Fade up complete, set lastColor up in the fixture lastColor is %v\n", lastColor)
 	}
 }
 
