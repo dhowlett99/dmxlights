@@ -46,7 +46,7 @@ func FixtureReceiver(
 	}
 
 	// Used for static fades, remember the last color.
-	var lastColor common.LastColor
+	var lastColor common.FixtureColor
 
 	stopFadeUp := make(chan bool)
 	stopFadeDown := make(chan bool)
@@ -166,7 +166,7 @@ func FixtureReceiver(
 			continue
 
 		case cmd.RGBStaticFadeUp:
-			if debug {
+			if debug && myFixtureNumber == 0 {
 				fmt.Printf("%d:%d Static Fade Up Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 			}
 			// FadeUpStatic doesn't return a lastColor, instead it sends a message directly to the fixture to set lastColor once it's finished fading up.
@@ -174,7 +174,7 @@ func FixtureReceiver(
 			continue
 
 		case cmd.RGBStaticOff:
-			if debug {
+			if debug && myFixtureNumber == 0 {
 				fmt.Printf("%d:%d Static Off Hidden=%t lastColor %v\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden, lastColor)
 			}
 			// staticOff doesn't return a lastColor, instead it sends a message directly to the fixture to set lastColor once it's finished fading down.

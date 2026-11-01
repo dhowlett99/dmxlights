@@ -1081,7 +1081,7 @@ func HowManyScannerColors(sequence *common.Sequence, fixturesConfig *Fixtures) [
 		fmt.Printf("HowManyScannerColors: \n")
 	}
 
-	// Clear out sequemce colors.
+	// Clear out sequence colors.
 	sequence.SequenceColors = []color.RGBA{}
 
 	for scannerNumber := 0; scannerNumber < sequence.NumberFixtures; scannerNumber++ {

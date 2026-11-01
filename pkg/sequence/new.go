@@ -37,13 +37,10 @@ func NewSequence(
 	channels common.Channels) common.Sequence {
 
 	// Populate the static colors for this sequence with the defaults.
-	staticColorsButtons := common.SetDefaultStaticColorButtons(mySequenceNumber)
+	staticColorsButtons := common.SetDefaultStaticColorButtons()
 
-	// Populate the available static colors for this sequence with the defaults.
-	availableStaticColorsButtons := common.SetDefaultStaticColorButtons(mySequenceNumber)
-
-	// Populate the edit sequence colors for this sequence with the defaults.
-	sequenceColorButtons := common.SetDefaultStaticColorButtons(mySequenceNumber)
+	// Populate the available colors pallete for this sequence.
+	availableColors := common.PopulateStaticColorPallete()
 
 	// Every scanner has a number of colors in its wheel.
 	availableScannerColors := make(map[int][]common.StaticColorButton)
@@ -123,8 +120,7 @@ func NewSequence(
 		Hidden:                 false,
 		Chase:                  true,
 		StaticColors:           staticColorsButtons,
-		AvailableStaticColors:  availableStaticColorsButtons,
-		RGBAvailableColors:     sequenceColorButtons,
+		RGBAvailableColors:     availableColors,
 		ScannerAvailableGobos:  availableScannerGobos,
 		Name:                   sequenceType,
 		Number:                 mySequenceNumber,

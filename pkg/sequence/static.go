@@ -24,6 +24,9 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
+// startStatic has two options.
+// - If the StaticFadeUpOnce is set it will fade down any previous scene and then fade up the next static scene
+// - If the StaticFadeUpOnce is not set the new scene will be applied witout any fades.
 func startStatic(mySequenceNumber int, sequence *common.Sequence, channels common.Channels, fixtureStepChannels []chan common.FixtureCommand) {
 
 	if debug {
@@ -51,6 +54,7 @@ func startStatic(mySequenceNumber int, sequence *common.Sequence, channels commo
 			Label:             sequence.Label,
 			SequenceNumber:    sequence.Number,
 			RGBStaticFadeUp:   true,
+			RGBStaticOff:      false,
 			RGBFade:           sequence.RGBFade,
 			RGBStaticColors:   sequence.StaticColors,
 			Hidden:            false,
@@ -94,9 +98,10 @@ func startStatic(mySequenceNumber int, sequence *common.Sequence, channels commo
 	}
 }
 
+// stopStatic will simply remove any static scene.
 func stopStatic(mySequenceNumber int, sequence *common.Sequence, channels common.Channels, fixtureStepChannels []chan common.FixtureCommand) {
 	if debug {
-		fmt.Printf("%d: Sequence RGB Static mode OFF Type %s Label %s \n", mySequenceNumber, sequence.Type, sequence.Label)
+		fmt.Printf("%d: Sequence RGB Static mode OFF Type %s Label %s Fade Down %t\n", mySequenceNumber, sequence.Type, sequence.Label, sequence.StaticFadeDownOnce)
 	}
 
 	channels.SoundTriggers[mySequenceNumber].State = false

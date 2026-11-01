@@ -348,7 +348,7 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 }
 
 // Clear fixture.
-func clearFixture(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
+func clearFixture(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.FixtureColor {
 
 	if debug {
 		fmt.Printf("Fixture:%d clear\n", fixtureNumber)

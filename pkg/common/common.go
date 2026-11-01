@@ -153,10 +153,11 @@ type ALight struct {
 }
 
 // Used for static fades, remember the last color.
-type LastColor struct {
+type FixtureColor struct {
 	RGBColor     color.RGBA
 	ScannerColor int
 	Brightness   int // Color is different if its at a different intensity.
+	Flash        bool
 }
 
 type ColorPicker struct {
@@ -571,8 +572,7 @@ type Sequence struct {
 	AutoPattern                 bool                        // Sequence is going to automatically change the pattern.
 	GuiFixtureLabels            []string                    // Storage for the fixture labels. Used for scanner names.
 	Pattern                     Pattern                     // Contains fixtures and RGB steps info.
-	RGBAvailableColors          []StaticColorButton         // Available colors for the RGB fixtures.
-	AvailableStaticColors       []StaticColorButton         // Available colors for static scenes.
+	RGBAvailableColors          []StaticColorButton         // Available colors for the RGB fixtures, also used for static colors.
 	RGBAvailablePatterns        []Pattern                   // Available RGB Patterns. Index by pattern number.
 	RGBColor                    int                         // The selected RGB fixture color.
 	FadeUp                      []int                       // Fade up values.
@@ -601,6 +601,7 @@ type Sequence struct {
 	StepSwitch                  bool                        // Step the switch if true.
 	FocusSwitch                 bool                        // Focus the switch.
 	StaticFadeUpOnce            bool                        // Only Fade up once, used for don't fade during color config operations.
+	StaticFadeDownOnce          bool                        // Only Fade down once, used for don't fade during color config operations.
 	StaticLampsOn               bool                        // Show the static scene on the lamps, but don't send anything to the DMX universe.
 	StartFlood                  bool                        // We're in flood mode.
 	StopFlood                   bool                        // We're not in flood mode.
@@ -687,7 +688,7 @@ type FixtureCommand struct {
 	Label          string
 	SequenceNumber int
 	FixtureState   FixtureState
-	LastColor      LastColor
+	LastColor      FixtureColor
 
 	// Common commands.
 	Hidden         bool
@@ -1617,16 +1618,27 @@ func ReverseDmx(n uint8) uint8 {
 	return in[n]
 }
 
-// Sets the static colors to default values.
-func SetDefaultStaticColorButtons(selectedSequence int) []StaticColorButton {
+// Defaults the static colors.
+// Create 1 row of 8 colors.
+func SetDefaultStaticColorButtons() []StaticColorButton {
+	return makeColors(1, 8)
+}
+
+// Populates the static colors pallete to default values.
+// Create 3 rows of 8 colors = 24 colors.
+func PopulateStaticColorPallete() []StaticColorButton {
+	return makeColors(3, 8)
+}
+
+func makeColors(height int, width int) []StaticColorButton {
 
 	// Make an array to hold static colors.
 	staticColorsButtons := []StaticColorButton{}
 
 	var selectedColor int
 
-	for Y := 0; Y < 3; Y++ {
-		for X := 0; X < 8; X++ {
+	for Y := 0; Y < height; Y++ {
+		for X := 0; X < width; X++ {
 			if selectedColor >= 24 {
 				break
 			}
@@ -1720,55 +1732,97 @@ func CalculateFadeValues(sequence *Sequence) {
 	sequence.FadeOff = GetFadeOnValues(MIN_DMX_BRIGHTNESS, sequence.RGBSize)
 }
 
-func GetFadeValues(noCoordinates int, from float64, too int, fade int, reverse bool) (out []int) {
-
-	var x float64
-	var counter float64
-	var slope float64
-
-	coordinates := float64(noCoordinates)
-
-	switch fade {
-	case 10:
-		slope = 30
-	case 9:
-		slope = 15
-	case 8:
-		slope = 10
-	case 7:
-		slope = 7
-	case 6:
-		slope = 5
-	case 5:
-		slope = 4
-	case 4:
-		slope = 3
-	case 3:
-		slope = 2
-	case 2:
-		slope = 1.5
-	case 1:
-		slope = 1
-	default:
-		slope = 0
+// GetFadeValues calculates a slice of faded integer values optimized for DMX ranges (0-255).
+// It filters out values outside your dynamic constraints while guaranteeing the slice
+// begins exactly with your starting point.
+func GetFadeValues(noCoordinates int, from int, too int, fade int, reverse bool) []int {
+	// Guard edge cases to prevent division by zero or empty outputs
+	if noCoordinates <= 0 {
+		return nil
+	}
+	if noCoordinates == 1 {
+		if !reverse && MAX_DMX_BRIGHTNESS >= from {
+			return []int{from}
+		} else if reverse && MAX_DMX_BRIGHTNESS >= from {
+			return []int{from}
+		}
+		return nil
 	}
 
+	// Map fade levels to slope exponents using an array lookup
+	slopes := [...]float64{0, 1, 1.5, 2, 3, 4, 5, 7, 10, 15, 30}
+	var slope float64
+	if fade >= 0 && fade < len(slopes) {
+		slope = slopes[fade]
+	}
+
+	out := make([]int, 0, noCoordinates)
+	maxIdx := float64(noCoordinates - 1)
+	addedFrom := false
+
 	if !reverse {
-		for counter = 0; counter <= coordinates-1; counter++ {
-			x = (counter / 2) / (coordinates - 1)
+		// Fade up mode.
+		for i := 0; i < noCoordinates; i++ {
+			x := (float64(i) / 2.0) / maxIdx
 			y := math.Pow(math.Sin(x*math.Pi), slope)
-			dmx := int(from * y)
+			dmx := int(MAX_DMX_BRIGHTNESS * y)
+
+			// Double-check standard DMX ceiling boundaries
+			if dmx > MAX_DMX_BRIGHTNESS {
+				dmx = MAX_DMX_BRIGHTNESS
+			}
+
+			// Filter out values below our floor starting point
+			if dmx < from {
+				addedFrom = true
+				continue
+			}
+
+			// Insert the starting floor value right before the first valid curve element
+			if addedFrom && len(out) == 0 {
+				out = append(out, from)
+			}
+
 			out = append(out, dmx)
 		}
+
+		// Fallback if all values were filtered out
+		if len(out) == 0 && addedFrom {
+			out = append(out, from)
+		}
+
 	} else {
-		for counter = coordinates - 1; counter >= 0; counter-- {
-			x = (counter / 2) / (coordinates - 1)
+		// Fade down mode.
+		for i := noCoordinates - 1; i >= 0; i-- {
+			x := (float64(i) / 2.0) / maxIdx
 			y := math.Pow(math.Sin(x*math.Pi), slope)
-			dmx := int(from * y)
+			dmx := int(MAX_DMX_BRIGHTNESS * y)
+
+			if dmx > MAX_DMX_BRIGHTNESS {
+				dmx = MAX_DMX_BRIGHTNESS
+			}
+
+			// Filter out values above our ceiling starting point
+			if dmx > from {
+				addedFrom = true
+				continue
+			}
+
+			// Insert the clean starting ceiling right before the first valid curve elements
+			if addedFrom && len(out) == 0 {
+				out = append(out, from)
+			}
+
+			// Stop the fade early if it goes lower than your target low threshold
 			if dmx < too {
-				return out
+				break
 			}
 			out = append(out, dmx)
+		}
+
+		// Fallback if all values were filtered out
+		if len(out) == 0 && addedFrom {
+			out = append(out, from)
 		}
 	}
 
@@ -1928,7 +1982,7 @@ func newColorPicker() []ColorPicker {
 		{ID: 16, X: 0, Y: 2, Name: "Salmon", Code: 0x6b, Color: colors.Salmon},
 		{ID: 17, X: 1, Y: 2, Name: "Light Orange", Code: 0x0c, Color: colors.LightOrange},
 		{ID: 18, X: 2, Y: 2, Name: "Olive", Code: 0x10, Color: colors.Olive},
-		{ID: 19, X: 3, Y: 2, Name: "Lawn green", Code: 0x13, Color: colors.LawnGreen},
+		{ID: 19, X: 3, Y: 2, Name: "Lawn Green", Code: 0x13, Color: colors.LawnGreen},
 		{ID: 20, X: 4, Y: 2, Name: "Teal", Code: 0x44, Color: colors.Teal},
 		{ID: 21, X: 5, Y: 2, Name: "Light Blue", Code: 0x20, Color: colors.LightBlue},
 		{ID: 22, X: 6, Y: 2, Name: "Violet", Code: 0x5e, Color: colors.Violet},

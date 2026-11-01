@@ -26,7 +26,7 @@ import (
 )
 
 // Start Flood.
-func startFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
+func startFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.FixtureColor {
 	if debug {
 		fmt.Printf("Fixture:%d Set RGB Flood\n", fixtureNumber)
 	}
@@ -60,7 +60,7 @@ func startFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures
 }
 
 // Stop Flood.
-func stopFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
+func stopFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.FixtureColor {
 
 	if debug {
 		fmt.Printf("Fixture:%d Set Stop RGB Flood\n", fixtureNumber)

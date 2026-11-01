@@ -240,6 +240,19 @@ func FullClear(this *CurrentState, sequences []*common.Sequence, fixturesConfig 
 
 		}
 
+		// Clear out our copy of the sequences RGB colors.
+		if sequenceNumber == sequence.ChaserSequenceNumber {
+			sequence.SequenceColors = []color.RGBA{colors.White}
+			sequence.UpdateColors = true
+		}
+		if sequenceNumber != sequence.ChaserSequenceNumber {
+			sequence.SequenceColors = []color.RGBA{colors.Green}
+			sequence.UpdateColors = true
+		}
+
+		// Clear out our copy of the sequences static colors.
+		sequences[sequenceNumber].StaticColors = common.SetDefaultStaticColorButtons() // Populate the static color pallete.
+
 		// Handle the display for this sequence.
 		this.SelectedSequence = sequenceNumber
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)

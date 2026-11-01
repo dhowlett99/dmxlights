@@ -37,7 +37,7 @@ func MapFixtures(iAmAChaserSequence bool, iAmARunningChaserSequence bool, scanne
 	baseColorName color.RGBA,
 	pan int, tilt int, shutter int, rotate int, program int, programSpeed int, selectedGobo int, scannerColor int,
 	fixtures *Fixtures, blackout bool, brightness int, master int, music int, strobe bool, strobeSpeed int,
-	dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
+	dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.FixtureColor) {
 
 	// We control the brightness of each color with the brightness value.
 	// The overall fixture brightness is set from the master value.

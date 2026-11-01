@@ -108,6 +108,20 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.StartFlood = false
 			sequence.StopFlood = true
 			sequence.FloodPlayOnce = true
+
+			// Clear out the sequence colors.
+			if mySequenceNumber == sequence.ChaserSequenceNumber {
+				sequence.SequenceColors = []color.RGBA{colors.White}
+				sequence.UpdateColors = true
+			}
+			if mySequenceNumber != sequence.ChaserSequenceNumber {
+				sequence.SequenceColors = []color.RGBA{colors.Green}
+				sequence.UpdateColors = true
+			}
+
+			// Clear out the sequences copy of static colors.
+			sequence.StaticColors = common.SetDefaultStaticColorButtons() // Populate the static color pallete.
+
 		}
 		if sequence.Type == "scanner" {
 			// Reset pan and tilt to the center
@@ -462,6 +476,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		// Normal is used to recover from blackout.
 		sequence.Hidden = false
+		sequence.StaticFadeDownOnce = true
 		sequence.StaticFadeUpOnce = true
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
@@ -601,7 +616,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Clear Static Color \n", mySequenceNumber)
 		}
 		// Populate the static colors for this sequence with the defaults.
-		sequence.StaticColors = common.SetDefaultStaticColorButtons(mySequenceNumber)
+		sequence.StaticColors = common.SetDefaultStaticColorButtons()
 		sequence.PlayStaticOnce = true
 		sequence.StaticFadeUpOnce = false
 		sequence.Static = true

@@ -25,7 +25,7 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
-func playScanner(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
+func playScanner(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.FixtureColor) {
 
 	if debug {
 		fmt.Printf("Fixture:%d playScanner\n", fixtureNumber)

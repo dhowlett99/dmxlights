@@ -24,7 +24,7 @@ import (
 )
 
 // Now play all the values for this state.
-func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
+func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.FixtureColor) {
 
 	if debug {
 		fmt.Printf("playRGB: fixtureNumber %d", fixtureNumber)

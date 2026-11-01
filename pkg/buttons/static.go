@@ -45,7 +45,7 @@ func selectStaticFixture(sequences []*common.Sequence, X int, Y int, this *Curre
 	// The current color is held in our local copy.
 	currentColor := sequences[this.TargetSequence].StaticColors[X].Color
 	if currentColor == colors.EmptyColor {
-		currentColor = FindCurrentColor(this.SelectedStaticFixtureNumber, this.SelectedSequence, sequences[this.TargetSequence].AvailableStaticColors)
+		currentColor = FindCurrentColor(this.SelectedStaticFixtureNumber, this.SelectedSequence, sequences[this.TargetSequence].RGBAvailableColors)
 	}
 
 	if debug {
@@ -56,7 +56,7 @@ func selectStaticFixture(sequences []*common.Sequence, X int, Y int, this *Curre
 	sequences[this.TargetSequence].StaticSequenceColors = append(sequences[this.TargetSequence].StaticSequenceColors, currentColor)
 
 	// We call ShowRGBColorPicker so you can choose the static color for this fixture.
-	ShowRGBColorPicker(sequences[this.TargetSequence].StaticSequenceColors, sequences[this.TargetSequence].AvailableStaticColors, eventsForLaunchpad, guiButtons, commandChannels)
+	ShowRGBColorPicker(sequences[this.TargetSequence].StaticSequenceColors, sequences[this.TargetSequence].RGBAvailableColors, eventsForLaunchpad, guiButtons, commandChannels)
 
 	// Switch the mode so we know we are picking a static color from the color picker.
 	this.ShowStaticColorPicker = true
@@ -78,7 +78,7 @@ func selectStaticColor(sequences []*common.Sequence, X int, Y int, this *Current
 	}
 
 	// Find the color from the button pressed.
-	color := FindCurrentColor(X, Y, sequences[this.TargetSequence].AvailableStaticColors)
+	color := FindCurrentColor(X, Y, sequences[this.TargetSequence].RGBAvailableColors)
 
 	if debug {
 		fmt.Printf("Selected Static Color for X %d  Y %d to Color %+v\n", this.SelectedStaticFixtureNumber, Y, color)
@@ -131,7 +131,7 @@ func selectStaticColor(sequences []*common.Sequence, X int, Y int, this *Current
 	common.HideSequence(this.TargetSequence, commandChannels)
 
 	// We call ShowRGBColorPicker so you can see which static color has been selected for this fixture.
-	ShowRGBColorPicker(sequences[this.TargetSequence].StaticSequenceColors, sequences[this.TargetSequence].AvailableStaticColors, eventsForLaunchpad, guiButtons, commandChannels)
+	ShowRGBColorPicker(sequences[this.TargetSequence].StaticSequenceColors, sequences[this.TargetSequence].RGBAvailableColors, eventsForLaunchpad, guiButtons, commandChannels)
 
 	// Set the first pressed for only this fixture and cancel any others
 	for x := 0; x < 8; x++ {

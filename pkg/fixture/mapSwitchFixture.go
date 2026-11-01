@@ -34,14 +34,14 @@ func MapSwitchFixture(swiTch common.Switch,
 	RGBFade int,
 	dmxController *ft232.DMXController,
 	fixturesConfig *Fixtures, blackout bool,
-	brightness int, master int, masterChanging bool, lastColor common.LastColor,
+	brightness int, master int, masterChanging bool, lastColor common.FixtureColor,
 	switchChannels []common.SwitchChannel,
 	SoundTriggers []*common.Trigger,
 	soundConfig *sound.SoundConfig,
 	dmxInterfacePresent bool,
 	eventsForLaunchpad chan common.ALight,
 	guiButtons chan common.ALight,
-	fixtureStepChannel chan common.FixtureCommand) common.LastColor {
+	fixtureStepChannel chan common.FixtureCommand) common.FixtureColor {
 
 	var useFixtureLabel string
 
@@ -113,7 +113,7 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.Name = "Off"
 			newAction.Number = 1
 			newAction.Mode = "Off"
-			lastColor := common.LastColor{}
+			lastColor := common.FixtureColor{}
 			newMiniSequencer(thisFixture, swiTch, override, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 		}
 

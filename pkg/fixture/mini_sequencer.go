@@ -67,7 +67,7 @@ func newMiniSequencer(fixture *Fixture,
 	action Action,
 	dmxController *ft232.DMXController, fixturesConfig *Fixtures,
 	switchChannels []common.SwitchChannel, soundConfig *sound.SoundConfig,
-	blackout bool, brightness int, master int, masterChanging bool, lastColor common.LastColor,
+	blackout bool, brightness int, master int, masterChanging bool, lastColor common.FixtureColor,
 	dmxInterfacePresent bool,
 	eventsForLaunchpad chan common.ALight,
 	guiButtons chan common.ALight,
@@ -142,7 +142,7 @@ func newMiniSequencer(fixture *Fixture,
 			if debug {
 				fmt.Printf("Action OFF fade to black\n")
 			}
-			fadeDownValues := common.GetFadeValues(64, float64(master), common.MIN_DMX_BRIGHTNESS, 1, true)
+			fadeDownValues := common.GetFadeValues(64, master, common.MIN_DMX_BRIGHTNESS, 1, true)
 			for _, fade := range fadeDownValues {
 				// Listen for stop command.
 				select {
@@ -455,11 +455,11 @@ func newMiniSequencer(fixture *Fixture,
 
 		// Soft start
 		// Calulate the steps
-		fadeUpValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), common.MIN_DMX_BRIGHTNESS, 1, false)
-		fadeDownValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), common.MIN_DMX_BRIGHTNESS, 1, true)
+		fadeUpValues := common.GetFadeValues(64, common.MAX_DMX_BRIGHTNESS, common.MIN_DMX_BRIGHTNESS, 1, false)
+		fadeDownValues := common.GetFadeValues(64, common.MIN_DMX_BRIGHTNESS, common.MAX_DMX_BRIGHTNESS, 1, true)
 
 		// Now Fade up
-		go func(lastColor common.LastColor) {
+		go func(lastColor common.FixtureColor) {
 
 			if !masterChanging {
 				// If last color is set then fade down first.
@@ -478,7 +478,7 @@ func newMiniSequencer(fixture *Fixture,
 						time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.Fade))))
 					}
 					// Fade down complete, set lastColor to empty in the fixture.
-					empty := common.LastColor{
+					empty := common.FixtureColor{
 						RGBColor:     colors.EmptyColor,
 						ScannerColor: 0,
 						Brightness:   common.MIN_DMX_BRIGHTNESS,
@@ -554,7 +554,7 @@ func newMiniSequencer(fixture *Fixture,
 			if debug {
 				fmt.Printf("Action Chase STARTUP: fade down to black from %+v\n", lastColor)
 			}
-			fadeDownValues := common.GetFadeValues(64, float64(master), common.MIN_DMX_BRIGHTNESS, 1, true)
+			fadeDownValues := common.GetFadeValues(64, master, common.MAX_DMX_BRIGHTNESS, 1, true)
 			for _, fade := range fadeDownValues {
 				// Listen for stop command.
 				select {

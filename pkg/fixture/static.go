@@ -28,15 +28,15 @@ import (
 )
 
 // Switch On Static Scene.
-func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
+func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.FixtureColor {
 
-	if debug {
-		fmt.Printf("Fixture:%d setStaticOn\n", fixtureNumber)
+	if debug && fixtureNumber == 00 {
+		fmt.Printf("setStaticOn: Fixture %d\n", fixtureNumber)
 	}
 
 	if cmd.RGBStaticColors[fixtureNumber].Enabled {
-		if debug {
-			fmt.Printf("%d: Fixture:%d RGB Switch Static On - Trying to Set RGB Static Master=%d\n", cmd.SequenceNumber, fixtureNumber, cmd.Master)
+		if debug && fixtureNumber == 00 {
+			fmt.Printf("setStaticOn: Fixture %d Master=%d\n", fixtureNumber, cmd.Master)
 		}
 
 		// TODO find sequence numbers from config.
@@ -44,20 +44,24 @@ func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 			cmd.SequenceNumber = 2
 		}
 
-		lamp := cmd.RGBStaticColors[fixtureNumber]
+		nextColor := common.FixtureColor{
+			RGBColor:   cmd.RGBStaticColors[fixtureNumber].Color,
+			Brightness: cmd.Master,
+			Flash:      cmd.RGBStaticColors[fixtureNumber].Flash,
+		}
 
 		// If we're not hiding the sequence on the launchpad, show the static colors on the buttons.
 		if !cmd.Hidden {
-			if lamp.Flash {
-				onColor := color.RGBA{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B, A: lamp.Color.A}
+			if nextColor.Flash {
+				onColor := color.RGBA{R: nextColor.RGBColor.R, G: nextColor.RGBColor.G, B: nextColor.RGBColor.B, A: nextColor.RGBColor.A}
 				common.FlashLight(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, onColor, colors.Black, eventsForLaunchpad, guiButtons)
 			} else {
-				common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, lamp.Color, cmd.Master, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, nextColor.RGBColor, cmd.Master, eventsForLaunchpad, guiButtons)
 			}
 		}
 
 		// Look for a matching color
-		color := common.GetColorNameByRGB(lamp.Color)
+		color := common.GetColorNameByRGB(nextColor.RGBColor)
 		// Find a suitable gobo based on the requested static lamp color.
 		scannerGobo := GetGoboByName(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 		// Find a suitable color wheel settin based on the requested static lamp color.
@@ -69,17 +73,25 @@ func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 		} else {
 			iAmAChaserSequence = false
 		}
-		return MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, lamp.Color, lamp.Color, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+		return MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, nextColor.RGBColor, nextColor.RGBColor, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, nextColor.Brightness, nextColor.Brightness, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 	}
 
-	return common.LastColor{}
+	return common.FixtureColor{}
 }
 
 // Fade Up RGB Static Scene
-func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 
-	if debug {
-		fmt.Printf("%d: fadeUpStaticFixture: Fixture No %d LastColor %+v\n", cmd.SequenceNumber, fixtureNumber, lastColor)
+	nextColor := common.FixtureColor{
+		RGBColor:   cmd.RGBStaticColors[fixtureNumber].Color,
+		Brightness: cmd.Master,
+		Flash:      cmd.RGBStaticColors[fixtureNumber].Flash,
+	}
+
+	if debug && fixtureNumber == 0 {
+		fmt.Printf("fadeUpStatic fixture number %d \n", fixtureNumber)
+		fmt.Printf("Last Color %+v Last Brightnes %d\n", lastColor.RGBColor, lastColor.Brightness)
+		fmt.Printf("Next Color %+v Next Brightnes %d\n", nextColor.RGBColor, nextColor.Brightness)
 	}
 
 	if cmd.SequenceNumber == 4 {
@@ -98,38 +110,35 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 	case <-time.After(100 * time.Millisecond):
 	}
 
-	lamp := cmd.RGBStaticColors[fixtureNumber]
-
-	if debug {
-		fmt.Printf("fadeUpStatic %d:%d Last Color %s Last Brightness %d This Color %s This Brightness %d\n", cmd.SequenceNumber, fixtureNumber, common.GetColorNameByRGB(lastColor.RGBColor), lastColor.Brightness, common.GetColorNameByRGB(lamp.Color), cmd.Master)
-	}
-
 	// They are the same color but the brightness is different.
-	if (lastColor.RGBColor == lamp.Color) && (lastColor.Brightness != cmd.Master) {
+	if (lastColor.RGBColor == nextColor.RGBColor) && (lastColor.Brightness != nextColor.Brightness) {
 
-		// If the requested brightness is greater than the last brightness just fade up to that brightness.
-		if cmd.Master > lastColor.Brightness {
+		// If the requested next color brightness is greater than the last color brightness just fade up to that brightness.
+		if nextColor.Brightness > lastColor.Brightness {
+
+			if debug && fixtureNumber == 0 {
+				fmt.Printf("requested colors are the same but the brightness is greater than the last brightness\n")
+			}
+
 			go func() {
-				if debug {
-					fmt.Printf("requested brightness is greater than the last brightness\n")
-				}
+
 				// If enabled fade up.
 				if cmd.RGBStaticColors[fixtureNumber].Enabled {
-					fadeUp(fixtureNumber, cmd, lastColor, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+					fadeUp(fixtureNumber, cmd, lastColor, nextColor, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 				}
 			}()
 			return
 		}
 
 		// if the requested brightness is less than the last brightness just fade down to that brightness.
-		if cmd.Master < lastColor.Brightness {
+		if nextColor.Brightness < lastColor.Brightness {
+			if debug && fixtureNumber == 0 {
+				fmt.Printf("requested colors are the same but requested color brightness is less than the last colors brightness\n")
+			}
 			go func() {
-				if debug {
-					fmt.Printf("requested brightness is less than the last brightness\n")
-				}
-				// If requested color is not empty fade down.
+				// If requested color is not empty fade down.nextColor is not black
 				if lastColor.RGBColor != colors.EmptyColor {
-					lastColor = fadeDown(fixtureNumber, cmd, lastColor, stopFadeDown, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+					lastColor = fadeDown(fixtureNumber, cmd, lastColor, nextColor, stopFadeDown, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 				}
 			}()
 			return
@@ -137,47 +146,62 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 	}
 
 	// If colors are completely different.
-	if lastColor.RGBColor != lamp.Color {
-		if debug {
+	if lastColor.RGBColor != nextColor.RGBColor {
+		if debug && fixtureNumber == 0 {
 			fmt.Printf("colors are completely different.\n")
 		}
 		// Now Fade Down
 		go func() {
 
-			// If requested color is not empty fade down.
-			if lastColor.RGBColor != colors.EmptyColor {
-				lastColor = fadeDown(fixtureNumber, cmd, lastColor, stopFadeDown, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			// If last color is not black fade down first.
+			if lastColor.RGBColor != colors.Black {
+				if debug && fixtureNumber == 0 {
+					fmt.Printf("nextColor is not black.\n")
+				}
+				// Make the off color black, brightness zero so fade to black works.
+				offColor := common.FixtureColor{}
+				offColor.RGBColor = color.RGBA{0, 0, 0, 0} // Black
+				offColor.Brightness = common.MIN_DMX_BRIGHTNESS
+				lastColor = fadeDown(fixtureNumber, cmd, lastColor, offColor, stopFadeDown, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			}
 
 			// If enabled fade up.
 			if cmd.RGBStaticColors[fixtureNumber].Enabled {
-				fadeUp(fixtureNumber, cmd, lastColor, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+				fadeUp(fixtureNumber, cmd, lastColor, nextColor, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			}
 		}()
+		return
+	}
+
+	if debug && fixtureNumber == 0 {
+		fmt.Printf("everything is the same, nothing to see here.\n")
 	}
 }
 
-func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastColor, stopFadeDown chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
+func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, nextColor common.FixtureColor, stopFadeDown chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.FixtureColor {
 
-	if debug {
-		fmt.Printf("fadeDown brightness was %d to %d\n", lastColor.Brightness, cmd.Master)
+	if debug && fixtureNumber == 0 {
+		fmt.Printf("fadeDown fixture number %d \n", fixtureNumber)
+		fmt.Printf("Last Color %+v Last Brightnes %d\n", lastColor.RGBColor, lastColor.Brightness)
+		fmt.Printf("Next Color %+v Next Brightnes %d\n", nextColor.RGBColor, nextColor.Brightness)
+	}
+	//}
+	if debug && fixtureNumber == 0 {
+		fmt.Printf("From %d To %d\n", lastColor.Brightness, nextColor.Brightness)
+	}
+	fadeDownValues := common.GetFadeValues(64, lastColor.Brightness, nextColor.Brightness, 1, true)
+	if debug && fixtureNumber == 0 {
+		fmt.Printf("fadeDown: Fadedown values %+v\n", fadeDownValues)
 	}
 
-	// Calulate the steps
-	fadeDownValues := common.GetFadeValues(64, float64(lastColor.Brightness), cmd.Master, 1, true)
-
-	if debug {
-		fmt.Printf("fadeDownValues are %v\n", fadeDownValues)
-	}
+	// Look for a matching color
+	color := common.GetColorNameByRGB(lastColor.RGBColor)
+	// Find a suitable gobo based on the requested static lamp color.
+	scannerGobo := GetGoboByName(fixtureNumber, cmd.SequenceNumber, color, fixtures)
+	// Find a suitable color wheel settin based on the requested static lamp color.
+	scannerColor := GetColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 
 	for _, fade := range fadeDownValues {
-
-		// Look for a matching color
-		color := common.GetColorNameByRGB(lastColor.RGBColor)
-		// Find a suitable gobo based on the requested static lamp color.
-		scannerGobo := GetGoboByName(fixtureNumber, cmd.SequenceNumber, color, fixtures)
-		// Find a suitable color wheel settin based on the requested static lamp color.
-		scannerColor := GetColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 
 		// Listen for stop command.
 		select {
@@ -198,16 +222,16 @@ func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Las
 		} else {
 			iAmAChaserSequence = false
 		}
-		MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, lastColor.RGBColor, lastColor.RGBColor, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, cmd.Master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+		MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, nextColor.RGBColor, nextColor.RGBColor, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, cmd.Master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 
 		// Control how long the fade take with the speed control.
 		time.Sleep((5 * time.Millisecond) * (time.Duration(cmd.RGBFade)))
 	}
 	// Fade down complete, set lastColor to the final color and brightness.
-	lastColor = common.LastColor{
+	lastColor = common.FixtureColor{
 		RGBColor:     lastColor.RGBColor,
 		ScannerColor: 0,
-		Brightness:   cmd.Master,
+		Brightness:   nextColor.Brightness,
 	}
 	command := common.FixtureCommand{
 		Type:      "lastColor",
@@ -218,22 +242,32 @@ func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Las
 	case <-time.After(100 * time.Millisecond):
 	}
 
+	if debug && fixtureNumber == 0 {
+		fmt.Printf("End of Fade down LastColor was %+v\n", lastColor)
+	}
+
 	return lastColor
 
 }
 
-func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastColor, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, nextColor common.FixtureColor, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 
-	if debug {
-		fmt.Printf("fadeUp\n")
+	if debug && fixtureNumber == 0 {
+		fmt.Printf("fadeUP fixture number %d \n", fixtureNumber)
+		fmt.Printf("Last Color %+v Last Brightnes %d\n", lastColor.RGBColor, lastColor.Brightness)
+		fmt.Printf("Next Color %+v Next Brightnes %d\n", nextColor.RGBColor, nextColor.Brightness)
 	}
 
 	// Calulate the steps
-	fadeUpValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 0, 1, false)
+	// HERE lastColor.Brightness is not getting set ?????
+	fadeUpValues := common.GetFadeValues(64, lastColor.Brightness, common.MAX_DMX_BRIGHTNESS, 1, false)
+	if debug && fixtureNumber == 0 {
+		fmt.Printf("fadeup: Fadeup values %+v\n", fadeUpValues)
+	}
 
 	// Look for a matching color
-	lamp := cmd.RGBStaticColors[fixtureNumber]
-	color := common.GetColorNameByRGB(lamp.Color)
+
+	color := common.GetColorNameByRGB(nextColor.RGBColor)
 	// Find a suitable gobo based on the requested static lamp color.
 	scannerGobo := GetGoboByName(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 	// Find a suitable color wheel settin based on the requested static lamp color.
@@ -273,17 +307,19 @@ func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastC
 		// Now play out the fade up commands.
 		if !cmd.Hidden {
 			fade := applyMasterToFade(fade, master)
-			common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, lamp.Color, fade, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, nextColor.RGBColor, fade, eventsForLaunchpad, guiButtons)
 		}
-		lastColor = MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, lamp.Color, lamp.Color, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+		lastColor = MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, nextColor.RGBColor, nextColor.RGBColor, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 
 		// Control how long the fade take with the speed control.
 		time.Sleep((5 * time.Millisecond) * (time.Duration(cmd.RGBFade)))
 	}
 
-	if debug {
+	if debug && fixtureNumber == 0 {
 		fmt.Printf("Fade up complete, set lastColor up in the fixture lastColor is %v\n", lastColor)
 	}
+
+	lastColor.Brightness = nextColor.Brightness
 
 	// Fade up complete, set lastColor up in the fixture.
 	command := common.FixtureCommand{
@@ -295,23 +331,32 @@ func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastC
 	case <-time.After(100 * time.Millisecond):
 	}
 
-	if debug {
+	if debug && fixtureNumber == 0 {
 		fmt.Printf("End of Fade up LastColor was %+v\n", lastColor)
 	}
 }
 
-func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 
-	if debug {
+	if debug && fixtureNumber == 0 {
 		fmt.Printf("staticOff Fixture No %d lastColor %v\n", fixtureNumber, lastColor.RGBColor)
 	}
 
 	go func() {
-		var master int
-		fadeDownValues := common.GetFadeValues(64, float64(cmd.Master), common.MIN_DMX_BRIGHTNESS, 1, true)
-		if lastColor.RGBColor != colors.Black {
 
-			if debug {
+		// Changing just the brightnes.
+		if lastColor.Brightness != cmd.Master {
+			return
+		}
+
+		if lastColor.RGBColor != colors.Black {
+			var master int
+			fadeDownValues := common.GetFadeValues(64, lastColor.Brightness, cmd.Master, 1, true)
+			if debug && fixtureNumber == 0 {
+				fmt.Printf("staticOff: Fadedown values %+v\n", fadeDownValues)
+			}
+
+			if debug && fixtureNumber == 0 {
 				fmt.Printf("Fixture:%d =====>   RGB Static OFF -> Fade Down from LastColor %+v fadeDownValues %v\n", fixtureNumber, lastColor, fadeDownValues)
 			}
 
@@ -358,7 +403,7 @@ func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.La
 				time.Sleep((5 * time.Millisecond) * (time.Duration(cmd.RGBFade)))
 			}
 			// Fade down complete, set lastColor to empty in the fixture.
-			empty := common.LastColor{
+			empty := common.FixtureColor{
 				RGBColor:     colors.EmptyColor,
 				ScannerColor: 0,
 				Brightness:   common.MIN_DMX_BRIGHTNESS,
