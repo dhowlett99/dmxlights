@@ -177,8 +177,8 @@ func FixtureReceiver(
 			if debug && myFixtureNumber == 0 {
 				fmt.Printf("%d:%d Static Off Hidden=%t lastColor %v\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden, lastColor)
 			}
-			// staticOff doesn't return a lastColor, instead it sends a message directly to the fixture to set lastColor once it's finished fading down.
-			staticOff(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixturesConfig, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			// setStaticOff doesn't return a lastColor, instead it sends a message directly to the fixture to set lastColor once it's finished fading down.
+			setStaticOff(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixturesConfig, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.Type == "scanner":

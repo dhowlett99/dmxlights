@@ -354,15 +354,14 @@ func clearFixture(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown cha
 		fmt.Printf("Fixture:%d clear\n", fixtureNumber)
 	}
 
-	// Send stop any running fade ups.
+	// Send stop to any running fade ups.
 	select {
 	case stopFadeUp <- true:
 	case <-time.After(100 * time.Millisecond):
 	}
 
-	// Send stop any running fade downs.
+	// Send stop to any running fade downs.
 	select {
-	case stopFadeDown <- true:
 	case stopFadeDown <- true:
 	case <-time.After(100 * time.Millisecond):
 	}
