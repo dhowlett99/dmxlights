@@ -89,9 +89,9 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 	}
 
 	if debug && fixtureNumber == 0 {
-		fmt.Printf("fadeUpStatic fixture number %d \n", fixtureNumber)
-		fmt.Printf("Last Color %+v Last Brightnes %d\n", lastColor.RGBColor, lastColor.Brightness)
-		fmt.Printf("Next Color %+v Next Brightnes %d\n", nextColor.RGBColor, nextColor.Brightness)
+		fmt.Printf("%d: fadeUpStatic fixture number %d \n", cmd.SequenceNumber, fixtureNumber)
+		fmt.Printf("%d: Last Color %+v Last Brightnes %d\n", cmd.SequenceNumber, lastColor.RGBColor, lastColor.Brightness)
+		fmt.Printf("%d: Next Color %+v Next Brightnes %d\n", cmd.SequenceNumber, nextColor.RGBColor, nextColor.Brightness)
 	}
 
 	if cmd.SequenceNumber == 4 {
@@ -117,7 +117,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 		if nextColor.Brightness > lastColor.Brightness {
 
 			if debug && fixtureNumber == 0 {
-				fmt.Printf("requested colors are the same but the brightness is greater than the last brightness\n")
+				fmt.Printf("%d: requested colors are the same but the brightness is greater than the last brightness\n", cmd.SequenceNumber)
 			}
 
 			go func() {
@@ -133,7 +133,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 		// if the requested brightness is less than the last brightness just fade down to that brightness.
 		if nextColor.Brightness < lastColor.Brightness {
 			if debug && fixtureNumber == 0 {
-				fmt.Printf("requested colors are the same but requested color brightness is less than the last colors brightness\n")
+				fmt.Printf("%d: requested colors are the same but requested color brightness is less than the last colors brightness\n", cmd.SequenceNumber)
 			}
 			go func() {
 				// If requested color is not empty fade down.nextColor is not black
@@ -148,7 +148,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 	// If colors are completely different.
 	if lastColor.RGBColor != nextColor.RGBColor {
 		if debug && fixtureNumber == 0 {
-			fmt.Printf("colors are completely different.\n")
+			fmt.Printf("%d: colors are completely different.\n", cmd.SequenceNumber)
 		}
 		// Now Fade Down
 		go func() {
@@ -156,7 +156,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 			// If last color is not black fade down first.
 			if lastColor.RGBColor != colors.Black {
 				if debug && fixtureNumber == 0 {
-					fmt.Printf("nextColor is not black.\n")
+					fmt.Printf("%d: nextColor is not black.\n", cmd.SequenceNumber)
 				}
 				// Make the off color black, brightness zero so fade to black works.
 				offColor := common.FixtureColor{}
@@ -174,20 +174,20 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 	}
 
 	if debug && fixtureNumber == 0 {
-		fmt.Printf("everything is the same, nothing to see here.\n")
+		fmt.Printf("%d: everything is the same, nothing to see here.\n", cmd.SequenceNumber)
 	}
 }
 
 func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, nextColor common.FixtureColor, stopFadeDown chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.FixtureColor {
 
 	if debug && fixtureNumber == 0 {
-		fmt.Printf("fadeDown fixture number %d sequence Number %d\n", fixtureNumber, cmd.SequenceNumber)
-		fmt.Printf("Last Color %+v Last Brightnes %d\n", lastColor.RGBColor, lastColor.Brightness)
-		fmt.Printf("Next Color %+v Next Brightnes %d\n", nextColor.RGBColor, nextColor.Brightness)
+		fmt.Printf("%d fadeDown fixture number %d sequence Number %d\n", cmd.SequenceNumber, fixtureNumber, cmd.SequenceNumber)
+		fmt.Printf("%d Last Color %+v Last Brightnes %d\n", cmd.SequenceNumber, lastColor.RGBColor, lastColor.Brightness)
+		fmt.Printf("%d Next Color %+v Next Brightnes %d\n", cmd.SequenceNumber, nextColor.RGBColor, nextColor.Brightness)
 	}
 	fadeDownValues := common.GetFadeValues(64, lastColor.Brightness, nextColor.Brightness, 1, true)
 	if debug && fixtureNumber == 0 {
-		fmt.Printf("fadeDown: Fadedown values %+v\n", fadeDownValues)
+		fmt.Printf("%d fadeDown: Fadedown values %+v\n", cmd.SequenceNumber, fadeDownValues)
 	}
 
 	// Look for a matching color
@@ -239,7 +239,7 @@ func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fix
 	}
 
 	if debug && fixtureNumber == 0 {
-		fmt.Printf("fadeDown: End of Fade Down LastColor was %+v Master %d\n", lastColor, cmd.Master)
+		fmt.Printf("%d fadeDown: End of Fade Down LastColor was %+v Master %d\n", cmd.SequenceNumber, lastColor, cmd.Master)
 	}
 
 	return lastColor
@@ -249,15 +249,15 @@ func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fix
 func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, nextColor common.FixtureColor, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 
 	if debug && fixtureNumber == 0 {
-		fmt.Printf("fadeUP fixture number %d \n", fixtureNumber)
-		fmt.Printf("Last Color %+v Last Brightnes %d\n", lastColor.RGBColor, lastColor.Brightness)
-		fmt.Printf("Next Color %+v Next Brightnes %d\n", nextColor.RGBColor, nextColor.Brightness)
+		fmt.Printf("%d: fadeUP fixture number %d \n", cmd.SequenceNumber, fixtureNumber)
+		fmt.Printf("%d: Last Color %+v Last Brightnes %d\n", cmd.SequenceNumber, lastColor.RGBColor, lastColor.Brightness)
+		fmt.Printf("%d: Next Color %+v Next Brightnes %d\n", cmd.SequenceNumber, nextColor.RGBColor, nextColor.Brightness)
 	}
 
 	// Calulate the steps
 	fadeUpValues := common.GetFadeValues(64, lastColor.Brightness, nextColor.Brightness, 1, false)
 	if debug && fixtureNumber == 0 {
-		fmt.Printf("fadeup: Fadeup values %+v\n", fadeUpValues)
+		fmt.Printf("%d: fadeup: Fadeup values %+v\n", cmd.SequenceNumber, fadeUpValues)
 	}
 
 	// Look for a matching color
@@ -323,7 +323,7 @@ func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fixtu
 	}
 
 	if debug && fixtureNumber == 0 {
-		fmt.Printf("fadeUp: Fade up complete, set lastColor up in the fixture lastColor is %v\n", lastColor)
+		fmt.Printf("%d: fadeUp: Fade up complete, set lastColor up in the fixture lastColor is %v\n", cmd.SequenceNumber, lastColor)
 	}
 }
 
