@@ -78,7 +78,7 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 		// If we're a scanner sequence and not in static mode or the chaser is not in static mode, clear the buttom
 		if this.SequenceType[sequenceNumber] == "scanner" &&
 			!this.Static[sequenceNumber] &&
-			!this.Static[this.ChaserSequenceNumber] {
+			!this.Static[common.GlobalChaserSequenceNumber] {
 			common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
 		}
 
@@ -119,14 +119,14 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 
 		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
 		if this.SequenceType[sequenceNumber] == "scanner" &&
-			this.ScannerChaser[this.ScannerSequenceNumber] {
+			this.ScannerChaser[common.GlobalScannerSequenceNumber] {
 			// So adjust the mode to be CHASER_DISPLAY
 			this.SelectedMode[sequenceNumber] = CHASER_DISPLAY
 		}
 
 		// or if the chaser is in static mode.
 		if this.SequenceType[sequenceNumber] == "scanner" &&
-			this.ScannerChaser[this.ScannerSequenceNumber] && sequenceNumber == this.ChaserSequenceNumber {
+			this.ScannerChaser[common.GlobalScannerSequenceNumber] && sequenceNumber == common.GlobalChaserSequenceNumber {
 			// So adjust the mode to be CHASER_DISPLAY
 			this.SelectedMode[sequenceNumber] = CHASER_DISPLAY
 		}
@@ -140,7 +140,7 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 			cmd := common.Command{
 				Action: common.ClearAllFixtures,
 			}
-			common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
+			common.SendCommandToSequence(common.GlobalScannerSequenceNumber, cmd, commandChannels)
 		}
 
 		// Restore the functions states from the sequence.
@@ -228,8 +228,8 @@ func autoSelect(this *CurrentState, commandChannels []chan common.Command, lastS
 	for sequenceNumber, sequenceRunning := range this.Running {
 		if sequenceRunning {
 			lastSelectedSequence = sequenceNumber
-			if lastSelectedSequence == this.ChaserSequenceNumber {
-				lastSelectedSequence = this.ScannerSequenceNumber
+			if lastSelectedSequence == common.GlobalChaserSequenceNumber {
+				lastSelectedSequence = common.GlobalScannerSequenceNumber
 				if debug {
 					fmt.Printf("Found a running sequence %d\n", sequenceNumber)
 				}
@@ -242,8 +242,8 @@ func autoSelect(this *CurrentState, commandChannels []chan common.Command, lastS
 	for sequenceNumber, sequenceInStatic := range this.Static {
 		if sequenceInStatic {
 			lastSelectedSequence = sequenceNumber
-			if lastSelectedSequence == this.ChaserSequenceNumber {
-				lastSelectedSequence = this.ScannerSequenceNumber
+			if lastSelectedSequence == common.GlobalChaserSequenceNumber {
+				lastSelectedSequence = common.GlobalScannerSequenceNumber
 				if debug {
 					fmt.Printf("Found a static sequence %d\n", sequenceNumber)
 				}

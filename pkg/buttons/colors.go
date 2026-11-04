@@ -122,7 +122,7 @@ func selectRGBChaseColor(sequences []*common.Sequence, X int, Y int, this *Curre
 	}
 
 	if this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION {
-		this.TargetSequence = this.ChaserSequenceNumber
+		this.TargetSequence = common.GlobalChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
 	} else {
 		this.TargetSequence = this.SelectedSequence
@@ -174,7 +174,7 @@ func selectScannerColor(sequences []*common.Sequence, X int, Y int, this *Curren
 				{Name: "SelectedFixture", Value: this.SelectedFixture},
 			},
 		}
-		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 	}
 
 	this.EditScannerColorsMode = true

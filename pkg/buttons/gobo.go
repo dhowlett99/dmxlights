@@ -52,7 +52,7 @@ func selectGobo(sequences []*common.Sequence, X int, Y int, this *CurrentState, 
 				{Name: "FixtureNumber", Value: this.SelectedFixture},
 			},
 		}
-		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 	}
 
 	this.EditGoboSelectionMode = true

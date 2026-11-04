@@ -33,7 +33,7 @@ func toggleSequence(sequences []*common.Sequence, X int, Y int, this *CurrentSta
 
 	// Start in normal mode, hide the shutter chaser.
 	if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
-		common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+		common.HideSequence(common.GlobalChaserSequenceNumber, commandChannels)
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 		this.SelectedMode[this.SelectedSequence] = NORMAL
 	}
@@ -62,8 +62,8 @@ func toggleSequence(sequences []*common.Sequence, X int, Y int, this *CurrentSta
 		this.Running[this.SelectedSequence] = false
 		this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 		this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
-		this.Functions[this.ChaserSequenceNumber][common.Function6_Static_Gobo].State = false
-		this.Functions[this.ChaserSequenceNumber][common.Function8_Music_Trigger].State = false
+		this.Functions[common.GlobalChaserSequenceNumber][common.Function6_Static_Gobo].State = false
+		this.Functions[common.GlobalChaserSequenceNumber][common.Function8_Music_Trigger].State = false
 
 		// Stop should also stop the shutter chaser.
 		if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
@@ -71,28 +71,30 @@ func toggleSequence(sequences []*common.Sequence, X int, Y int, this *CurrentSta
 			cmd := common.Command{
 				Action: common.Stop,
 				Args: []common.Arg{
-					{Name: "Speed", Value: this.Speed[this.ChaserSequenceNumber]},
+					{Name: "Speed", Value: this.Speed[common.GlobalChaserSequenceNumber]},
 				},
 			}
-			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 
-			// If we're a scanner sequence, send a message to the chaser sequence so it knowns
-			// rotate commands are NOT being sent to the Pan and Tilt channels.
-			cmd = common.Command{
-				Action: common.UpdateRotateRunning,
-				Args: []common.Arg{
-					{Name: "Rotate", Value: false},
-				},
+			if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
+				// If we're a scanner sequence, send a message to the chaser sequence so it knowns
+				// rotate commands are NOT being sent to the Pan and Tilt channels.
+				cmd = common.Command{
+					Action: common.UpdateRotateRunning,
+					Args: []common.Arg{
+						{Name: "Rotate", Value: false},
+					},
+				}
+				common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 			}
-			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
-			this.Functions[this.ChaserSequenceNumber][common.Function6_Static_Gobo].State = false
-			this.Functions[this.ChaserSequenceNumber][common.Function8_Music_Trigger].State = false
+			this.Functions[common.GlobalChaserSequenceNumber][common.Function6_Static_Gobo].State = false
+			this.Functions[common.GlobalChaserSequenceNumber][common.Function8_Music_Trigger].State = false
 			this.ScannerChaser[this.SelectedSequence] = false
 			this.SelectedMode[this.SelectedSequence] = NORMAL
-			this.Running[this.ChaserSequenceNumber] = false
+			this.Running[common.GlobalChaserSequenceNumber] = false
 		}
 
 		// Clear the pattern function keys
@@ -128,15 +130,17 @@ func toggleSequence(sequences []*common.Sequence, X int, Y int, this *CurrentSta
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		common.LightLamp(common.Button{X: X, Y: Y}, colors.Green, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
-		// If we're a scanner sequence, send a message to the chaser sequence so it knowns
-		// rotate commands are being sent to the Pan and Tilt channels.
-		cmd = common.Command{
-			Action: common.UpdateRotateRunning,
-			Args: []common.Arg{
-				{Name: "Rotate", Value: true},
-			},
+		if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
+			// If we're a scanner sequence, send a message to the chaser sequence so it knowns
+			// rotate commands are being sent to the Pan and Tilt channels.
+			cmd = common.Command{
+				Action: common.UpdateRotateRunning,
+				Args: []common.Arg{
+					{Name: "Rotate", Value: true},
+				},
+			}
+			common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 		}
-		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
 		this.Running[this.SelectedSequence] = true
 		this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false

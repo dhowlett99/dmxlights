@@ -24,6 +24,9 @@ import (
 
 func Test_autoSelect(t *testing.T) {
 
+	common.GlobalChaserSequenceNumber = 4
+	common.GlobalScannerSequenceNumber = 2
+
 	type args struct {
 		this                 *CurrentState
 		commandChannels      []chan common.Command
@@ -102,8 +105,6 @@ func Test_autoSelect(t *testing.T) {
 			args: args{
 				lastSelectedSwitch: 0,
 				this: &CurrentState{
-					ChaserSequenceNumber:  4,
-					ScannerSequenceNumber: 2,
 					Running: map[int]bool{
 						0: false,
 						1: false,
@@ -121,9 +122,7 @@ func Test_autoSelect(t *testing.T) {
 				lastSelectedSwitch:   7,
 				lastSelectedSequence: 3,
 				this: &CurrentState{
-					ChaserSequenceNumber:  4,
-					ScannerSequenceNumber: 2,
-					SwitchSequenceNumber:  3,
+					SwitchSequenceNumber: 3,
 					Running: map[int]bool{
 						0: false,
 						1: false,

@@ -28,7 +28,7 @@ func selectPattern(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 	this.SelectedSequence = Y
 
 	if this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION {
-		this.TargetSequence = this.ChaserSequenceNumber
+		this.TargetSequence = common.GlobalChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
 		// This is the way we get the shutter chaser to be displayed as we exit
 		// the pattern selection

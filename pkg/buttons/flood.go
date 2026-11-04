@@ -59,7 +59,7 @@ func FloodOff(numberSequences int, this *CurrentState, commandChannels []chan co
 				{Name: "Hide", Value: this.ScannerChaser[this.SelectedSequence]},
 			},
 		}
-		common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(common.GlobalScannerSequenceNumber, cmd, commandChannels)
 	}
 
 	// ReStart any sequences that were running before the flood.

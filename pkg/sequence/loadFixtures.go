@@ -53,7 +53,7 @@ func LoadNewFixtures(sequence *common.Sequence,
 	// Count the number of fixtures for this sequence.
 	// The chaser uses the fixtures from the scanner group.
 	if sequence.Label == "chaser" {
-		sequence.NumberFixtures = fixture.GetNumberOfFixturesInGroup(sequence.ScannerSequenceNumber, fixturesConfig)
+		sequence.NumberFixtures = fixture.GetNumberOfFixturesInGroup(common.GlobalScannerSequenceNumber, fixturesConfig)
 	} else {
 		sequence.NumberFixtures = fixture.GetNumberOfFixturesInGroup(sequence.Number, fixturesConfig)
 	}

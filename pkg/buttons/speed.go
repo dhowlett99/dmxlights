@@ -44,7 +44,7 @@ func decreaseSpeed(sequences []*common.Sequence, this *CurrentState, commandChan
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
-				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+				common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 			}
 
 		}
@@ -208,7 +208,7 @@ func increaseSpeedRGB(sequences []*common.Sequence, this *CurrentState, commandC
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
-				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+				common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 			}
 		}
 

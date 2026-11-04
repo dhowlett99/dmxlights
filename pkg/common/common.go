@@ -77,6 +77,7 @@ const IS_SCANNER = true
 const IS_RGB = false
 
 var GlobalScannerSequenceNumber int
+var GlobalChaserSequenceNumber int
 
 var FLOOD_BUTTON = Button{X: 8, Y: 3}
 var SAVE_BUTTON = Button{X: 8, Y: 4}
@@ -541,8 +542,6 @@ type Sequence struct {
 	Label                       string                      // Sequence label.
 	Description                 string                      // Sequence description.
 	Number                      int                         // Sequence number.
-	ChaserSequenceNumber        int                         // Chaser Sequence Number.
-	ScannerSequenceNumber       int                         // Scanner Sequence Number.
 	Run                         bool                        // True if this sequence is running.
 	Pause                       bool                        // True if this sequence is paused.
 	SavedRun                    bool                        // Place to save state when loading.

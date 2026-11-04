@@ -42,7 +42,7 @@ func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForL
 	// Make sure modes are setup.
 	if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
 		(this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY) {
-		this.TargetSequence = this.ChaserSequenceNumber
+		this.TargetSequence = common.GlobalChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
 	} else {
 		this.TargetSequence = this.SelectedSequence

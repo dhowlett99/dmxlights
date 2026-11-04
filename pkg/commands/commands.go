@@ -110,11 +110,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.FloodPlayOnce = true
 
 			// Clear out the sequence colors.
-			if mySequenceNumber == sequence.ChaserSequenceNumber {
+			if mySequenceNumber == common.GlobalChaserSequenceNumber {
+				fmt.Printf("%d: Setting Sequence Color default to WhitechaserSeqNo is %d \n", mySequenceNumber, common.GlobalChaserSequenceNumber)
 				sequence.SequenceColors = []color.RGBA{colors.White}
 				sequence.UpdateColors = true
 			}
-			if mySequenceNumber != sequence.ChaserSequenceNumber {
+			if mySequenceNumber != common.GlobalChaserSequenceNumber {
+				fmt.Printf("%d: Setting Sequence Color default to Green chaserSeqNo is %d \n", mySequenceNumber, common.GlobalChaserSequenceNumber)
 				sequence.SequenceColors = []color.RGBA{colors.Green}
 				sequence.UpdateColors = true
 			}
@@ -204,7 +206,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	case common.Reveal:
 		if debug {
-			fmt.Printf("%d: Command Reveal Static=%t\n", mySequenceNumber, sequence.Static)
+			fmt.Printf("%d: Command Reveal PlayStatic=%t Hidden=%t\n", mySequenceNumber, false, false)
 		}
 		sequence.Hidden = false
 		sequence.PlayStaticOnce = false
@@ -212,7 +214,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	case common.StopStatic:
 		if debug {
-			fmt.Printf("%d: Command Stop Static=%t\n", mySequenceNumber, sequence.Static)
+			fmt.Printf("%d: Command Stop Static=%t\n", mySequenceNumber, true)
 		}
 		sequence.Hidden = false
 		sequence.StopStatic = true

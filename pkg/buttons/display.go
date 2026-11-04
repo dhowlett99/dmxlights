@@ -77,7 +77,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// Make sure we hide the shutter chaser.
 		if this.SequenceType[sequenceNumber] == "scanner" {
-			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+			common.HideSequence(common.GlobalChaserSequenceNumber, commandChannels)
 		}
 
 		common.RevealSequence(sequenceNumber, commandChannels)
@@ -105,7 +105,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// Make sure we hide the shutter chaser.
 		if this.SequenceType[sequenceNumber] == "scanner" {
-			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+			common.HideSequence(common.GlobalChaserSequenceNumber, commandChannels)
 		}
 
 		common.RevealSequence(sequenceNumber, commandChannels)
@@ -134,7 +134,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		if sequences[sequenceNumber].Type == "scanner" {
 			// Make sure we hide any rotates and show chaser.
 			common.HideSequence(sequenceNumber, commandChannels)
-			common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
+			common.RevealSequence(common.GlobalChaserSequenceNumber, commandChannels)
 		} else {
 			// Reveal the selected sequence.
 			common.RevealSequence(sequenceNumber, commandChannels)
@@ -162,7 +162,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		common.HideSequence(sequenceNumber, commandChannels)
 
 		// Reveal the chaser sequence.
-		common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
+		common.RevealSequence(common.GlobalChaserSequenceNumber, commandChannels)
 
 		// Label the select button to let you know your in chaser mode.
 		if this.SelectedSequence < 3 {
@@ -186,7 +186,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		common.HideSequence(sequenceNumber, commandChannels)
 
 		// Reveal the chaser sequence.
-		common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
+		common.RevealSequence(common.GlobalChaserSequenceNumber, commandChannels)
 
 		// Select individual fixtures.
 		this.SelectAllStaticFixtures = false
@@ -213,7 +213,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		common.HideSequence(sequenceNumber, commandChannels)
 
 		// Reveal the chaser sequence.
-		common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
+		common.RevealSequence(common.GlobalChaserSequenceNumber, commandChannels)
 
 		// Select all fixtures.
 		this.SelectAllStaticFixtures = true
@@ -240,7 +240,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// If we have a shutter chaser running hide it.
 		if this.SequenceType[sequenceNumber] == "scanner" {
-			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+			common.HideSequence(common.GlobalChaserSequenceNumber, commandChannels)
 		}
 
 		// Hide the sequence.
@@ -269,13 +269,13 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		}
 		// If we have a shutter chaser running hide it.
 		if this.ScannerChaser[sequenceNumber] && this.SelectedType == "scanner" {
-			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+			common.HideSequence(common.GlobalChaserSequenceNumber, commandChannels)
 		}
 		// Hide the normal sequence.
 		common.HideSequence(sequenceNumber, commandChannels)
 
 		// Show the chaser function buttons.
-		this.TargetSequence = this.ChaserSequenceNumber
+		this.TargetSequence = common.GlobalChaserSequenceNumber
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 
 		// Label the select button to let you know your in chaser mode.
@@ -294,7 +294,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// If we're a scanner sequence and trying to display the status bar we don't want a shutter chaser in view.
 		if this.SelectedType == "scanner" {
-			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+			common.HideSequence(common.GlobalChaserSequenceNumber, commandChannels)
 		}
 
 		// Hide the normal sequence.
@@ -376,7 +376,7 @@ func SetTarget(this *CurrentState) {
 	if this.SelectedType == "scanner" &&
 		this.ScannerChaser[this.SelectedSequence] &&
 		(this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY) {
-		this.TargetSequence = this.ChaserSequenceNumber
+		this.TargetSequence = common.GlobalChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
 	} else {
 		this.TargetSequence = this.SelectedSequence

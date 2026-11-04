@@ -46,7 +46,7 @@ func upArrow(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.AL
 	}
 	common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 	if this.ScannerChaser[this.SelectedSequence] {
-		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 	}
 
 	// Update status bar.
@@ -75,7 +75,7 @@ func downArrow(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.
 	}
 	common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 	if this.ScannerChaser[this.SelectedSequence] {
-		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 	}
 
 	// Update status bar.
@@ -105,7 +105,7 @@ func leftArrow(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.
 	}
 	common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 	if this.ScannerChaser[this.SelectedSequence] {
-		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 	}
 
 	// Update status bar.
@@ -136,7 +136,7 @@ func rightArrow(X int, Y int, this *CurrentState, eventsForLaunchpad chan common
 	}
 	common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 	if this.ScannerChaser[this.SelectedSequence] {
-		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 	}
 
 	// Update status bar.

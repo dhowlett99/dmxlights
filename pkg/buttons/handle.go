@@ -63,7 +63,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 	// Setup sequence numbers.
 	if this.ScannerChaser[this.SelectedSequence] {
-		this.TargetSequence = this.ChaserSequenceNumber
+		this.TargetSequence = common.GlobalChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
 	} else {
 		this.TargetSequence = this.SelectedSequence
@@ -78,11 +78,11 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	if this.EditScannerColorsMode {
 
 		if debug {
-			fmt.Printf("%d: If we're in color selection mode. turn off color func key\n", this.ChaserSequenceNumber)
+			fmt.Printf("%d: If we're in color selection mode. turn off color func key\n", common.GlobalChaserSequenceNumber)
 		}
 
 		// Reset the gobo function key.
-		this.Functions[this.ScannerSequenceNumber][common.Function5_Color].State = false
+		this.Functions[common.GlobalScannerSequenceNumber][common.Function5_Color].State = false
 
 		// Editing gobo is over for this sequence.
 		this.EditScannerColorsMode = false
@@ -91,11 +91,11 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// Clear scanner gobo selection mode.
 	if this.EditGoboSelectionMode {
 		if debug {
-			fmt.Printf("%d: If we're in gobo selection mode. turn off gobo func key\n", this.ChaserSequenceNumber)
+			fmt.Printf("%d: If we're in gobo selection mode. turn off gobo func key\n", common.GlobalChaserSequenceNumber)
 		}
 
 		// Reset the gobo function key.
-		this.Functions[this.ScannerSequenceNumber][common.Function6_Static_Gobo].State = false
+		this.Functions[common.GlobalScannerSequenceNumber][common.Function6_Static_Gobo].State = false
 
 		// Editing gobo is over for this sequence.
 		this.EditGoboSelectionMode = false
@@ -105,7 +105,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	if this.EditPatternMode {
 
 		if debug {
-			fmt.Printf("%d: If we're in pattern selection mode. turn off pattern func key\n", this.ChaserSequenceNumber)
+			fmt.Printf("%d: If we're in pattern selection mode. turn off pattern func key\n", common.GlobalChaserSequenceNumber)
 		}
 
 		// Reset the pattern function key.
@@ -126,7 +126,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.ShowStaticColorPicker = false
 
 		this.Functions[this.DisplaySequence][common.Function5_Color].State = false
-		this.Functions[this.ChaserSequenceNumber][common.Function5_Color].State = false
+		this.Functions[common.GlobalChaserSequenceNumber][common.Function5_Color].State = false
 
 		removeColorPicker(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
@@ -267,12 +267,12 @@ func getStatic(this *CurrentState) bool {
 
 	if debug {
 		fmt.Printf("Static SelectedSequence %t\n", this.Static[this.SelectedSequence])
-		fmt.Printf("Static ChaserSequenceNumber %t\n\n", this.Static[this.ChaserSequenceNumber])
+		fmt.Printf("Static ChaserSequenceNumber %t\n\n", this.Static[common.GlobalChaserSequenceNumber])
 	}
 
 	// If we're a scanner static can be from either the scanner or shutter chaser static value.
-	if this.SelectedSequence == this.ScannerSequenceNumber {
-		return this.Static[this.SelectedSequence] || this.Static[this.ChaserSequenceNumber]
+	if this.SelectedSequence == common.GlobalScannerSequenceNumber {
+		return this.Static[this.SelectedSequence] || this.Static[common.GlobalChaserSequenceNumber]
 	}
 	return this.Static[this.SelectedSequence]
 }
@@ -354,7 +354,7 @@ func printHandleDebug(this *CurrentState) {
 	fmt.Printf("HANDLE: this.ShowRGBColorPicker[%d] = %t\n", this.SelectedSequence, this.ShowRGBColorPicker)
 	fmt.Printf("HANDLE: this.ShowStaticColorPicker[%d] = %t\n", this.SelectedSequence, this.ShowStaticColorPicker)
 	fmt.Printf("HANDLE: this.Static[%d] = %t\n", this.SelectedSequence, this.Static[this.SelectedSequence])
-	fmt.Printf("HANDLE: this.Static[%d] = %t\n", this.ChaserSequenceNumber, this.Static[this.ChaserSequenceNumber])
+	fmt.Printf("HANDLE: this.Static[%d] = %t\n", common.GlobalChaserSequenceNumber, this.Static[common.GlobalChaserSequenceNumber])
 	fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t\n", this.SelectedSequence, this.EditGoboSelectionMode)
 	fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t\n", this.SelectedSequence, this.EditPatternMode)
 	fmt.Printf("HANDLE:===============================================\n")

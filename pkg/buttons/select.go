@@ -30,7 +30,7 @@ func selectSequence(sequences []*common.Sequence, this *CurrentState, eventsForL
 	this.SelectedType = sequences[this.SelectedSequence].Type
 
 	if this.ScannerChaser[this.SelectedSequence] {
-		this.EditWhichStaticSequence = this.ChaserSequenceNumber
+		this.EditWhichStaticSequence = common.GlobalChaserSequenceNumber
 	} else {
 		this.EditWhichStaticSequence = this.SelectedSequence
 	}
@@ -41,7 +41,7 @@ func selectSequence(sequences []*common.Sequence, this *CurrentState, eventsForL
 
 	// If we're in shutter chase mode
 	if this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY {
-		this.TargetSequence = this.ChaserSequenceNumber
+		this.TargetSequence = common.GlobalChaserSequenceNumber
 	} else {
 		this.TargetSequence = this.SelectedSequence
 	}

@@ -295,19 +295,17 @@ func main() {
 		}
 
 		if newSequence.Label == "chaser" {
-			this.ChaserSequenceNumber = sequenceNumber
-			newSequence.ChaserSequenceNumber = sequenceNumber
+			common.GlobalChaserSequenceNumber = sequenceNumber
 		}
 
 		if newSequence.Type == "scanner" {
-			this.ScannerSequenceNumber = sequenceNumber
 			common.GlobalScannerSequenceNumber = sequenceNumber
 		}
 
 		// Count the number of fixtures for this sequence.
 		// The chaser uses the fixtures from the scanner group.
 		if newSequence.Label == "chaser" {
-			newSequence.NumberFixtures = fixture.GetNumberOfFixturesInGroup(this.ScannerSequenceNumber, fixturesConfig)
+			newSequence.NumberFixtures = fixture.GetNumberOfFixturesInGroup(common.GlobalChaserSequenceNumber, fixturesConfig)
 		} else {
 			newSequence.NumberFixtures = fixture.GetNumberOfFixturesInGroup(sequenceNumber, fixturesConfig)
 		}
@@ -351,13 +349,6 @@ func main() {
 			}
 			this.Functions[sequenceNumber] = append(this.Functions[sequenceNumber], newFunction)
 		}
-	}
-
-	// Tell all sequences who does what.
-	for i := range sequences {
-		// Let each sequence know which sequence numbers have been stored.
-		sequences[i].ChaserSequenceNumber = this.ChaserSequenceNumber
-		sequences[i].ScannerSequenceNumber = this.ScannerSequenceNumber
 	}
 
 	// Create all the channels I need.

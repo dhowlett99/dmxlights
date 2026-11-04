@@ -216,7 +216,7 @@ func SetFixtureStatus(sequence *common.Sequence, this *CurrentState, selectedFix
 
 				// If we're a scanner also tell the sequence shutter chaser to invert this fixture.
 				if this.SelectedType == "scanner" {
-					common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+					common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 				}
 
 				return
@@ -249,7 +249,7 @@ func SetFixtureStatus(sequence *common.Sequence, this *CurrentState, selectedFix
 
 			// If we're a scanner also tell the sequence shutter chaser to invert this fixture.
 			if this.SelectedType == "scanner" {
-				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+				common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 			}
 
 			return
@@ -282,7 +282,7 @@ func SetFixtureStatus(sequence *common.Sequence, this *CurrentState, selectedFix
 
 			// If we're a scanner also tell the sequence shutter chaser to invert this fixture.
 			if this.SelectedType == "scanner" {
-				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+				common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 			}
 			return
 		}
@@ -314,7 +314,7 @@ func SetFixtureStatus(sequence *common.Sequence, this *CurrentState, selectedFix
 
 			// If we're a scanner also tell the sequence shutter chaser to invert this fixture.
 			if this.SelectedType == "scanner" {
-				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+				common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 			}
 			return
 		}
@@ -345,7 +345,7 @@ func SetFixtureStatus(sequence *common.Sequence, this *CurrentState, selectedFix
 
 			// If we're a scanner also tell the sequence shutter chaser to invert this fixture.
 			if this.SelectedType == "scanner" {
-				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+				common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 			}
 			return
 		}

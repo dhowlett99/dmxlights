@@ -120,8 +120,6 @@ type CurrentState struct {
 	DisplayChaserShortCut       bool                       // Flag to indicate we've taken a shortcut to the chaser display
 	SwitchSequenceNumber        int                        // Switch sequence number, setup at start.
 	SwitchStateName             string                     // Current state name.
-	ChaserSequenceNumber        int                        // Chaser sequence number, setup at start.
-	ScannerSequenceNumber       int                        // Scanner sequence number, setup at start.
 	Labels                      *labels.LabelData          // Space for button labels as loaded from labels.yaml
 	ButtonConfig                ButtonConfig               // Context sensitive abels for bottom row of buttons.
 	FixturesConfig              *fixture.Fixtures          // Pointer to fixtures.

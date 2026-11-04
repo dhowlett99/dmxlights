@@ -87,7 +87,7 @@ func StopStrobe(this *CurrentState, eventsForLaunchpad chan common.ALight, guiBu
 
 		// Also send to chaser sequencer.
 		if this.ScannerChaser[this.SelectedSequence] {
-			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 		}
 	}
 
@@ -153,7 +153,7 @@ func StartStrobe(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 
 		// Also send to chaser sequencer.
 		if this.ScannerChaser[this.SelectedSequence] {
-			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 		}
 	}
 

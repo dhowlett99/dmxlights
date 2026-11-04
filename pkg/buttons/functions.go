@@ -87,7 +87,7 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 		this.SelectedMode[this.SelectedSequence] == CHASER_EDIT_ALL_STATIC ||
 		this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION {
 
-		this.TargetSequence = this.ChaserSequenceNumber
+		this.TargetSequence = common.GlobalChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
 	} else {
 		this.TargetSequence = this.SelectedSequence
@@ -515,12 +515,12 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 
 		if this.ScannerChaser[this.SelectedSequence] {
 			// The static scene is being turned off so restart the shutter chaser.
-			this.Running[this.ChaserSequenceNumber] = true
+			this.Running[common.GlobalChaserSequenceNumber] = true
 			// Tell the chaser to start.
 			cmd = common.Command{
 				Action: common.StartChase,
 			}
-			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 		}
 
 		common.RevealSequence(this.TargetSequence, commandChannels)
@@ -659,17 +659,17 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 				{Name: "ScannerHasShutterChase", Value: this.ScannerChaser[this.SelectedSequence]},
 			},
 		}
-		common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
-		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(common.GlobalScannerSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 
 		// Tell the chaser to start.
 		cmd = common.Command{
 			Action: common.StartChase,
 		}
-		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 
 		// Update the running flag.
-		this.Running[this.ChaserSequenceNumber] = true
+		this.Running[common.GlobalChaserSequenceNumber] = true
 
 		// Update the labels.
 		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
@@ -697,7 +697,7 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 		// Tell scanner & chaser sequence that the scanner shutter chase flag is off.
-		this.Running[this.ChaserSequenceNumber] = false
+		this.Running[common.GlobalChaserSequenceNumber] = false
 		cmd := common.Command{
 			Action: common.UpdateScannerHasShutterChase,
 			Args: []common.Arg{
@@ -705,20 +705,20 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 
 		// Stop the chaser.
 		cmd = common.Command{
 			Action: common.StopChase,
 		}
-		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 
 		// Make sure any left over static scene is turned off.
-		this.Static[this.ChaserSequenceNumber] = false
+		this.Static[common.GlobalChaserSequenceNumber] = false
 		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State = false // Update the running flag.
 
 		// Update the running flag.
-		this.Running[this.ChaserSequenceNumber] = false
+		this.Running[common.GlobalChaserSequenceNumber] = false
 
 		// Update the labels.
 		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
@@ -816,7 +816,7 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 		// Tell scanner & chaser sequence that the scanner shutter chase flag is off.
-		this.Running[this.ChaserSequenceNumber] = this.ScannerChaser[this.SelectedSequence]
+		this.Running[common.GlobalChaserSequenceNumber] = this.ScannerChaser[this.SelectedSequence]
 		cmd := common.Command{
 			Action: common.UpdateScannerHasShutterChase,
 			Args: []common.Arg{
@@ -833,7 +833,7 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 				{Name: "MusicTriger", Value: this.ScannerChaser[this.SelectedSequence]},
 			},
 		}
-		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(common.GlobalChaserSequenceNumber, cmd, commandChannels)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return

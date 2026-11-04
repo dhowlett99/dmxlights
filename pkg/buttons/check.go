@@ -17,13 +17,15 @@
 
 package buttons
 
+import "github.com/dhowlett99/dmxlights/pkg/common"
+
 // Check If we're a scanner and we're in shutter chase mode return the chaser sequence number.
 // otherwise return this seleeted sequnce number.
 func CheckType(sequenceType string, this *CurrentState) int {
 
 	if sequenceType == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
 		(this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY) {
-		return this.ChaserSequenceNumber
+		return common.GlobalChaserSequenceNumber
 	} else {
 		return this.SelectedSequence
 	}
