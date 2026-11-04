@@ -111,12 +111,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 			// Clear out the sequence colors.
 			if mySequenceNumber == common.GlobalChaserSequenceNumber {
-				fmt.Printf("%d: Setting Sequence Color default to WhitechaserSeqNo is %d \n", mySequenceNumber, common.GlobalChaserSequenceNumber)
 				sequence.SequenceColors = []color.RGBA{colors.White}
 				sequence.UpdateColors = true
 			}
 			if mySequenceNumber != common.GlobalChaserSequenceNumber {
-				fmt.Printf("%d: Setting Sequence Color default to Green chaserSeqNo is %d \n", mySequenceNumber, common.GlobalChaserSequenceNumber)
 				sequence.SequenceColors = []color.RGBA{colors.Green}
 				sequence.UpdateColors = true
 			}
