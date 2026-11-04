@@ -123,7 +123,7 @@ func FixtureReceiver(
 			if debug {
 				fmt.Printf("%d:%d ClearFixture %t Blackout %t\n", cmd.SequenceNumber, myFixtureNumber, cmd.ClearFixture, cmd.Blackout)
 			}
-			lastColor = clearFixture(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixturesConfig, dmxController, dmxInterfacePresent)
+			lastColor = clearFixture(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, eventsForLaunchpad, guiButtons, fixturesConfig, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.StartFlood:

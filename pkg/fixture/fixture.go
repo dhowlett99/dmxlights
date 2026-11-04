@@ -348,7 +348,7 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 }
 
 // Clear fixture.
-func clearFixture(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.FixtureColor {
+func clearFixture(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool, stopFadeUp chan bool, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.FixtureColor {
 
 	if debug {
 		fmt.Printf("Fixture:%d clear\n", fixtureNumber)
@@ -366,6 +366,7 @@ func clearFixture(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown cha
 	case <-time.After(100 * time.Millisecond):
 	}
 
+	common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, colors.Black, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 	return MapFixtures(false, false, false, cmd.SequenceNumber, fixtureNumber, colors.Black, colors.Black, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, common.MIN_DMX_BRIGHTNESS, common.MIN_DMX_BRIGHTNESS, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 }
 
