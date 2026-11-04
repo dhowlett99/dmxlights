@@ -56,6 +56,7 @@ func startStatic(mySequenceNumber int, sequence *common.Sequence, channels commo
 			RGBStaticFadeUp:   true,
 			RGBStaticOff:      false,
 			RGBFade:           sequence.RGBFade,
+			ProgramSpeed:      sequence.Speed,
 			RGBStaticColors:   sequence.StaticColors,
 			Hidden:            false,
 			StrobeSpeed:       sequence.StrobeSpeed,
@@ -121,6 +122,7 @@ func stopStatic(mySequenceNumber int, sequence *common.Sequence, channels common
 		RGBStaticColors:   sequence.StaticColors,
 		RGBStaticFadeUp:   false,
 		RGBFade:           sequence.RGBFade,
+		ProgramSpeed:      sequence.Speed,
 		ScannerOffsetPan:  sequence.ScannerOffsetPan,
 		ScannerOffsetTilt: sequence.ScannerOffsetTilt,
 	}

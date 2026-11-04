@@ -185,7 +185,7 @@ func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fix
 		fmt.Printf("%d Last Color %+v Last Brightnes %d\n", cmd.SequenceNumber, lastColor.RGBColor, lastColor.Brightness)
 		fmt.Printf("%d Next Color %+v Next Brightnes %d\n", cmd.SequenceNumber, nextColor.RGBColor, nextColor.Brightness)
 	}
-	fadeDownValues := common.GetFadeValues(64, lastColor.Brightness, nextColor.Brightness, 1, true)
+	fadeDownValues := common.GetFadeValues(common.SEQUENCE_STEPS, lastColor.Brightness, nextColor.Brightness, cmd.RGBFade, true)
 	if debug && fixtureNumber == 0 {
 		fmt.Printf("%d fadeDown: Fadedown values %+v\n", cmd.SequenceNumber, fadeDownValues)
 	}
@@ -221,7 +221,7 @@ func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fix
 		MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, nextColor.RGBColor, nextColor.RGBColor, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, cmd.Master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 
 		// Control how long the fade take with the speed control.
-		time.Sleep((5 * time.Millisecond) * (time.Duration(cmd.RGBFade)))
+		time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse12(cmd.ProgramSpeed))))
 	}
 	// Fade down complete, set lastColor to the final color and brightness.
 	lastColor = common.FixtureColor{
@@ -255,7 +255,7 @@ func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fixtu
 	}
 
 	// Calulate the steps
-	fadeUpValues := common.GetFadeValues(64, lastColor.Brightness, nextColor.Brightness, 1, false)
+	fadeUpValues := common.GetFadeValues(common.SEQUENCE_STEPS, lastColor.Brightness, nextColor.Brightness, cmd.RGBFade, false)
 	if debug && fixtureNumber == 0 {
 		fmt.Printf("%d: fadeup: Fadeup values %+v\n", cmd.SequenceNumber, fadeUpValues)
 	}
@@ -307,7 +307,7 @@ func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fixtu
 		lastColor = MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, nextColor.RGBColor, nextColor.RGBColor, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 
 		// Control how long the fade take with the speed control.
-		time.Sleep((5 * time.Millisecond) * (time.Duration(cmd.RGBFade)))
+		time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse12(cmd.ProgramSpeed))))
 	}
 
 	lastColor.Brightness = nextColor.Brightness

@@ -72,6 +72,7 @@ const DEFAULT_RGB_FADE_STEPS = 10
 const DEFAULT_STROBE_SPEED = 255
 const MAX_STROBE_SPEED = 255
 const MIN_STROBE_SPEED = 1
+const SEQUENCE_STEPS = 64
 
 const IS_SCANNER = true
 const IS_RGB = false
