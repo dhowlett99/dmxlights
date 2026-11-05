@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/gordonklaus/portaudio"
 )
@@ -60,7 +61,9 @@ func NewSoundTrigger(channels common.Channels, guiButtons chan common.ALight, ev
 
 func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons chan common.ALight, eventsForLaunchpad chan common.ALight) {
 
-	fmt.Printf("Starting Sound System Version %s\n", portaudio.VersionText())
+	if debug {
+		fmt.Printf("Starting Sound System Version %s\n", portaudio.VersionText())
+	}
 
 	soundConfig.deviceName = deviceName
 
@@ -89,18 +92,28 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons c
 				fmt.Printf("error: portaudio: failed to list input channels \n")
 			}
 			for _, inputChannel := range inputChannels {
-				fmt.Printf("New Input Channel %v\n", *inputChannel)
+				if debug {
+					fmt.Printf("New Input Channel %v\n", *inputChannel)
+				}
 
 				for _, device := range inputChannel.Devices {
 					if device.MaxInputChannels > 0 {
 						if device.Name == deviceName {
-							fmt.Printf("Found device %s\n", device.Name)
+							if debug {
+								fmt.Printf("Found device %s\n", device.Name)
+							}
 							p := portaudio.HighLatencyParameters(device, nil)
-							fmt.Printf("Input.Channels %d\n", device.MaxInputChannels)
+							if debug {
+								fmt.Printf("Input.Channels %d\n", device.MaxInputChannels)
+							}
 							p.Input.Channels = device.MaxInputChannels
-							fmt.Printf("Output.Channels %d\n", device.MaxOutputChannels)
+							if debug {
+								fmt.Printf("Output.Channels %d\n", device.MaxOutputChannels)
+							}
 							p.Output.Channels = device.MaxOutputChannels
-							fmt.Printf("SampleRate %f\n", device.DefaultSampleRate)
+							if debug {
+								fmt.Printf("SampleRate %f\n", device.DefaultSampleRate)
+							}
 							p.SampleRate = device.DefaultSampleRate
 							p.FramesPerBuffer = len(in)
 							soundConfig.stream, err = portaudio.OpenStream(p, in)
@@ -162,7 +175,7 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons c
 								fmt.Printf("SOUND Trying to send to %s %d\n", trigger.Name, triggerNumber)
 							}
 							// Update status bar.
-							common.LightLamp(common.Button{X: 0, Y: -1}, common.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+							common.LightLamp(common.Button{X: 0, Y: -1}, colors.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 							select {
 							case soundConfig.SoundTriggers[triggerNumber].Channel <- cmd:
@@ -175,7 +188,7 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons c
 					}
 					// A short delay stop a sequnece being overwhelmed by trigger events.
 					time.Sleep(time.Millisecond * 10)
-					common.LightLamp(common.Button{X: 0, Y: -1}, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+					common.LightLamp(common.Button{X: 0, Y: -1}, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 				}
 			}
 		}
@@ -191,7 +204,9 @@ func (soundConfig *SoundConfig) EnableSoundTrigger(name string) error {
 	// Step through the existing sound triggers and find the one we want to enable.
 	for triggerNumber, trigger := range soundConfig.SoundTriggers {
 		if trigger.Name == name {
-			//fmt.Printf("Enable trigger number %d name %s\n", triggerNumber, trigger.Name)
+			if debug {
+				fmt.Printf("Enable trigger number %d name %s\n", triggerNumber, trigger.Name)
+			}
 			soundConfig.SoundTriggers[triggerNumber].State = true
 			return nil
 		}

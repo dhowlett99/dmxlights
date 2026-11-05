@@ -8,17 +8,14 @@ import (
 	"log"
 	"strings"
 
+	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/pkg/errors"
 	"github.com/scgolang/midi"
 )
 
 type Pad struct {
 	*midi.Device
-	hits chan Hit
-}
-type Hit struct {
-	X int
-	Y int
+	hits chan common.Button
 }
 
 // Open opens a connection to the Novation Launchpad.
@@ -87,7 +84,7 @@ func (pad *Pad) Program() error {
 }
 
 // Listen for button events from the Launchpad.
-func (pad *Pad) Listen(buttonchannel chan Hit) error {
+func (pad *Pad) Listen(buttonchannel chan common.Button) error {
 	eventChannel, err := pad.Packets()
 	if err != nil {
 		log.Fatal("error can't open button channel")
@@ -109,7 +106,7 @@ func (pad *Pad) Listen(buttonchannel chan Hit) error {
 			if packet.Data[2] > 0 {
 				x = int(packet.Data[1])%10 - 1
 				y = 8 - (int(packet.Data[1])-x)/10
-				buttonchannel <- Hit{X: x, Y: y}
+				buttonchannel <- common.Button{X: x, Y: y}
 			}
 
 			// Button released codes.
@@ -117,14 +114,14 @@ func (pad *Pad) Listen(buttonchannel chan Hit) error {
 				x = int(packet.Data[1])%10 - 1
 				y = 8 - (int(packet.Data[1])-x)/10
 				x = x + 100
-				buttonchannel <- Hit{X: x, Y: y}
+				buttonchannel <- common.Button{X: x, Y: y}
 			}
 		}
 	}
 }
 
 // Light lights the button at x,y with the given red, green, and blue values.
-func (pad *Pad) Light(x, y, red int, green int, blue int) error {
+func (pad *Pad) Light(x int, y int, red uint8, green uint8, blue uint8) error {
 	led := int64((8-y)*10 + x + 1)
 
 	_, err := pad.Write([]byte{0xF0, 0x00, 0x20})

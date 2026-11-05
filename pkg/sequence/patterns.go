@@ -1,0 +1,257 @@
+// Copyright (C) 2022,2023,2024,2025 dhowlett99.
+// This is the dmxlights main sequencers pattern functions.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+package sequence
+
+import (
+	"bytes"
+	"encoding/gob"
+	"fmt"
+	"image/color"
+
+	"github.com/dhowlett99/dmxlights/pkg/colors"
+	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/pattern"
+	"github.com/dhowlett99/dmxlights/pkg/position"
+)
+
+func setupNewRGBPattern(sequence *common.Sequence, availablePatterns []common.Pattern) []common.Step {
+
+	if debug {
+		fmt.Printf("updateRGBPatterns: Pattern Number %d\n", sequence.SelectedPattern)
+	}
+	selectedPattern := availablePatterns[sequence.SelectedPattern]
+	RGBPattern := position.ApplyFixtureState(selectedPattern, sequence.FixtureState)
+	sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
+	steps := RGBPattern.Steps
+	sequence.Pattern.Name = RGBPattern.Name
+	sequence.Pattern.Label = RGBPattern.Label
+	if sequence.NewPattern {
+		sequence.SequenceColors = common.HowManyColorsInSteps(steps)
+		sequence.NewPattern = false
+	}
+
+	// Initialise chaser.
+	if sequence.Label == "chaser" {
+		// Set the chase RGB steps used to chase the shutter.
+		sequence.ScannerChaser = true
+		// Chaser start with a standard chase pattern in white.
+		steps = replaceRGBcolorsInSteps(sequence.Pattern.Name, steps, []color.RGBA{colors.White})
+	}
+
+	if debug {
+		fmt.Printf("Steps are %+v\n", steps)
+	}
+
+	return steps
+}
+
+func setupNewScannerPattern(sequence *common.Sequence) []common.Step {
+
+	if debug {
+		fmt.Printf("setupNewScannerPattern: Pattern Number %d\n", sequence.SelectedPattern)
+	}
+
+	// Get available scanner patterns.
+	sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
+	sequence.StartPattern = false
+	sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
+	// Set the scanner steps used to send out pan and tilt values.
+	sequence.Pattern = sequence.ScannerAvailablePatterns[sequence.SelectedPattern]
+	steps := sequence.Pattern.Steps
+
+	return steps
+}
+
+func updateScannerPattern(steps []common.Step, sequence *common.Sequence, fixturesConfig *fixture.Fixtures) []common.Step {
+
+	// Start the scanner pattern.
+	if sequence.StartPattern {
+		steps = setupNewScannerPattern(sequence)
+		sequence.StartPattern = false
+		return steps
+	}
+
+	// Uodate the scanner shift.
+	if sequence.UpdateShift {
+		steps = setupNewScannerPattern(sequence)
+		sequence.UpdateShift = false
+	}
+
+	if sequence.AutoPattern {
+		steps = scannerAutoPattern(sequence)
+	}
+
+	// Auto color change.
+	if sequence.AutoColor {
+		steps = scannerAutoColor(steps, sequence)
+	}
+
+	// Update scanner colors.
+	if sequence.UpdateColors {
+		sequence.SequenceColors = fixture.HowManyScannerColors(sequence, fixturesConfig)
+		sequence.UpdateColors = false
+	}
+
+	return steps
+}
+
+func makeACopy(src, dist interface{}) (err error) {
+	buf := bytes.Buffer{}
+	if err = gob.NewEncoder(&buf).Encode(src); err != nil {
+		return
+	}
+	return gob.NewDecoder(&buf).Decode(dist)
+}
+
+func replaceRGBcolorsInSteps(patternName string, steps []common.Step, colorsIn []color.RGBA) []common.Step {
+
+	stepsOut := []common.Step{}
+
+	if debug {
+		fmt.Printf("replaceRGBcolorsInSteps: with colors %+v\n", colorsIn)
+		fmt.Printf("Number Steps In: %v\n", len(steps))
+		fmt.Printf("PatternName: %v\n", patternName)
+	}
+
+	var insertColor int
+	numberColors := len(colorsIn)
+
+	if patternName == "Flash" {
+
+		for _, newColor := range colorsIn {
+
+			// Create a step with all fixtures to that color.
+			newStep := common.Step{}
+			// Init the map for the fixtures.
+			newStep.Fixtures = make(map[int]common.Fixture, 8)
+			for fixtureNumber := 0; fixtureNumber < 8; fixtureNumber++ {
+				newFixture := common.Fixture{}
+				newFixture.Color = newColor
+				newStep.Fixtures[fixtureNumber] = newFixture
+			}
+			stepsOut = append(stepsOut, newStep)
+
+			// Create a blank step with all fixtures with a black.
+			newStep = common.Step{}
+			// Init the map for the fixtures.
+			newStep.Fixtures = make(map[int]common.Fixture, 8)
+			// Set all fixtures to that color.
+			for fixtureNumber := 0; fixtureNumber < 8; fixtureNumber++ {
+				newFixture := common.Fixture{}
+				newFixture.Color = colors.Black
+				newStep.Fixtures[fixtureNumber] = newFixture
+			}
+			stepsOut = append(stepsOut, newStep)
+
+		}
+
+	} else {
+		err := makeACopy(steps, &stepsOut)
+		if err != nil {
+			fmt.Printf("replaceRGBcolorsInSteps: error failed to copy steps.\n")
+		}
+
+		for stepNumber, step := range steps {
+			for fixtureNumber, fixture := range step.Fixtures {
+
+				// found a color.
+				if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+					if insertColor >= numberColors {
+						insertColor = 0
+					}
+					newFixture := stepsOut[stepNumber].Fixtures[fixtureNumber]
+					newFixture.Color = colorsIn[insertColor]
+					stepsOut[stepNumber].Fixtures[fixtureNumber] = newFixture
+					insertColor++
+				}
+			}
+		}
+	}
+
+	if debug {
+		for stepNumber, step := range stepsOut {
+			fmt.Printf("Step %d\n", stepNumber)
+			for fixtureNumber, fixture := range step.Fixtures {
+				fmt.Printf("\tFixture %d\n", fixtureNumber)
+				fmt.Printf("\t\tColor %+v\n", fixture.Color)
+			}
+		}
+	}
+
+	return stepsOut
+}
+
+// getAvailableScannerPattens generates scanner patterns and stores them in the sequence.
+// Each scanner can then select which pattern to use.
+// All scanner patterns have the same number of steps defined by NumberCoordinates.
+func getAvailableScannerPattens(sequence *common.Sequence) map[int]common.Pattern {
+
+	if debug {
+		fmt.Printf("getAvailableScannerPattens\n")
+	}
+
+	scannerPattens := make(map[int]common.Pattern)
+
+	// Scanner circle pattern 0
+	coordinates := pattern.CircleGenerator(sequence.ScannerSize, sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates], float64(sequence.ScannerOffsetTilt), float64(sequence.ScannerOffsetPan))
+	circlePatten := pattern.GenerateScannerPattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
+	circlePatten.Name = "circle"
+	circlePatten.Number = 0
+	circlePatten.Label = "Circle"
+	scannerPattens[0] = circlePatten
+
+	// Scanner left right pattern 1
+	coordinates = pattern.ScanGeneratorLeftRight(float64(sequence.ScannerSize), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]), float64(sequence.ScannerOffsetTilt), float64(sequence.ScannerOffsetPan))
+	leftRightPatten := pattern.GenerateScannerPattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
+	leftRightPatten.Name = "leftright"
+	leftRightPatten.Number = 1
+	leftRightPatten.Label = "Left.Right"
+	scannerPattens[1] = leftRightPatten
+
+	// // Scanner up down pattern 2
+	coordinates = pattern.ScanGeneratorUpDown(float64(sequence.ScannerSize), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]), float64(sequence.ScannerOffsetTilt), float64(sequence.ScannerOffsetPan))
+	upDownPatten := pattern.GenerateScannerPattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
+	upDownPatten.Name = "updown"
+	upDownPatten.Number = 2
+	upDownPatten.Label = "Up.Down"
+	scannerPattens[2] = upDownPatten
+
+	// // Scanner zig zag pattern 3
+	coordinates = pattern.ScanGenerateSawTooth(float64(sequence.ScannerSize), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]), float64(sequence.ScannerOffsetTilt), float64(sequence.ScannerOffsetPan))
+	zigZagPatten := pattern.GenerateScannerPattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
+	zigZagPatten.Name = "zigzag"
+	zigZagPatten.Number = 3
+	zigZagPatten.Label = "Zig.Zag"
+	scannerPattens[3] = zigZagPatten
+
+	coordinates = []pattern.Coordinate{{Pan: 127, Tilt: 127}}
+	stopPatten := pattern.GenerateScannerPattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
+	stopPatten.Name = "stop"
+	stopPatten.Number = 4
+	stopPatten.Label = "Stop"
+	scannerPattens[4] = stopPatten
+
+	if debug {
+		for _, pattern := range scannerPattens {
+			fmt.Printf("Made a scanner pattern called %s\n", pattern.Name)
+		}
+	}
+
+	return scannerPattens
+
+}

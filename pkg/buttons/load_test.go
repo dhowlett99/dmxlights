@@ -16,21 +16,33 @@
 
 package buttons
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/dhowlett99/dmxlights/pkg/common"
+)
 
 func Test_autoSelect(t *testing.T) {
 
+	common.GlobalChaserSequenceNumber = 4
+	common.GlobalScannerSequenceNumber = 2
+
 	type args struct {
-		this *CurrentState
+		this                 *CurrentState
+		commandChannels      []chan common.Command
+		lastSelectedSequence int
+		lastSelectedSwitch   int
 	}
 	tests := []struct {
 		name                 string
 		args                 args
 		wantSelectedSequence int
+		wantSelectedSwitch   int
 	}{
 		{
 			name: "first sequence is running",
 			args: args{
+				lastSelectedSwitch: 0,
 				this: &CurrentState{
 					Running: map[int]bool{
 						0: true,
@@ -44,6 +56,7 @@ func Test_autoSelect(t *testing.T) {
 		{
 			name: "second sequence is running",
 			args: args{
+				lastSelectedSwitch: 0,
 				this: &CurrentState{
 					Running: map[int]bool{
 						0: false,
@@ -57,6 +70,7 @@ func Test_autoSelect(t *testing.T) {
 		{
 			name: "last sequence is running",
 			args: args{
+				lastSelectedSwitch: 0,
 				this: &CurrentState{
 					Running: map[int]bool{
 						0: false,
@@ -70,6 +84,7 @@ func Test_autoSelect(t *testing.T) {
 		{
 			name: "last sequence is in static mode",
 			args: args{
+				lastSelectedSwitch: 0,
 				this: &CurrentState{
 					Running: map[int]bool{
 						0: false,
@@ -88,10 +103,8 @@ func Test_autoSelect(t *testing.T) {
 		{
 			name: "shutter chaser is running",
 			args: args{
-
+				lastSelectedSwitch: 0,
 				this: &CurrentState{
-					ChaserSequenceNumber:  4,
-					ScannerSequenceNumber: 2,
 					Running: map[int]bool{
 						0: false,
 						1: false,
@@ -103,11 +116,36 @@ func Test_autoSelect(t *testing.T) {
 			},
 			wantSelectedSequence: 2,
 		},
+		{
+			name: "switch 7 is set",
+			args: args{
+				lastSelectedSwitch:   7,
+				lastSelectedSequence: 3,
+				this: &CurrentState{
+					SwitchSequenceNumber: 3,
+					Running: map[int]bool{
+						0: false,
+						1: false,
+						2: false,
+						3: false,
+						4: false,
+					},
+					Static: []bool{
+						0: false,
+						1: false,
+						2: false,
+					},
+				},
+			},
+			wantSelectedSequence: 3,
+			wantSelectedSwitch:   7,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotSelectedSequence := autoSelect(tt.args.this); gotSelectedSequence != tt.wantSelectedSequence {
-				t.Errorf("autoSelect() = %v, want %v", gotSelectedSequence, tt.wantSelectedSequence)
+			if gotSelectedSequence, gotSelectedSwitch := autoSelect(tt.args.this, tt.args.commandChannels, tt.args.lastSelectedSequence, tt.args.lastSelectedSwitch); gotSelectedSequence != tt.wantSelectedSequence {
+				t.Errorf("autoSelect() SwitchNumber = %v, want %v", gotSelectedSwitch, tt.wantSelectedSwitch)
+				t.Errorf("autoSelect() SequenceNumber = %v, want %v", gotSelectedSequence, tt.wantSelectedSequence)
 			}
 		})
 	}

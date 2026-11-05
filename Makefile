@@ -5,6 +5,31 @@ COVERAGE = -coverprofile=../c.out -covermode=atomic
 SHELL := /usr/bin/env bash
 VERSION := "3.0"
 export PKG_CONFIG_PATH=/usr/local/Cellar/portaudio/19.7.0/lib/pkgconfig
+# Set Architecture
+ARCH ?= $(shell uname -m)
+ifeq ($(ARCH),x86_64)
+    export GOARCH = amd64
+	export GOHOSTARCH=amd64
+else ifeq ($(ARCH),arm64)
+    export GOARCH = arm64
+	export GOHOSTARCH=arm64
+else
+    GOARCH = $(ARCH)
+endif
+
+export CGO_ENABLED=1
+# Set Deployment Target
+ifeq ($(ARCH),arm64)
+	export MACOSX_DEPLOYMENT_TARGET = 26
+	export CGO_CFLAGS="-I/opt/homebrew/include" 
+	export CGO_LDFLAGS="-L/opt/homebrew/lib"
+else ifeq ($(ARCH),x86_64)
+	expoert MACOSX_DEPLOYMENT_TARGET = 1015
+else
+	$(error Unknown Architecture: $(ARCH))
+endif
+
+
 
 # The name of the application
 APP_NAME="dmxlights"
@@ -53,8 +78,21 @@ legacy-deploy:
 
 installer:
 	go install fyne.io/fyne/v2/cmd/fyne@latest
-	
-deploy: installer
+
+certificate:
+	# Clean out configuration files and existing certificate.
+	rm -rf dmxlights.csr dmxlights.rsa dmxlights.crt
+	- sudo security delete-certificate -c dmxlights
+	# Generate private key.
+	openssl genrsa -out dmxlights.rsa 2048
+	# Create signing request and generare certificate.
+	openssl req -x509 -new -nodes -key dmxlights.rsa -config code_sign_csr.conf -subj "/CN=dmxlights" -days 3650 -out dmxlights.crt -extensions v3_ca -extensions codesign_reqext 
+	# Upload private key to login keychain.
+	sudo security import dmxlights.rsa -k "/Users/derek/Library/Keychains/login.keychain"
+	# Upload self signed certificate to login keychain.
+	sudo security add-trusted-cert -r trustRoot -k "/Users/derek/Library/Keychains/login.keychain" dmxlights.crt
+
+deploy: installer certificate
 	rm -rf dmxlights.app/
 	codesign --remove-signature /usr/local/opt/portaudio/lib/libportaudio.2.dylib
 	codesign --force --deep --entitlements entitlements.plist --sign ${CERT} -i ${APP_ID} /usr/local/opt/portaudio/lib/libportaudio.2.dylib
@@ -66,10 +104,12 @@ deploy: installer
 	codesign --force --deep --entitlements entitlements.plist --verbose=2 --options runtime --sign ${CERT} -i ${APP_ID} ${APP_NAME}.app
 	mkdir -p dmxlights.app/Contents/Resources/projects
 	cp projects/Default.yaml dmxlights.app/Contents/Resources/projects
+	- ./deploy_presets.sh
 	cp groups.yaml dmxlights.app/Contents/Resources/
 	cp sequences.yaml dmxlights.app/Contents/Resources/
 	cp dmxlights.png dmxlights.app/Contents/Resources/
-	cp *.json dmxlights.app/Contents/Resources/
+	cp labels.yaml dmxlights.app/Contents/Resources/
+
 
 
 release: deploy

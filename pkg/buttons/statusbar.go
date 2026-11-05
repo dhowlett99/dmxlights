@@ -1,0 +1,1258 @@
+// Copyright (C) 2022, 2023, 2024, 2025 dhowlett99.
+// This is status bar update code, used to update the speed, shift, size and fade labels.
+// Along with the labels on the bottom row buttons.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software \t\tFoundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+package buttons
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/dhowlett99/dmxlights/pkg/colors"
+	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/labels"
+)
+
+type Slot struct {
+	Button          int
+	Label           string
+	ChannelAssigned string
+}
+
+const UPDATE = 0
+const DISPLAY = 1
+
+func getAction(this *CurrentState) int {
+
+	var action int
+
+	// Position
+	number := this.SelectedSwitch
+	position := this.SwitchPosition[this.SelectedSwitch]
+	overrides := *this.SwitchOverrides
+
+	if this.SelectedType == "rgb" {
+		action = common.ActionRGB
+		if debug {
+			fmt.Printf("Action RGB\n")
+		}
+	}
+	if this.SelectedType == "scanner" {
+		action = common.ActionScanner
+		if debug {
+			fmt.Printf("Action Scanner\n")
+		}
+	}
+
+	if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
+		action = common.ActionChaser
+		if debug {
+			fmt.Printf("Action Chaser\n")
+		}
+	}
+	if this.SelectedType == "switch" {
+		if debug {
+			fmt.Printf("Action Switch ")
+		}
+		switch overrides[number][position].Mode {
+
+		case "Setting":
+
+			action = common.ActionSwitchSetting
+			if debug {
+				fmt.Printf("Setting \n")
+			}
+
+		case "Off":
+			action = common.ActionSwitchOff
+			if debug {
+				fmt.Printf("Off \n")
+			}
+
+		case "Static":
+			action = common.ActionSwitchStatic
+			if debug {
+				fmt.Printf("Static \n")
+			}
+
+		case "Control":
+			action = common.ActionSwitchControl
+			if debug {
+				fmt.Printf("Control \n")
+			}
+
+		case "Chase":
+			action = common.ActionSwitchChaser
+			if debug {
+				fmt.Printf("Chase \n")
+			}
+		}
+	}
+
+	return action
+}
+
+func getType(selectedFixtureType string) int {
+
+	var fixtureType int
+	switch selectedFixtureType {
+
+	case "rgb":
+		fixtureType = common.RGB
+
+	case "scanner":
+		fixtureType = common.Scanner
+
+	case "derby":
+		fixtureType = common.Derby
+
+	case "projector":
+		fixtureType = common.Projector
+	}
+
+	return fixtureType
+}
+
+// updateStatusBar processes speed, shift, size and fade actions and all there variations, depending on fixture.
+func updateBottomStatusBar(X int, Y int, sub int, direction int, sequences []*common.Sequence, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	if debug {
+		fmt.Printf("DecideOnAction action \n")
+	}
+
+	action := getAction(this)
+	fixtureType := getType(this.SelectedFixtureType)
+
+	// If we're in shutter chase mode.
+	this.TargetSequence = CheckType(this.SequenceType[this.SelectedSequence], this)
+
+	if !(X == 0 && Y == 0) {
+		buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
+	}
+
+	switch action {
+
+	// Common RGB Fixure.
+	case common.ActionRGB:
+		if debug {
+			fmt.Printf("Action RGB\n")
+		}
+		rgbFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+		labelButtons(this.ButtonConfig.RGBButtons, eventsForLaunchpad, guiButtons)
+
+	// Scanner RGB Shutter Chaser. With Speed, Shift, Size & Fade.
+	case common.ActionChaser:
+		if debug {
+			fmt.Printf("Action Shutter Chaser\n")
+		}
+		chaserFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+		labelButtons(this.ButtonConfig.ChaserButtons, eventsForLaunchpad, guiButtons)
+
+	// Scanner with Speed, Shift, Size & Coordinates.
+	case common.ActionScanner:
+		if debug {
+			fmt.Printf("Action Scanner\n")
+		}
+		scannerFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+		labelButtons(this.ButtonConfig.ScannerButtons, eventsForLaunchpad, guiButtons)
+
+	// A Switch that has Settings could be a RGB Lamp, Scanner (TODO), Derby RGB with Rotate or a Projector with Color & Gobo Wheels.
+	case common.ActionSwitchSetting:
+		// Get settings for this fixture.
+		if debug {
+			fmt.Printf("Action Switch Settings\n")
+		}
+		number := this.SelectedSwitch
+		position := this.SwitchPosition[this.SelectedSwitch]
+
+		useFixture := fixture.GetSwitchUseFixture(number, int16(position), this.FixturesConfig)
+
+		channels := []string{}
+		for _, channel := range useFixture.Channels {
+			channels = append(channels, channel.Name)
+		}
+		overrideAvailableSettings(channels, sub, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+	case common.ActionSwitchOff:
+		if debug {
+			fmt.Printf("Action Switch Off\n")
+		}
+		blankFixture(sub, guiButtons)
+		labelButtons(this.ButtonConfig.BlankButtons, eventsForLaunchpad, guiButtons)
+
+	case common.ActionSwitchStatic:
+		staticFixture(sub, direction, this, commandChannels, guiButtons)
+		labelButtons(this.ButtonConfig.SwitchStaticsButtons, eventsForLaunchpad, guiButtons)
+
+	case common.ActionSwitchControl:
+		if debug {
+			fmt.Printf("Action Switch Control\n")
+		}
+		programFixture(sub, direction, this, commandChannels, guiButtons)
+		labelButtons(this.ButtonConfig.SwitchControlButtons, eventsForLaunchpad, guiButtons)
+
+	// Control a fixture that has a mini sequencer in chase mode.
+	// The chaser can control a RGB lamp, a scanner (TODO), a derby with RGB and rotate, a projector with gobo and color wheels
+	case common.ActionSwitchChaser:
+
+		switch fixtureType {
+
+		case common.RGB:
+			if debug {
+				fmt.Printf("Action Switch Chaser RGB\n")
+			}
+			overrideChaserRgbFixture(sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.RGBButtons, eventsForLaunchpad, guiButtons)
+
+		// TODO Support for scanner in the mini sequencer Chase Mode.
+		// case common.Scanner:
+		// 	if debug {
+		// 		fmt.Printf("Action Switch Chaser Scanner\n")
+		// 	}
+		// 	overrideChaserScannerFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+		// 	labelButtons(this.ButtonConfig.ScannerButtons, eventsForLaunchpad, guiButtons)
+
+		case common.Derby:
+			if debug {
+				fmt.Printf("Action Switch Chaser Derby\n")
+			}
+			overrideChaserDerbyFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.DerbyButtons, eventsForLaunchpad, guiButtons)
+
+		case common.Projector:
+
+			if debug {
+				fmt.Printf("Action Switch Chaser ProjectorRGB\n")
+			}
+			overrideChaserProjectorFixture(sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.ProjectorButtons, eventsForLaunchpad, guiButtons)
+
+		}
+
+	}
+
+}
+
+func rgbFixture(sequences []*common.Sequence, sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+
+	switch sub {
+
+	case common.DisplayAll:
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", false, guiButtons)
+
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseSpeed(sequences, this, commandChannels)
+		case common.Increase:
+			increaseSpeedRGB(sequences, this, commandChannels)
+		}
+
+		if this.Strobe[this.SelectedSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		} else {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
+		}
+
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseShiftRGB(this, commandChannels)
+		case common.Increase:
+			increaseShiftRGB(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", false, guiButtons)
+
+	case common.ChangeSize:
+		switch direction {
+		case common.Decrease:
+			decreaseSizeRGB(this, commandChannels)
+		case common.Increase:
+			increaseSizeRGB(this, commandChannels)
+		}
+
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", false, guiButtons)
+
+	case common.ChangeFade:
+		switch direction {
+		case common.Decrease:
+			decreaseFadeRGB(this, commandChannels)
+		case common.Increase:
+			increaseFadeRGB(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", false, guiButtons)
+	}
+}
+
+func overrideChaserRgbFixture(sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+
+	// Pull overrides.
+	overrides := *this.SwitchOverrides
+
+	// Position
+	number := this.SelectedSwitch
+	position := this.SwitchPosition[this.SelectedSwitch]
+
+	switch sub {
+
+	case common.DisplayAll:
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", overrides[number][position].Speed), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", overrides[number][position].Shift), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", overrides[number][position].Size), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", overrides[number][position].Fade), "fade", false, guiButtons)
+
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideSpeedRGB(this, commandChannels)
+		case common.Increase:
+			increaseOverrideSpeedRGB(this, commandChannels)
+		}
+
+		if this.Strobe[this.SelectedSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		} else {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", overrides[number][position].Speed), "speed", false, guiButtons)
+		}
+
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideShift(this, commandChannels)
+		case common.Increase:
+			increaseOverrideShift(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", overrides[number][position].Shift), "shift", false, guiButtons)
+
+	case common.ChangeSize:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideSize(this, commandChannels)
+		case common.Increase:
+			increaseOverrideSize(this, commandChannels)
+		}
+
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", overrides[number][position].Size), "size", false, guiButtons)
+
+	case common.ChangeFade:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideFade(this, commandChannels)
+		case common.Increase:
+			increaseOverrideFade(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", overrides[number][position].Fade), "fade", false, guiButtons)
+	}
+}
+
+func chaserFixture(sequences []*common.Sequence, sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+	switch sub {
+
+	case common.DisplayAll:
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseSpeed(sequences, this, commandChannels)
+		case common.Increase:
+			increaseSpeedRGB(sequences, this, commandChannels)
+		}
+		if this.Strobe[this.SelectedSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		} else {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
+		}
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseShiftRGB(this, commandChannels)
+		case common.Increase:
+			increaseShiftRGB(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
+
+	case common.ChangeSize:
+		switch direction {
+		case common.Decrease:
+			decreaseSizeRGB(this, commandChannels)
+		case common.Increase:
+			increaseSizeRGB(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
+
+	case common.ChangeFade:
+		switch direction {
+		case common.Decrease:
+			decreaseFadeRGB(this, commandChannels)
+		case common.Increase:
+			increaseFadeRGB(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+	}
+}
+
+func scannerFixture(sequences []*common.Sequence, sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+
+	switch sub {
+
+	case common.DisplayAll:
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %s", getScannerShiftLabel(this.ScannerShift[this.SelectedSequence])), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])), "fade", false, guiButtons)
+
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseSpeed(sequences, this, commandChannels)
+		case common.Increase:
+			increaseSpeedScanner(this, commandChannels)
+		}
+		if this.Strobe[this.SelectedSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		} else {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		}
+
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseShiftScanner(this, commandChannels)
+		case common.Increase:
+			increaseShiftScanner(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Shift %s", getScannerShiftLabel(this.ScannerShift[this.SelectedSequence])), "shift", false, guiButtons)
+
+	case common.ChangeSize:
+		switch direction {
+		case common.Decrease:
+			decreaseSizeScanner(this, commandChannels)
+		case common.Increase:
+			increaseSizeScanner(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Scanner Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
+
+	case common.ChangeFade:
+		switch direction {
+		case common.Decrease:
+			decreaseScannerCoordinates(this, commandChannels)
+		case common.Increase:
+			increaseScannerCoordinates(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])), "fade", false, guiButtons)
+	}
+}
+
+func overrideChaserDerbyFixture(sequences []*common.Sequence, sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+
+	color, colorName := getColor(this)
+	rotate, rotateName := getRotate(this)
+	gobo, goboName := getGobo(this)
+
+	switch sub {
+
+	case common.DisplayAll:
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %d:%s", rotate, rotateName), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Color %d:%s", color, colorName), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Gobo %d:%s", gobo, goboName), "fade", false, guiButtons)
+
+	// ShutterSpeed
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseSpeed(sequences, this, commandChannels)
+		case common.Increase:
+			increaseSpeedScanner(this, commandChannels)
+		}
+		if this.Strobe[this.SelectedSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		} else {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		}
+
+	// RotateSpeed
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideRotateSpeed(this, commandChannels)
+		case common.Increase:
+			increaseOverrideRotateSpeed(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %d:%s", rotate, rotateName), "shift", false, guiButtons)
+
+		// ColorWheel
+	case common.ChangeSize:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideColor(this, commandChannels)
+		case common.Increase:
+			increaseOverrideColor(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Color %d:%s", color, colorName), "size", false, guiButtons)
+
+	// GoboWheel
+	case common.ChangeFade:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideGobo(this, commandChannels)
+		case common.Increase:
+			increaseOverrideGobo(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Gobo %d:%s", gobo, goboName), "fade", false, guiButtons)
+	}
+}
+
+func overrideChaserProjectorFixture(sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+
+	switch sub {
+
+	case common.DisplayAll:
+		speed := getSpeed(this)
+		color, colorName := getColor(this)
+		rotate, rotateName := getRotate(this)
+		gobo, goboName := getGobo(this)
+
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %d:%s", rotate, rotateName), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", color, colorName), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", gobo, goboName), "fade", false, guiButtons)
+
+	// ShutterSpeed
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideSpeedRGB(this, commandChannels)
+		case common.Increase:
+			increaseOverrideSpeedRGB(this, commandChannels)
+		}
+
+		if this.Strobe[this.SelectedSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		} else {
+			speed := getSpeed(this)
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButtons)
+		}
+
+	// RotateSpeed.
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideRotateSpeed(this, commandChannels)
+		case common.Increase:
+			increaseOverrideRotateSpeed(this, commandChannels)
+		}
+		rotate, rotateName := getRotate(this)
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %d:%s", rotate, rotateName), "shift", false, guiButtons)
+
+	// ColorWheel
+	case common.ChangeSize:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideColor(this, commandChannels)
+		case common.Increase:
+			increaseOverrideColor(this, commandChannels)
+		}
+		color, colorName := getColor(this)
+		common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", color, colorName), "size", false, guiButtons)
+
+	// GoboWheel
+	case common.ChangeFade:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideGobo(this, commandChannels)
+		case common.Increase:
+			increaseOverrideGobo(this, commandChannels)
+		}
+		gobo, goboName := getGobo(this)
+		common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", gobo, goboName), "fade", false, guiButtons)
+	}
+}
+
+func programFixture(sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+
+	switch sub {
+
+	case common.DisplayAll:
+		programSpeed, programSpeedName := getProgramSpeed(this)
+		program, programName := getProgram(this)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %d:%s", programSpeed, programSpeedName), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Program %d:%s", program, programName), "shift", false, guiButtons)
+		common.UpdateStatusBar("     ", "size", false, guiButtons)
+		common.UpdateStatusBar("     ", "fade", false, guiButtons)
+
+	// ProgramSpeed
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideProgramSpeed(this, commandChannels)
+		case common.Increase:
+			increaseOverrideProgramSpeed(this, commandChannels)
+		}
+		programSpeed, programSpeedName := getProgramSpeed(this)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %d:%s", programSpeed, programSpeedName), "speed", false, guiButtons)
+
+	// Program
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideProgram(this, commandChannels)
+		case common.Increase:
+			increaseOverrideProgram(this, commandChannels)
+		}
+		program, programName := getProgram(this)
+		common.UpdateStatusBar(fmt.Sprintf("Program %d:%s", program, programName), "shift", false, guiButtons)
+	}
+}
+
+func blankFixture(sub int, guiButtons chan common.ALight) {
+
+	switch sub {
+
+	case common.DisplayAll:
+		common.UpdateStatusBar("    ", "speed", false, guiButtons)
+		common.UpdateStatusBar("    ", "shift", false, guiButtons)
+		common.UpdateStatusBar("    ", "size", false, guiButtons)
+		common.UpdateStatusBar("    ", "fade", false, guiButtons)
+
+	case common.ChangeSpeed:
+		common.UpdateStatusBar("    ", "speed", false, guiButtons)
+
+	case common.ChangeShift:
+		common.UpdateStatusBar("    ", "shift", false, guiButtons)
+
+	case common.ChangeSize:
+		common.UpdateStatusBar("    ", "size", false, guiButtons)
+
+	case common.ChangeFade:
+		common.UpdateStatusBar("    ", "fade", false, guiButtons)
+	}
+}
+
+func staticFixture(sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+
+	switch sub {
+
+	case common.DisplayAll:
+
+		color, colorName := getColor(this)
+		common.UpdateStatusBar("    ", "speed", false, guiButtons)
+		common.UpdateStatusBar("    ", "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Color %d:%s", color, colorName), "size", false, guiButtons)
+		common.UpdateStatusBar("    ", "fade", false, guiButtons)
+
+	case common.ChangeSpeed:
+		common.UpdateStatusBar("    ", "speed", false, guiButtons)
+
+	case common.ChangeShift:
+		common.UpdateStatusBar("    ", "shift", false, guiButtons)
+
+	// ColorWheel
+	case common.ChangeSize:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideColor(this, commandChannels)
+		case common.Increase:
+			increaseOverrideColor(this, commandChannels)
+		}
+		color, colorName := getColor(this)
+		common.UpdateStatusBar(fmt.Sprintf("Color %d:%s", color, colorName), "size", false, guiButtons)
+
+	case common.ChangeFade:
+		common.UpdateStatusBar("    ", "fade", false, guiButtons)
+	}
+}
+
+func getRotate(this *CurrentState) (int, string) {
+
+	// Pull Overrides
+	overrides := *this.SwitchOverrides
+
+	// Position
+	number := this.SelectedSwitch
+	position := this.SwitchPosition[this.SelectedSwitch]
+
+	// Rotate.
+	rotate := overrides[number][position].Rotate
+	availableRotates := overrides[number][position].RotateChannels
+	// rotateName := overrides[number][position].RotateName
+	//isRotateOverrideAble := overrides[number][position].IsRotateOverrideAble
+	numberOfRotates := len(availableRotates)
+	rotateName := "Unknown"
+	if numberOfRotates > 0 && rotate <= numberOfRotates && rotate != -1 {
+		if rotate > 0 {
+			rotateName = availableRotates[rotate-1]
+		}
+	}
+
+	return rotate, rotateName
+}
+
+func getColor(this *CurrentState) (int, string) {
+
+	// Pull Overrides
+	overrides := *this.SwitchOverrides
+
+	// Position
+	number := this.SelectedSwitch
+	position := this.SwitchPosition[this.SelectedSwitch]
+
+	// Color.
+	color := overrides[number][position].Color
+	maxNumberColors := overrides[number][position].MaxColors
+	availableColors := overrides[number][position].AvailableColors
+	//hasColorChannel := overrides[number][position].HasColorChannel
+	//hasRGBChannels := overrides[number][position].HasRGBChannels
+	colorName := "Unknown"
+	if maxNumberColors > 0 && color <= maxNumberColors && color != -1 {
+		colorName = availableColors[color]
+	}
+	return color, colorName
+}
+
+func getGobo(this *CurrentState) (int, string) {
+
+	// Pull Overrides
+	overrides := *this.SwitchOverrides
+
+	// Position
+	number := this.SelectedSwitch
+	position := this.SwitchPosition[this.SelectedSwitch]
+
+	// Gobo.
+	gobo := overrides[number][position].Gobo
+	maxNumberGobos := overrides[number][position].MaxGobos
+	goboName := "Unknown"
+	if maxNumberGobos > 0 && gobo < maxNumberGobos && gobo != -1 {
+		if gobo != 0 {
+			goboName = overrides[number][position].AvailableGobos[gobo-1]
+		}
+	}
+	return gobo, goboName
+}
+
+func getProgram(this *CurrentState) (int, string) {
+
+	// Pull Overrides
+	overrides := *this.SwitchOverrides
+
+	// Position
+	number := this.SelectedSwitch
+	position := this.SwitchPosition[this.SelectedSwitch]
+
+	// Program.
+	program := overrides[number][position].Program
+	//isProgramOverrideAble := overrides[number][position].IsProgramOverrideAble
+	maxPrograms := overrides[number][position].MaxPrograms
+	programName := "Unknown"
+	if maxPrograms > 0 && program <= maxPrograms && program != -1 {
+		availablePrograms := overrides[number][position].AvailableProgramChannels
+		if debug {
+			fmt.Printf("AvailableProgramChannels %+v switchInfo.MaxPrograms %d switchInfo.Program %d\n", availablePrograms, maxPrograms, program)
+		}
+		if program > 0 {
+			programName = availablePrograms[program-1]
+		}
+	}
+
+	return program, programName
+}
+
+func getProgramSpeed(this *CurrentState) (int, string) {
+
+	// Pull Overrides
+	overrides := *this.SwitchOverrides
+
+	// Position
+	number := this.SelectedSwitch
+	position := this.SwitchPosition[this.SelectedSwitch]
+
+	// Program Speed.
+	programSpeed := overrides[number][position].ProgramSpeed
+	availableProgramSpeedChannels := len(overrides[number][position].AvailableProgramSpeedChannels)
+	maxNumberProgramSpeeds := overrides[number][position].MaxProgramSpeeds
+	//isProgramSpeedOverrideAble := overrides[number][position].IsProgramSpeedOverrideAble
+	numberOfProgramSpeeds := availableProgramSpeedChannels
+	programSpeedName := "Unknown"
+	if numberOfProgramSpeeds > 0 && programSpeed <= maxNumberProgramSpeeds && programSpeed != -1 {
+		availableProgramSpeeds := overrides[number][position].AvailableProgramSpeedChannels
+		if programSpeed > 0 {
+			programSpeedName = availableProgramSpeeds[programSpeed-1]
+		}
+	}
+
+	return programSpeed, programSpeedName
+}
+
+func getSpeed(this *CurrentState) int {
+
+	// Pull Overrides
+	overrides := *this.SwitchOverrides
+
+	return overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
+
+}
+
+func labelButtons(b []bottonButton, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	if debug {
+		fmt.Printf("labelButtons %+v\n", b)
+	}
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	// Loop through the available button names this sequence
+	for index, button := range b {
+		if debug {
+			fmt.Printf("labelButtons %+v\n", button)
+		}
+		common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+		common.LabelButton(index, bottomRow, button.Label, guiButtons)
+	}
+}
+
+func getSlot(button int) (label string) {
+
+	if debug {
+		fmt.Printf("Button is %d\n", button)
+	}
+
+	switch button {
+
+	case 0:
+		label = "speed"
+
+	case 1:
+		label = "speed"
+
+	case 2:
+		label = "shift"
+
+	case 3:
+		label = "shift"
+
+	case 4:
+		label = "size"
+
+	case 5:
+		label = "size"
+
+	case 6:
+		label = "fade"
+
+	case 7:
+		label = "fade"
+	}
+
+	if debug {
+		fmt.Printf("Label is %s\n", label)
+	}
+	return label
+}
+
+func overrideAvailableSettings(channels []string, sub int, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	var slots []Slot
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	// We are going to assign buttons based on overridable channels so clear all buttons down first.
+	for button := 0; button < 7; button++ {
+		common.LabelButton(button, bottomRow, "   ", guiButtons)
+	}
+	// Clear labels
+	common.UpdateStatusBar("", "speed", false, guiButtons)
+	common.UpdateStatusBar("", "shift", false, guiButtons)
+	common.UpdateStatusBar("", "size", false, guiButtons)
+	common.UpdateStatusBar("", "fade", false, guiButtons)
+
+	slots = findSlots(channels)
+
+	switch sub {
+
+	case common.DisplayAll:
+
+		UpdateSlot(slots, "speed", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "shift", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "size", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "fade", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+	case common.ChangeSpeed:
+		UpdateSlot(slots, "speed", channels, UPDATE, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+		UpdateSlot(slots, "shift", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "size", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "fade", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+	case common.ChangeShift:
+		UpdateSlot(slots, "shift", channels, UPDATE, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+		UpdateSlot(slots, "speed", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "size", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "fade", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+	case common.ChangeSize:
+		UpdateSlot(slots, "size", channels, UPDATE, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+		UpdateSlot(slots, "speed", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "shift", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "fade", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+	case common.ChangeFade:
+		UpdateSlot(slots, "fade", channels, UPDATE, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+		UpdateSlot(slots, "speed", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "shift", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "size", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+	}
+}
+
+func UpdateSlot(slots []Slot, label string, channels []string, action int, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	// Find out what has been assigned to this slot of type label
+	// And call the relevant update channel.
+	for _, slot := range slots {
+
+		if slot.Label == label {
+
+			switch slot.ChannelAssigned {
+
+			case "Program":
+				UpdateSettingProgram(slot.Button, channels, action, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+			case "ProgramSpeed":
+				UpdateSettingProgramSpeed(slot.Button, channels, action, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+			case "Color":
+				UpdateSettingColor(slot.Button, channels, action, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+			case "Gobo":
+				UpdateSettingGobo(slot.Button, channels, action, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+			case "Rotate":
+				UpdateSettingRotate(slot.Button, channels, action, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+			}
+		}
+	}
+}
+
+// findSlots will allocate channels to buttons and return a list of slots used by which channel.
+func findSlots(channels []string) []Slot {
+
+	var slots []Slot
+	button := 0
+	maxSlots := 7
+	var colorAssigned bool
+
+	for _, channel := range channels {
+
+		if debug {
+			fmt.Printf("\tChannel  %s\n", channel)
+		}
+
+		if channel == "Master" {
+			continue
+		}
+
+		if channel == "ProgramSpeed" {
+
+			slot := Slot{}
+			slot.ChannelAssigned = channel
+			slot.Label = getSlot(button)
+			slot.Button = button
+			slots = append(slots, slot)
+
+			button = button + 2
+			if button > maxSlots {
+				return slots
+			}
+		}
+
+		if channel == "Program" {
+
+			slot := Slot{}
+			slot.ChannelAssigned = channel
+			slot.Label = getSlot(button)
+			slot.Button = button
+			slots = append(slots, slot)
+
+			button = button + 2
+			if button > maxSlots {
+				return slots
+			}
+		}
+
+		if strings.Contains(channel, "Red") || strings.Contains(channel, "red") ||
+			strings.Contains(channel, "Green") || strings.Contains(channel, "green") ||
+			strings.Contains(channel, "Blue") || strings.Contains(channel, "blue") ||
+			strings.Contains(channel, "Color") || strings.Contains(channel, "color") {
+
+			// Only assign color once.
+			if !colorAssigned {
+				slot := Slot{}
+				slot.ChannelAssigned = "Color"
+				slot.Label = getSlot(button)
+				slot.Button = button
+				slots = append(slots, slot)
+
+				button = button + 2
+				if button > maxSlots {
+					return slots
+				}
+				if button > maxSlots {
+					return slots
+				}
+			}
+
+			colorAssigned = true
+		}
+
+		if channel == "Gobo" {
+
+			slot := Slot{}
+			slot.ChannelAssigned = channel
+			slot.Label = getSlot(button)
+			slot.Button = button
+			slots = append(slots, slot)
+
+			button = button + 2
+			if button > maxSlots {
+				return slots
+			}
+		}
+
+		if channel == "Rotate" {
+
+			slot := Slot{}
+			slot.ChannelAssigned = channel
+			slot.Label = getSlot(button)
+			slot.Button = button
+			slots = append(slots, slot)
+
+			button = button + 2
+			if button > maxSlots {
+				return slots
+			}
+		}
+	}
+
+	return slots
+}
+
+func UpdateSettingProgramSpeed(button int, channels []string, action, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	if debug {
+		fmt.Printf("\t\tFound Program Speed Button %d\n", button)
+	}
+
+	// Update
+	if action == UPDATE {
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideProgramSpeed(this, commandChannels)
+		case common.Increase:
+			increaseOverrideProgramSpeed(this, commandChannels)
+		}
+	}
+
+	// Display
+	speed := getSpeed(this)
+	common.UpdateStatusBar(fmt.Sprintf("Program Speed %d", speed), getSlot(button), false, guiButtons)
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Program Speed Down\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Program Speed", "Down"), guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Program Speed Up\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Program Speed", "Up"), guiButtons)
+
+}
+
+func UpdateSettingProgram(button int, channels []string, action int, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	if debug {
+		fmt.Printf("\t\tFound Program Button\n")
+	}
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	// Update
+	if action == UPDATE {
+		switch direction {
+		case common.Decrease:
+			increaseOverrideProgram(this, commandChannels)
+		case common.Increase:
+			increaseOverrideProgram(this, commandChannels)
+		}
+	}
+
+	// Display
+	program, programName := getProgram(this)
+	if debug {
+		fmt.Printf("Setting Program %d Name %s on slot %s\n", program, programName, getSlot(button))
+	}
+	common.UpdateStatusBar(fmt.Sprintf("Program %d:%s", program, programName), getSlot(button), false, guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Program Down\n", button+1)
+		common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	}
+	common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Program", "Down"), guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Program Up\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Program", "Up"), guiButtons)
+
+}
+
+func UpdateSettingColor(button int, channels []string, action int, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	if debug {
+		fmt.Printf("\t\tFound Color Button\n")
+	}
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	// Update
+	if action == UPDATE {
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideColor(this, commandChannels)
+		case common.Increase:
+			increaseOverrideColor(this, commandChannels)
+		}
+	}
+
+	// Display
+	color, colorName := getColor(this)
+	if debug {
+		fmt.Printf("Setting Color %d Name %s on slot %s\n", color, colorName, getSlot(button))
+	}
+	common.UpdateStatusBar(fmt.Sprintf("Color %d:%s", color, colorName), getSlot(button), false, guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Color Down\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Color", "Down"), guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Color Up\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Color", "Up"), guiButtons)
+}
+
+func UpdateSettingGobo(button int, channels []string, action int, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	if debug {
+		fmt.Printf("\t\tFound Gobo Button\n")
+	}
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	// Update
+	if action == UPDATE {
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideGobo(this, commandChannels)
+		case common.Increase:
+
+		}
+	}
+
+	// Display
+	gobo, goboName := getGobo(this)
+	if debug {
+		fmt.Printf("Setting Program %d Name %s on slot %s\n", gobo, goboName, getSlot(button))
+	}
+	common.UpdateStatusBar(fmt.Sprintf("Gobo %d:%s", gobo, goboName), getSlot(button), false, guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Gobo Down\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Gobo", "Down"), guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Gobo Up\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Gobo", "Up"), guiButtons)
+
+}
+
+func UpdateSettingRotate(button int, channels []string, action int, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	if debug {
+		fmt.Printf("\t\tFound Rotate Button\n")
+	}
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	// Update
+	if action == UPDATE {
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideRotateSpeed(this, commandChannels)
+		case common.Increase:
+			increaseOverrideRotateSpeed(this, commandChannels)
+		}
+	}
+
+	// Display
+	rotate, rotateName := getRotate(this)
+	if debug {
+		fmt.Printf("Setting Program %d Name %s on slot %s\n", rotate, rotateName, getSlot(button))
+	}
+	common.UpdateStatusBar(fmt.Sprintf("Rotate %d:%s", rotate, rotateName), getSlot(button), false, guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Rotate Down\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Rotate", "Down"), guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Rotate Up\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Rotate", "Up"), guiButtons)
+
+}

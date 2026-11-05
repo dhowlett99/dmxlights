@@ -19,7 +19,6 @@ package editor
 
 import (
 	"fmt"
-	"image/color"
 	"regexp"
 	"strconv"
 	"strings"
@@ -29,8 +28,11 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/dhowlett99/dmxlights/pkg/buttons"
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/override"
 )
 
 type FixturesPanel struct {
@@ -140,19 +142,28 @@ func updateArray(fixtures []fixture.Fixture) [][]string {
 	return data
 }
 
-func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *fixture.Groups, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (popupFixturePanel *widget.PopUp, err error) {
+func generateFixtureNumberOptions(totalNumberOptions int) []string {
+
+	var options []string
+	for x := 1; x <= totalNumberOptions; x++ {
+		options = append(options, strconv.Itoa(x))
+	}
+	return options
+}
+
+func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w fyne.Window, groupConfig *fixture.Groups, fixturesConfig *fixture.Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, switchOverrides *[][]common.Override) (popupFixturePanel *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewFixturesPanel\n")
 	}
 
 	fp := FixturesPanel{}
-	fp.Fixtures = fixtures
+	fp.Fixtures = fixturesConfig
 	fp.FixtureList = []fixture.Fixture{}
 
 	// Populate group options from the available sequence labels.
 	fp.GroupOptions = getGroupOptions(groupConfig)
-	fp.NumberOptions = []string{"1", "2", "3", "4", "5", "6", "7", "8"}
+	fp.NumberOptions = generateFixtureNumberOptions(8)
 	fp.TypeOptions = []string{"rgb", "scanner", "switch", "projector"}
 
 	// Storage for error flags for each fixture.
@@ -160,14 +171,6 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 	fp.NameEntryError = make(map[int]bool, len(fp.FixtureList))
 	fp.LabelEntryError = make(map[int]bool, len(fp.FixtureList))
 	fp.DescriptionEntryError = make(map[int]bool, len(fp.FixtureList))
-
-	Red := color.RGBA{}
-	Red.R = uint8(255)
-	Red.G = uint8(0)
-	Red.B = uint8(0)
-	Red.A = 255
-
-	White := color.White
 
 	// Create the save widget.
 	var buttonSave *widget.Button
@@ -190,7 +193,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 	)
 
 	// Load the fixtures into the array used by the table.
-	data := makeArray(fixtures)
+	data := makeArray(fixturesConfig)
 
 	// Title.
 	title := widget.NewLabel("Fixture List")
@@ -199,7 +202,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 	}
 
 	// Geneate the fixture list.
-	for no, f := range fixtures.Fixtures {
+	for no, f := range fixturesConfig.Fixtures {
 		newItem := fixture.Fixture{}
 
 		if f.ID == 0 { // We have a empty ID for this fixture.
@@ -217,8 +220,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 		newItem.Type = f.Type
 		newItem.Channels = f.Channels
 		newItem.States = f.States
-		newItem.MultiFixtureDevice = f.MultiFixtureDevice
-		newItem.NumberSubFixtures = f.NumberSubFixtures
+		newItem.FixtureInfo = f.FixtureInfo
 		newItem.UseFixture = f.UseFixture
 		fp.FixtureList = append(fp.FixtureList, newItem)
 	}
@@ -236,7 +238,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 				fp.UpdateChannels = false
 			}
 			if fp.UpdateUseFixture {
-				address := fixture.FindFixtureAddressByName(fp.UseFixture, fixtures)
+				address := fixture.GetFadeValuesFixtureAddressByName(fp.UseFixture, fixturesConfig)
 				data[fp.UpdateThisFixture][FIXTURE_ADDRESS] = address
 				fp.FixtureList[fp.UpdateThisFixture].UseFixture = fp.UseFixture
 				dmx, _ := strconv.Atoi(address)
@@ -260,19 +262,19 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 				widget.NewSelect(fp.GroupOptions, func(value string) {}),  // Group Number.
 				widget.NewSelect(fp.NumberOptions, func(value string) {}), // Fixture Number.
 				container.NewStack(
-					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(colors.White),
 					widget.NewEntry(), // Name.
 				),
 				container.NewStack(
-					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(colors.White),
 					widget.NewEntry(), // Label.
 				),
 				container.NewStack(
-					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(colors.White),
 					widget.NewEntry(), // DMX Address.
 				),
 				container.NewStack(
-					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(colors.White),
 					widget.NewEntry(), // Description.
 				),
 				widget.NewButton("-", func() {}),        // Fixture delete button.
@@ -350,9 +352,9 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 			if i.Col == FIXTURE_NAME {
 				showField(FIXTURE_NAME, o)
 				if fp.NameEntryError[fp.FixtureList[i.Row].ID] {
-					o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
+					o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = colors.Red
 				} else {
-					o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
+					o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = colors.White
 				}
 				o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
@@ -399,9 +401,9 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 			if i.Col == FIXTURE_LABEL {
 				showField(FIXTURE_LABEL, o)
 				if fp.LabelEntryError[fp.FixtureList[i.Row].ID] {
-					o.(*fyne.Container).Objects[FIXTURE_LABEL].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
+					o.(*fyne.Container).Objects[FIXTURE_LABEL].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = colors.Red
 				} else {
-					o.(*fyne.Container).Objects[FIXTURE_LABEL].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
+					o.(*fyne.Container).Objects[FIXTURE_LABEL].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = colors.White
 				}
 				o.(*fyne.Container).Objects[FIXTURE_LABEL].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[FIXTURE_LABEL].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
@@ -444,16 +446,16 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 			if i.Col == FIXTURE_ADDRESS {
 				showField(FIXTURE_ADDRESS, o)
 				if fp.DMXAddressEntryError[fp.FixtureList[i.Row].ID] {
-					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
+					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = colors.Red
 				} else {
-					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
+					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = colors.White
 				}
 				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
 				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = func(value string) {
 					if value != "" {
 						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).FocusGained()
-						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = color.White
+						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = colors.White
 						newFixture := makeNewFixture(data, i, FIXTURE_ADDRESS, value, fp.FixtureList)
 						fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 						data = updateArray(fp.FixtureList)
@@ -502,9 +504,9 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 			if i.Col == FIXTURE_DESCRIPTION {
 				showField(FIXTURE_DESCRIPTION, o)
 				if fp.DescriptionEntryError[fp.FixtureList[i.Row].ID] {
-					o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
+					o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = colors.Red
 				} else {
-					o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
+					o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = colors.White
 				}
 				o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
@@ -573,16 +575,16 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 				o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).OnTapped = nil
 				o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).SetText("->")
 				o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).OnTapped = func() {
-					fixtures.Fixtures = fp.FixtureList
+					fixturesConfig.Fixtures = fp.FixtureList
 					var modal *widget.PopUp
 					if fp.FixtureList[i.Row].Type == "switch" {
-						modal, err = NewStatesEditor(w, fp.FixtureList[i.Row].ID, fp.FixtureList[i.Row].UseFixture, &fp, fixtures)
+						modal, err = NewStatesEditor(w, fp.FixtureList[i.Row].ID, fp.FixtureList[i.Row].UseFixture, &fp, fixturesConfig)
 						if err != nil {
 							fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fp.FixtureList[i.Row].Group, fp.FixtureList[i.Row].Number, err)
 							return
 						}
 					} else {
-						modal, err = NewChannelEditor(w, fp.FixtureList[i.Row].ID, fp.FixtureList[i.Row].Channels, &fp, fixtures)
+						modal, err = NewChannelEditor(w, fp.FixtureList[i.Row].ID, fp.FixtureList[i.Row].Channels, &fp, groupConfig, fixturesConfig)
 						if err != nil {
 							fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fp.FixtureList[i.Row].Group, fp.FixtureList[i.Row].Number, err)
 							return
@@ -619,24 +621,32 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 		fp.FixtureList = removeEmptyActions(fp.FixtureList)
 
 		// Insert updated fixture into fixtures.
-		fixtures.Fixtures = fp.FixtureList
+		fixturesConfig.Fixtures = fp.FixtureList
 
-		// Clear switch positions to their first positions.
-		for _, seq := range sequences {
-			if seq.Type == "switch" {
-				cmd := common.Command{
-					Action: common.ResetAllSwitchPositions,
-					Args: []common.Arg{
-						{Name: "Fixtures", Value: fixtures},
-					},
-				}
-				// Send a message to the switch sequence.
-				common.SendCommandToSequence(seq.Number, cmd, commandChannels)
+		// Re-populate the fixture info based on the new state of fixtures.
+		fixture.PopulateFixturesInfo(fixturesConfig)
+
+		// Count the number of fixtures for all sequences since the user may have added or deleted fixtures.
+		// The chaser uses the fixtures from the scanner group.
+		for _, sequence := range sequences {
+			cmd := common.Command{
+				Action: common.UpdateFixturesConfig,
+				Args: []common.Arg{
+					{Name: "Fixtures", Value: fixturesConfig},
+				},
 			}
+			// Send a message to the switch sequence.
+			common.SendCommandToSequence(sequence.Number, cmd, commandChannels)
 		}
 
+		// When we add a new set of fixtues with a possible new switch states we also need to populate a new override for that switch state.
+		// So we recreate the overrides from scratch by using the pointer to SwitchOverrides.
+		override.CreateOverrides(this.SwitchSequenceNumber, fixturesConfig, switchOverrides)
+
+		buttons.FullClear(this, sequences, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons)
+
 		// Check DMX addresses don't overlap.
-		reports, err = checkForNoOverlap(fixtures, fp)
+		reports, err = checkForNoOverlap(fixturesConfig, fp)
 		if err != nil {
 			fmt.Printf("DMX Address %s:%s \n", err, strings.Join(reports, "\n"))
 			fp.FixturePanel.Refresh()
@@ -652,7 +662,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 			buttonSave.Enable()
 
 			// Check Name is not duplicated.
-			reports, err = checkForDuplicateName(fixtures, fp)
+			reports, err = checkForDuplicateName(fixturesConfig, fp)
 			if err != nil {
 				fmt.Printf("Name Duplicated %s:%s \n", err, strings.Join(reports, "\n"))
 				fp.FixturePanel.Refresh()
@@ -667,7 +677,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 				buttonSave.Enable()
 
 				// Check Name is not duplicated.
-				reports, err = checkForDuplicateLabel(fixtures, fp)
+				reports, err = checkForDuplicateLabel(fixturesConfig, fp)
 				if err != nil {
 					fmt.Printf("Label Duplicated %s:%s \n", err, strings.Join(reports, "\n"))
 					fp.FixturePanel.Refresh()
@@ -1158,8 +1168,7 @@ func makeNewFixture(data [][]string, i widget.TableCellID, field int, value stri
 	// Set up the pointers to further data.
 	newFixture.Channels = fixtureList[i.Row].Channels
 	newFixture.States = fixtureList[i.Row].States
-	newFixture.MultiFixtureDevice = fixtureList[i.Row].MultiFixtureDevice
-	newFixture.NumberSubFixtures = fixtureList[i.Row].NumberSubFixtures
+	newFixture.FixtureInfo = fixtureList[i.Row].FixtureInfo
 	newFixture.UseFixture = fixtureList[i.Row].UseFixture
 
 	// Now setup the new selected value.
@@ -1270,8 +1279,7 @@ func removeEmptyActions(fixtureList []fixture.Fixture) []fixture.Fixture {
 		newFixture.Address = f.Address
 		newFixture.Channels = f.Channels
 
-		newFixture.MultiFixtureDevice = f.MultiFixtureDevice
-		newFixture.NumberSubFixtures = f.NumberSubFixtures
+		newFixture.FixtureInfo = f.FixtureInfo
 		newFixture.UseFixture = f.UseFixture
 
 		newStates := []fixture.State{}

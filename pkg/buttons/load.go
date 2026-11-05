@@ -1,4 +1,4 @@
-// Copyright (C) 2022, 2023 dhowlett99.
+// Copyright (C) 2022, 2023, 2024, 2025 dhowlett99.
 // This implements the load preset feature, used by the buttons package.
 //
 // This program is free software: you can redistribute it and/or modify
@@ -19,15 +19,20 @@ package buttons
 import (
 	"fmt"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
+	"github.com/dhowlett99/dmxlights/pkg/labels"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 )
 
-func loadConfig(sequences []*common.Sequence, this *CurrentState,
+func loadPreset(sequences []*common.Sequence, this *CurrentState,
 	X int, Y int,
 	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight,
 	guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
+
+	var lastSelectedSequence int
+	var lastSelectedSwitch int
 
 	// Stop all sequences, so we start in sync.
 	cmd := common.Command{
@@ -36,8 +41,8 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	common.SendCommandToAllSequence(cmd, commandChannels)
 
 	// Load the config.
-	// Which forces all sequences to load their config.
-	config.AskToLoadConfig(commandChannels, X, Y)
+	// Which forces all sequences to load their config in the stopped position. Run=false.
+	config.AskToLoadConfig(commandChannels, X, Y, this.ProjectName)
 
 	// Turn the selected preset light flashing it's current color and yellow.
 	if this.LastPreset != nil {
@@ -59,16 +64,28 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	// Turn off the local copy of the this.Flood flag.
 	this.Flood = false
 	// And stop the flood button flashing.
-	common.LightLamp(common.FLOOD_BUTTON, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.FLOOD_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 	// Remember we selected this preset
 	last := fmt.Sprint(X) + "," + fmt.Sprint(Y)
 	this.LastPreset = &last
 
 	// Get an upto date copy of all of the sequences.
-	for sequenceNumber, sequence := range sequences {
+	for sequenceNumber := range sequences {
+
 		sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
-		// restore the speed, shift, size, fade, coordinates label data.
+
+		// If we're a scanner sequence and not in static mode or the chaser is not in static mode, clear the buttom
+		if this.SequenceType[sequenceNumber] == "scanner" &&
+			!this.Static[sequenceNumber] &&
+			!this.Static[common.GlobalChaserSequenceNumber] {
+			common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
+		}
+
+		// Clear any left over labels.
+		common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)
+
+		// Restore the speed, shift, size, fade, coordinates label data.
 		this.Speed[sequenceNumber] = sequences[sequenceNumber].Speed
 		this.RGBShift[sequenceNumber] = sequences[sequenceNumber].RGBShift
 		this.ScannerShift[sequenceNumber] = sequences[sequenceNumber].ScannerShift
@@ -76,9 +93,10 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.ScannerSize[sequenceNumber] = sequences[sequenceNumber].ScannerSize
 		this.RGBFade[sequenceNumber] = sequences[sequenceNumber].RGBFade
 		this.ScannerCoordinates[sequenceNumber] = sequences[sequenceNumber].ScannerSelectedCoordinates
-		this.Running[sequenceNumber] = sequences[sequenceNumber].Run
+		this.Running[sequenceNumber] = sequences[sequenceNumber].SavedRun
 		this.Strobe[sequenceNumber] = sequences[sequenceNumber].Strobe
 		this.StrobeSpeed[sequenceNumber] = sequences[sequenceNumber].StrobeSpeed
+		this.Paused[sequenceNumber] = false
 
 		// Setup the correct mode for the displays.
 		this.SequenceType[sequenceNumber] = sequences[sequenceNumber].Type
@@ -89,6 +107,9 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		// Forget we've pressed twice.
 		this.SelectButtonPressed[sequenceNumber] = false
 
+		// Load the last selected sequence from the preset.
+		lastSelectedSequence = sequences[sequenceNumber].LastSelectedSequence
+
 		this.ScannerChaser[sequenceNumber] = sequences[sequenceNumber].ScannerChaser
 		this.Static[sequenceNumber] = sequences[sequenceNumber].Static
 		this.StaticFlashing[sequenceNumber] = false
@@ -97,18 +118,33 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.ShowRGBColorPicker = false
 
 		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
-		if this.SequenceType[sequenceNumber] == "scanner" && !this.Running[this.ScannerSequenceNumber] && this.ScannerChaser[this.ScannerSequenceNumber] {
+		if this.SequenceType[sequenceNumber] == "scanner" &&
+			this.ScannerChaser[common.GlobalScannerSequenceNumber] {
 			// So adjust the mode to be CHASER_DISPLAY
 			this.SelectedMode[sequenceNumber] = CHASER_DISPLAY
 		}
 
-		// Reload the fixture state.
-		for fixtureNumber := 0; fixtureNumber < sequences[this.SelectedSequence].NumberFixtures; fixtureNumber++ {
-			this.FixtureState[sequenceNumber][fixtureNumber] = sequences[sequenceNumber].FixtureState[fixtureNumber]
+		// or if the chaser is in static mode.
+		if this.SequenceType[sequenceNumber] == "scanner" &&
+			this.ScannerChaser[common.GlobalScannerSequenceNumber] && sequenceNumber == common.GlobalChaserSequenceNumber {
+			// So adjust the mode to be CHASER_DISPLAY
+			this.SelectedMode[sequenceNumber] = CHASER_DISPLAY
+		}
+
+		// If we are a scanner and the scanner and chaser sequence aren't running.
+		// Turn off the scanners by issuing a clear all fixtures command to the scanner sequence.
+		if sequences[sequenceNumber].Type == "scanner" &&
+			!this.Running[sequenceNumber] &&
+			!this.ScannerChaser[sequenceNumber] {
+
+			cmd := common.Command{
+				Action: common.ClearAllFixtures,
+			}
+			common.SendCommandToSequence(common.GlobalScannerSequenceNumber, cmd, commandChannels)
 		}
 
 		// Restore the functions states from the sequence.
-		if sequence.Type == "rgb" {
+		if sequences[sequenceNumber].Type == "rgb" {
 			this.Functions[sequenceNumber][common.Function2_Auto_Color].State = sequences[sequenceNumber].AutoColor
 			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = sequences[sequenceNumber].AutoPattern
 			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
@@ -116,7 +152,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequences[sequenceNumber].RGBInvert
 			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
 		}
-		if sequence.Type == "scanner" {
+		if sequences[sequenceNumber].Type == "scanner" {
 			this.Functions[sequenceNumber][common.Function2_Auto_Color].State = sequences[sequenceNumber].AutoColor
 			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = sequences[sequenceNumber].AutoPattern
 			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
@@ -125,73 +161,79 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		}
 
 		// If we are loading a switch sequence, update our local copy of the switch settings.
-		if sequence.Type == "switch" {
+		// and defocus each switch in turn.
+		if sequences[sequenceNumber].Type == "switch" {
 
 			// Get an upto date copy of the switch sequence.
 			sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
 
-			// Now set our local representation of switches
-			for swiTchNumber, swiTch := range sequences[sequenceNumber].Switches {
-				this.SwitchPositions[sequenceNumber][swiTchNumber] = swiTch.CurrentPosition
-				if debug {
-					var stateNames []string
-					for _, state := range swiTch.States {
-						stateNames = append(stateNames, state.Name)
-					}
-					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPositions[sequenceNumber][swiTchNumber], stateNames)
-				}
-			}
+			// Load the last selected switch from the sequence.
+			lastSelectedSwitch = sequences[sequenceNumber].LastSelectedSwitch
+			// Get the overrides.
+			RefreshLocalOverrides(this, sequences[sequenceNumber])
+
+			deFocusAllSwitches(this, sequences, commandChannels)
 		}
+
+		// Now start any thing that needs to run with load fixtures on.
+		if sequences[sequenceNumber].SavedRun {
+			cmd := common.Command{
+				Action: common.Start,
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+		}
+
+		// Restore the master brightness for each individual sequence in this loaded config.
+		this.MasterBrightness[sequenceNumber] = sequences[sequenceNumber].Master
+
+		// Set the dsiplay mode for this sequence.
+		displayMode(sequenceNumber, this.SelectedMode[sequenceNumber], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
 		if debug {
 			fmt.Printf("Loading Sequence %d Name %s Label %s Static %t\n", sequenceNumber, sequences[sequenceNumber].Name, sequences[sequenceNumber].Label, this.Static[sequenceNumber])
 		}
-
-		// Play out this sequence.
-		displayMode(sequenceNumber, this.SelectedMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 	}
-
-	// Restore the master brightness, remember that the master is for all sequences in this loaded config.
-	// So the master we retrive from this selected sequence will be the same for all the others.
-	this.MasterBrightness = sequences[this.SelectedSequence].Master
 
 	// Show the correct running and strobe buttons.
 	if this.Strobe[this.SelectedSequence] {
 		this.StrobeSpeed[this.SelectedSequence] = sequences[this.SelectedSequence].StrobeSpeed
 	}
-	// Show this sequence running status in the start/stop button.
-	common.ShowRunningStatus(this.Running[this.TargetSequence], eventsForLaunchpad, guiButtons)
-	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
-	// Auto select the last running or static sequence which lights it's select lamp.
-	this.SelectedSequence = autoSelect(this)
+	// Auto select the last running or static sequence or switch which lights it's selected lamp.
+	this.SelectedSequence, this.LastSelectedSwitch = autoSelect(this, commandChannels, lastSelectedSequence, lastSelectedSwitch)
 
-	// Tailor the top buttons to the sequence type.
-	common.ShowTopButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
-
-	// Tailor the bottom buttons to the sequence type.
-	common.ShowBottomButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
+	// And set its type.
+	this.SelectedType = this.SequenceType[this.SelectedSequence]
 
 	// Show this sequence running status in the start/stop button.
 	common.ShowRunningStatus(this.Running[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 	// Update the status bar.
-	showStatusBar(this, sequences, guiButtons)
+	showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 
 	// Light the sequence selector button.
-	SequenceSelect(eventsForLaunchpad, guiButtons, this)
+	lightSelectedButton(eventsForLaunchpad, guiButtons, this)
+
+	// Clear the pause button.
+	this.AllPaused = false
+	common.LightLamp(common.FREEZE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(common.FREEZE_BUTTON.X, common.FREEZE_BUTTON.Y, labels.GetLabel(this.Labels, "Freeze", "Off"), guiButtons)
 
 }
 
-func autoSelect(this *CurrentState) (selectedSequence int) {
+func autoSelect(this *CurrentState, commandChannels []chan common.Command, lastSelectedSequence int, lastSelectedSwitch int) (int, int) {
 
 	// Check for running sequences.
 	for sequenceNumber, sequenceRunning := range this.Running {
 		if sequenceRunning {
-			selectedSequence = sequenceNumber
-			if selectedSequence == this.ChaserSequenceNumber {
-				selectedSequence = this.ScannerSequenceNumber
+			lastSelectedSequence = sequenceNumber
+			if lastSelectedSequence == common.GlobalChaserSequenceNumber {
+				lastSelectedSequence = common.GlobalScannerSequenceNumber
+				if debug {
+					fmt.Printf("Found a running sequence %d\n", sequenceNumber)
+				}
+				return lastSelectedSequence, common.NOT_SELECTED
 			}
 		}
 	}
@@ -199,13 +241,38 @@ func autoSelect(this *CurrentState) (selectedSequence int) {
 	// Check for static sequences.
 	for sequenceNumber, sequenceInStatic := range this.Static {
 		if sequenceInStatic {
-			selectedSequence = sequenceNumber
-			if selectedSequence == this.ChaserSequenceNumber {
-				selectedSequence = this.ScannerSequenceNumber
+			lastSelectedSequence = sequenceNumber
+			if lastSelectedSequence == common.GlobalChaserSequenceNumber {
+				lastSelectedSequence = common.GlobalScannerSequenceNumber
+				if debug {
+					fmt.Printf("Found a static sequence %d\n", sequenceNumber)
+				}
+				return lastSelectedSequence, common.NOT_SELECTED
 			}
 		}
 	}
 
+	// Check for a selected switch.
+	// If this is a switch sequence also focus the last touched switch.
+	if lastSelectedSequence == this.SwitchSequenceNumber {
+
+		// Just send a message to focus the switch button.
+		cmd := common.Command{
+			Action: common.UpdateSwitch,
+			Args: []common.Arg{
+				{Name: "SwitchNumber", Value: lastSelectedSwitch},
+				{Name: "SwitchPosition", Value: this.SwitchPosition[lastSelectedSwitch]},
+				{Name: "Step", Value: false}, // Don't step the switch state.
+				{Name: "Focus", Value: true}, // Focus the switch lamp.
+			},
+		}
+		if commandChannels != nil {
+			// Send a message to the switch sequence.
+			common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
+		}
+	}
+
 	// default to first sequnce if nothings running.
-	return selectedSequence
+	lastSelectedSwitch = common.NOT_SELECTED
+	return lastSelectedSequence, lastSelectedSwitch
 }
