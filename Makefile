@@ -96,7 +96,7 @@ deploy: installer certificate
 	rm -rf dmxlights.app/
 	codesign --remove-signature /usr/local/opt/portaudio/lib/libportaudio.2.dylib
 	codesign --force --deep --entitlements entitlements.plist --sign ${CERT} -i ${APP_ID} /usr/local/opt/portaudio/lib/libportaudio.2.dylib
-	$(GOPATH)/bin/fyne package --appVersion ${VERSION} --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png
+	$(GOPATH)/bin/fyne package --appVersion ${VERSION} --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png -use-raw-icon
 	# fix the Info.plist
 	./fix.sh dmxlights.app/Contents/Info.plist > /tmp/file
 	mv /tmp/file dmxlights.app/Contents/Info.plist
@@ -111,3 +111,6 @@ deploy: installer certificate
 	cp labels.yaml dmxlights.app/Contents/Resources/
 
 
+
+release: deploy
+	$(GOPATH)/bin/fyne release -os ios -appID com.github.dhowlett99.dmxlights -appVersion ${VERSION} -appBuild 1 -icon dmxlights.png -use-raw-icon -profile 1
