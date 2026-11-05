@@ -33,6 +33,8 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
 * MapFixture rewritten for clarity.
 * Master Dimmer has been replaced with Dimmer controls that now controls the brightness of selected sequences or switch fixtures.
 * Changes to Makefile so will build on ARM64 architectures.
+* Static scenes now support fading between different brightnesses of same color.
+* Static scene fade times and fade slope can now be controlled with speed and fade controls.
 
 ## Known Problems
 
@@ -63,6 +65,7 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
 # Dependances.
 
 * The fyne toolkit for creating graphical apps for desktop, mobile and web. https://fyne.io/
+* Based on fyne.io/fyne/v2 v2.5.1 because newer version break the threading model.
 * USBDMX, a versatile USB DMX library written in Go for programatic show control and special effects. https://github.com/oliread/usbdmx
 * A simple MIDI package for Go. Currently only supports Linux and Mac. https://github.com/scgolang/midi
 * Interface to the PortAudio audio I/O library. https://github.com/gordonklaus/portaudio
