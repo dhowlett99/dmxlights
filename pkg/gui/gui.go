@@ -158,7 +158,9 @@ func (panel *MyPanel) UpdateColorDisplayWidget(control common.ColorDisplayContro
 		panel.ColorDisplay.Objects[box].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	panel.ColorDisplay.Hidden = false
-	panel.ColorDisplay.Refresh()
+	fyne.Do(func() {
+		panel.ColorDisplay.Refresh()
+	})
 
 	if control.Red {
 		panel.ColorDisplay.Objects[Red].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Red
@@ -259,8 +261,10 @@ func (panel *MyPanel) UpdateColorDisplayWidget(control common.ColorDisplayContro
 		panel.ColorDisplay.Objects[White].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 
-	panel.ColorDisplay.Hidden = false
-	panel.ColorDisplay.Refresh()
+	fyne.Do(func() {
+		panel.ColorDisplay.Hidden = false
+		panel.ColorDisplay.Refresh()
+	})
 }
 
 func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons [][]common.ALight) {
@@ -285,13 +289,17 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 
 	// Shortcut to label a button.
 	if alight.UpdateLabel {
-		panel.UpdateButtonLabel(alight.Button.X, alight.Button.Y, alight.Label)
+		fyne.Do(func() {
+			panel.UpdateButtonLabel(alight.Button.X, alight.Button.Y, alight.Label)
+		})
 		return
 	}
 
 	// Shortcut to label a status bar item.
 	if alight.UpdateStatus {
-		panel.UpdateStatusBar(alight.Status, alight.Hidden, alight.Which)
+		fyne.Do(func() {
+			panel.UpdateStatusBar(alight.Status, alight.Hidden, alight.Which)
+		})
 		return
 	}
 
@@ -317,8 +325,10 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 		color.B = uint8(Blue)
 		color.A = 255
 
-		panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.FillColor = color
-		panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.Refresh()
+		fyne.Do(func() {
+			panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.FillColor = color
+			panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.Refresh()
+		})
 	} else {
 
 		// Stop any existing flashing.
@@ -335,8 +345,10 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 			for {
 				// Turn on.
 				// Convert the  RGB color into RGBA for the fyne.io GUI.
-				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.FillColor = common.ConvertRGBtoRGBA(alight.OnColor)
-				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.Refresh()
+				fyne.Do(func() {
+					panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.FillColor = common.ConvertRGBtoRGBA(alight.OnColor)
+					panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.Refresh()
+				})
 
 				// We wait for a stop message or 250ms which ever comes first.
 				select {
@@ -347,8 +359,10 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 
 				// Turn off.
 				// Convert the  RGB color into RGBA for the fyne.io GUI.
-				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.FillColor = common.ConvertRGBtoRGBA(alight.OffColor)
-				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.Refresh()
+				fyne.Do(func() {
+					panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.FillColor = common.ConvertRGBtoRGBA(alight.OffColor)
+					panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.Refresh()
+				})
 
 				// We wait for a stop message or 250ms which ever comes first.
 				select {
@@ -366,8 +380,10 @@ func (panel *MyPanel) UpdateButtonLabel(X int, Y int, label string) {
 	label = strings.Replace(label, " ", "\n", 2)
 	// If the label contains a period, replace it with a new line.
 	label = strings.Replace(label, ".", "\n", 2)
-	panel.Buttons[X][Y].button.Text = label
-	panel.Buttons[X][Y].button.Refresh()
+	fyne.Do(func() {
+		panel.Buttons[X][Y].button.Text = label
+		panel.Buttons[X][Y].button.Refresh()
+	})
 }
 
 func (panel *MyPanel) UpdateStatusBar(label string, hide bool, which string) {

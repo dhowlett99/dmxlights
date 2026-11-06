@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"time"
 
+	"fyne.io/fyne/v2"
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -57,7 +58,9 @@ func ReadLaunchPadButtons(guiButtons chan common.ALight, this *buttons.CurrentSt
 	for {
 		hit := <-buttonChannel
 		this.GUI = false
-		buttons.ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+		fyne.Do(func() {
+			buttons.ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+		})
 	}
 }
 

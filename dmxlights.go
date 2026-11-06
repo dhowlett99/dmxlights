@@ -216,14 +216,17 @@ func main() {
 		defer this.Pad.Close()
 	}
 
-	// Report on connected devices.
-	panel.PopupNotFoundMessage(myWindow,
-		gui.Device{
-			Name:   "DMX Interface",
-			Status: this.DmxInterfacePresent},
-		gui.Device{
-			Name:   "LaunchPad",
-			Status: this.LaunchPadConnected})
+	fyne.Do(func() {
+		// Report on connected devices.
+		panel.PopupNotFoundMessage(myWindow,
+			gui.Device{
+				Name:   "DMX Interface",
+				Status: this.DmxInterfacePresent},
+			gui.Device{
+				Name:   "LaunchPad",
+				Status: this.LaunchPadConnected})
+
+	})
 
 	// Create a channel to send events to the launchpad.
 	eventsForLaunchpad := make(chan common.ALight)
@@ -268,8 +271,10 @@ func main() {
 	myWindow.SetCloseIntercept(func() {
 		theSame, message := fixture.CheckFixturesAreTheSame(fixturesConfig, startConfig)
 		if !theSame {
-			model := gui.AreYouSureDialog(myWindow, message)
-			model.Show()
+			fyne.Do(func() {
+				model := gui.AreYouSureDialog(myWindow, message)
+				model.Show()
+			})
 		} else {
 			os.Exit(0)
 		}

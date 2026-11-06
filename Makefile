@@ -3,7 +3,7 @@
 GO111MODULE=on
 COVERAGE = -coverprofile=../c.out -covermode=atomic
 SHELL := /usr/bin/env bash
-VERSION := "3.0"
+VERSION := "4.0"
 export PKG_CONFIG_PATH=/usr/local/Cellar/portaudio/19.7.0/lib/pkgconfig
 # Set Architecture
 ARCH ?= $(shell uname -m)
