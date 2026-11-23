@@ -240,6 +240,9 @@ func FullClear(this *CurrentState, sequences []*common.Sequence, fixturesConfig 
 
 		}
 
+		// Turn off static for this sequence.
+		sequence.Static = false
+
 		// Clear out our copy of the sequences RGB colors.
 		if sequenceNumber == common.GlobalChaserSequenceNumber {
 			sequence.SequenceColors = []color.RGBA{colors.White}

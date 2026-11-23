@@ -20,6 +20,7 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
 * Replaced the raw libusb USB driver (oliread/usbdmx) with a native macOS serial port implementation that communicates directly through Apple's built-in FTDI Virtual COM Port driver (/dev/cu.usbserial-A50285BI).
 Instead of fighting macOS for low-level control of the USB hardware, dmxlights now works with macOS's built-in driver as a high-speed serial port.
 * support for auto reconnect for dmx controller.
+* Bug fix for flash buttons, when in static mode we flash between white and the color of the static scene. Reset now switches off static properly and clears out the off color back to black.
 
 ![image](UsbDriverChanges.png)
  
