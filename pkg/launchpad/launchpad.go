@@ -118,7 +118,7 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *pad.Pad
 						}
 						err := pad.Light(alight.Button.X, alight.Button.Y, Red, Green, Blue)
 						if err != nil {
-							fmt.Printf("error writing to launchpad %s\n" + err.Error())
+							fmt.Printf("error writing to launchpad %s\n", err.Error())
 						}
 					}
 
@@ -130,7 +130,7 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *pad.Pad
 					}
 					err := pad.FlashLight(alight.Button.X, alight.Button.Y, common.GetLaunchPadCodeByRGBColor(alight.OnColor), common.GetLaunchPadCodeByRGBColor(alight.OffColor))
 					if err != nil {
-						fmt.Printf("flash: error writing to launchpad %s\n" + err.Error())
+						fmt.Printf("flash: error writing to launchpad %s\n", err.Error())
 					}
 
 				}
