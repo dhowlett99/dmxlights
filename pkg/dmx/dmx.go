@@ -21,6 +21,7 @@ const (
 	darwinTIOCCBRK    = 0x2000747a // Clear serial BREAK
 	darwinIOSSIOSPEED = 0x80085402 // Set arbitrary baud rate (speed_t = uint64 on 64-bit macOS)
 	dmxBaudRate       = 250000     // Standard DMX512 baud rate (250 kbps)
+	preferredPort     = "/dev/cu.usbserial-A50285BI"
 )
 
 // ControllerConfig holds the active port and forwards channel updates to the controller.
@@ -29,7 +30,7 @@ type ControllerConfig struct {
 	controller *DMXController
 }
 
-// SetChannel updates a DMX channel (1-512) via dmxControllerConfig.SetChannel(address, value).
+// SetChannel updates a DMX channel (1-512) in memory even while disconnected.
 func (cfg *ControllerConfig) SetChannel(index int16, data byte) error {
 	if cfg == nil || cfg.controller == nil {
 		return errors.New("DMX controller config not initialized")
@@ -43,8 +44,11 @@ type DMXController struct {
 	file     *os.File
 	portName string
 	universe [513]byte // Byte 0 = DMX Start Code (0x00), Bytes 1..512 = Channels 1..512
+	stopCh   chan struct{}
+	stopOnce sync.Once
 }
 
+// findFTDIPort checks your known adapter first, then falls back to any usbserial port.
 func findFTDIPort() (string, error) {
 	patterns := []string{
 		"/dev/cu.usbserial*",
@@ -62,25 +66,20 @@ func findFTDIPort() (string, error) {
 	return "", fmt.Errorf("no FTDI serial device found (available ports: %v)", allPorts)
 }
 
-// Connect opens the FTDI serial port and configures it for DMX512 (250000 baud, 8N2).
+// Connect opens the FTDI serial port in non-blocking mode for DMX512 (250000 baud, 8N2).
 func (c *DMXController) Connect() error {
 	port, err := findFTDIPort()
 	if err != nil {
 		return err
 	}
-	c.portName = port
 
+	// Keep O_NONBLOCK enabled so Write() and Close() never stall in the macOS tty driver
 	f, err := os.OpenFile(port, os.O_RDWR|syscall.O_NOCTTY|syscall.O_NONBLOCK, 0666)
 	if err != nil {
 		return fmt.Errorf("failed to open %s: %w", port, err)
 	}
 
 	fd := f.Fd()
-
-	if err := syscall.SetNonblock(int(fd), false); err != nil {
-		f.Close()
-		return err
-	}
 
 	var termios syscall.Termios
 	if _, _, errno := syscall.Syscall6(syscall.SYS_IOCTL, fd, syscall.TIOCGETA, uintptr(unsafe.Pointer(&termios)), 0, 0, 0); errno != 0 {
@@ -106,7 +105,14 @@ func (c *DMXController) Connect() error {
 		return fmt.Errorf("failed to set 250000 baud: %v", errno)
 	}
 
+	c.mu.Lock()
+	if c.file != nil {
+		c.closeFileLocked()
+	}
 	c.file = f
+	c.portName = port
+	c.mu.Unlock()
+
 	return nil
 }
 
@@ -146,23 +152,43 @@ func (c *DMXController) Render() error {
 
 	// 3. Write Start Code (0x00) + all 512 channels
 	_, err := c.file.Write(c.universe[:])
+	if errors.Is(err, syscall.EAGAIN) || errors.Is(err, syscall.EWOULDBLOCK) {
+		return nil
+	}
 	return err
 }
 
-// Close closes the serial connection.
+// closeFileLocked flushes pending serial buffers and closes the fd immediately.
+func (c *DMXController) closeFileLocked() error {
+	if c.file == nil {
+		return nil
+	}
+	// 3 = FREAD (1) | FWRITE (2): discard unread/unsent serial data so macOS does not hang in ttywait()
+	rw := 3
+	syscall.Syscall(syscall.SYS_IOCTL, c.file.Fd(), syscall.TIOCFLUSH, uintptr(unsafe.Pointer(&rw)))
+
+	err := c.file.Close()
+	c.file = nil
+	return err
+}
+
+// Close halts the render loop and closes the serial connection immediately.
 func (c *DMXController) Close() error {
+	c.stopOnce.Do(func() {
+		if c.stopCh != nil {
+			close(c.stopCh)
+		}
+	})
+
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if c.file != nil {
-		err := c.file.Close()
-		c.file = nil
-		return err
-	}
-	return nil
+	return c.closeFileLocked()
 }
 
 func NewDmXController() (*DMXController, *ControllerConfig, error) {
-	controller := &DMXController{}
+	controller := &DMXController{
+		stopCh: make(chan struct{}),
+	}
 
 	if err := controller.Connect(); err != nil {
 		return nil, nil, errors.New("failed to connect DMX Controller: " + err.Error())
@@ -174,15 +200,50 @@ func NewDmXController() (*DMXController, *ControllerConfig, error) {
 	}
 	log.Printf("Connected to DMX interface on %s", controller.portName)
 
-	// Continuous ~44Hz DMX512 refresh loop
-	go func(c *DMXController) {
+	// Continuous DMX512 refresh loop: waits 35ms AFTER each non-blocking write so the
+	// 22.6ms frame finishes transmitting completely before the next BREAK signal.
+	go func(c *DMXController, cfg *ControllerConfig) {
+		connected := true
+
 		for {
-			if err := c.Render(); err != nil {
-				log.Fatalf("Failed to render output: %s", err)
+			select {
+			case <-c.stopCh:
+				return
+			default:
 			}
-			time.Sleep(23 * time.Millisecond)
+
+			if !connected {
+				if err := c.Connect(); err == nil {
+					cfg.PortName = c.portName
+					connected = true
+					log.Printf("Reconnected to DMX interface on %s", c.portName)
+				} else {
+					select {
+					case <-c.stopCh:
+						return
+					case <-time.After(500 * time.Millisecond):
+						continue
+					}
+				}
+			}
+
+			if err := c.Render(); err != nil {
+				log.Printf("DMX interface disconnected (%v); attempting to reconnect...", err)
+				c.mu.Lock()
+				c.closeFileLocked()
+				c.mu.Unlock()
+				connected = false
+				continue
+			}
+
+			// Wait for the 22.6ms frame + USB latency to clear before starting the next BREAK
+			select {
+			case <-c.stopCh:
+				return
+			case <-time.After(35 * time.Millisecond):
+			}
 		}
-	}(controller)
+	}(controller, config)
 
 	return controller, config, nil
 }
