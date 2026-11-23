@@ -24,9 +24,9 @@ import (
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
-	"github.com/oliread/usbdmx/ft232"
 )
 
 func LoadNewFixtures(sequence *common.Sequence,
@@ -36,7 +36,7 @@ func LoadNewFixtures(sequence *common.Sequence,
 	switchChannels []common.SwitchChannel,
 	soundTriggers []*common.Trigger,
 	soundConfig *sound.SoundConfig,
-	dmxController *ft232.DMXController,
+	dmxController *dmx.ControllerConfig,
 	fixturesConfig *fixture.Fixtures,
 	dmxInterfacePresent bool) []chan common.FixtureCommand {
 
@@ -117,7 +117,7 @@ func CreateFixtureReceiverThreads(numberFixtures int,
 	switchChannels []common.SwitchChannel,
 	soundTriggers []*common.Trigger,
 	soundConfig *sound.SoundConfig,
-	dmxController *ft232.DMXController,
+	dmxController *dmx.ControllerConfig,
 	fixturesConfig *fixture.Fixtures,
 	dmxInterfacePresent bool) int {
 

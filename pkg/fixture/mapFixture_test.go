@@ -21,7 +21,7 @@ package fixture
 import (
 	"testing"
 
-	"github.com/oliread/usbdmx/ft232"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 )
 
 func TestSetColorByNumber(t *testing.T) {
@@ -31,7 +31,7 @@ func TestSetColorByNumber(t *testing.T) {
 		fixture             Fixture
 		channelNumber       int
 		color               int
-		dmxController       *ft232.DMXController
+		dmxController       *dmx.ControllerConfig
 		dmxInterfacePresent bool
 	}
 	tests := []struct {

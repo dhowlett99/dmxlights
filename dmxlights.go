@@ -44,7 +44,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
-	"github.com/oliread/usbdmx/ft232"
 )
 
 const debug = false
@@ -180,13 +179,13 @@ func main() {
 
 	// Setup DMX interface.
 	fmt.Println("Setup DMX Interface")
-	dmxController, dmxInterfaceConfig, err := dmx.NewDmXController()
+	_, dmxControllerConfig, err := dmx.NewDmXController()
 	if err != nil {
 		fmt.Printf("dmx interface: %v\n", err)
 		this.DmxInterfacePresent = false
 	} else {
 		this.DmxInterfacePresent = true
-		this.DmxInterfacePresentConfig = dmxInterfaceConfig
+		this.DmxControllerConfig = dmxControllerConfig
 	}
 
 	// Save the presets on exit.
@@ -432,7 +431,7 @@ func main() {
 	this.SoundConfig = sound.NewSoundTrigger(this.SequenceChannels, guiButtons, eventsForLaunchpad)
 
 	// Generate the toolbar at the top.
-	toolbar := gui.MakeToolbar(myWindow, sequences, dmxController,
+	toolbar := gui.MakeToolbar(myWindow, sequences, dmxControllerConfig,
 		guiButtons, eventsForLaunchpad, commandChannels, updateChannels,
 		fixturesConfig, startConfig, &this)
 
@@ -474,15 +473,15 @@ func main() {
 	launchpad.ListenAndSendToLaunchPad(eventsForLaunchpad, this.Pad, this.LaunchPadConnected)
 
 	// Add buttons to the main panel.
-	row0 := panel.GenerateRow(myWindow, 0, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
-	row1 := panel.GenerateRow(myWindow, 1, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
-	row2 := panel.GenerateRow(myWindow, 2, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
-	row3 := panel.GenerateRow(myWindow, 3, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
-	row4 := panel.GenerateRow(myWindow, 4, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
-	row5 := panel.GenerateRow(myWindow, 5, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
-	row6 := panel.GenerateRow(myWindow, 6, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
-	row7 := panel.GenerateRow(myWindow, 7, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
-	row8 := panel.GenerateRow(myWindow, 8, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
+	row0 := panel.GenerateRow(myWindow, 0, sequences, &this, eventsForLaunchpad, guiButtons, dmxControllerConfig, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
+	row1 := panel.GenerateRow(myWindow, 1, sequences, &this, eventsForLaunchpad, guiButtons, dmxControllerConfig, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
+	row2 := panel.GenerateRow(myWindow, 2, sequences, &this, eventsForLaunchpad, guiButtons, dmxControllerConfig, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
+	row3 := panel.GenerateRow(myWindow, 3, sequences, &this, eventsForLaunchpad, guiButtons, dmxControllerConfig, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
+	row4 := panel.GenerateRow(myWindow, 4, sequences, &this, eventsForLaunchpad, guiButtons, dmxControllerConfig, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
+	row5 := panel.GenerateRow(myWindow, 5, sequences, &this, eventsForLaunchpad, guiButtons, dmxControllerConfig, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
+	row6 := panel.GenerateRow(myWindow, 6, sequences, &this, eventsForLaunchpad, guiButtons, dmxControllerConfig, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
+	row7 := panel.GenerateRow(myWindow, 7, sequences, &this, eventsForLaunchpad, guiButtons, dmxControllerConfig, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
+	row8 := panel.GenerateRow(myWindow, 8, sequences, &this, eventsForLaunchpad, guiButtons, dmxControllerConfig, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent, this.SwitchOverrides)
 
 	// Gather all the rows into a container called squares.
 	squares := container.New(layout.NewGridLayoutWithRows(gui.ColumnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
@@ -525,7 +524,7 @@ func main() {
 
 	// Start threads for each sequence.
 	for sequenceNumber := 0; sequenceNumber < numberOfSequences; sequenceNumber++ {
-		go sequence.StartSequence(*sequences[sequenceNumber], eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+		go sequence.StartSequence(*sequences[sequenceNumber], eventsForLaunchpad, guiButtons, dmxControllerConfig, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
 	}
 
 	// Light the first sequence as the default selected.
@@ -537,7 +536,7 @@ func main() {
 	panel.LabelRightHandButtons()
 
 	// Clear the pad. Strobe is set to 0.
-	fixture.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
+	fixture.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxControllerConfig, fixturesConfig, this.DmxInterfacePresent)
 	buttons.Clear(&this, sequences, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 
 	// If present create a thread to listen to launchpad button events.
@@ -546,16 +545,16 @@ func main() {
 			this *buttons.CurrentState,
 			sequences []*common.Sequence,
 			eventsForLaunchpad chan common.ALight,
-			dmxController *ft232.DMXController,
+			dmxControllerConfig *dmx.ControllerConfig,
 			fixturesConfig *fixture.Fixtures,
 			commandChannels []chan common.Command,
 			replyChannels []chan common.Sequence,
 			updateChannels []chan common.Sequence,
 			dmxInterfaceCardPresent bool) {
 
-			launchpad.ReadLaunchPadButtons(guiButtons, this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, dmxInterfaceCardPresent)
+			launchpad.ReadLaunchPadButtons(guiButtons, this, sequences, eventsForLaunchpad, dmxControllerConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, dmxInterfaceCardPresent)
 
-		}(guiButtons, &this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+		}(guiButtons, &this, sequences, eventsForLaunchpad, dmxControllerConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
 	}
 
 	// Show this sequence running status in the start/stop button.
@@ -566,14 +565,14 @@ func main() {
 
 	// Main menu.
 	openProject := fyne.NewMenuItem("Open", func() {
-		gui.FileOpen(myWindow, startConfig, &this, sequences, dmxController, fixturesConfig,
+		gui.FileOpen(myWindow, startConfig, &this, sequences, dmxControllerConfig, fixturesConfig,
 			commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 	})
 	saveProject := fyne.NewMenuItem("Save", func() {
 		gui.FileSave(myWindow, startConfig, fixturesConfig, commandChannels)
 	})
 	editSettings := fyne.NewMenuItem("Edit", func() {
-		modal := gui.RunSettingsPopUp(myWindow, this.SoundConfig, guiButtons, eventsForLaunchpad, dmxInterfaceConfig, this.LaunchpadName)
+		modal := gui.RunSettingsPopUp(myWindow, this.SoundConfig, guiButtons, eventsForLaunchpad, dmxControllerConfig, this.LaunchpadName)
 		modal.Resize(fyne.NewSize(250, 250))
 		modal.Show()
 	})

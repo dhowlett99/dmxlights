@@ -22,8 +22,8 @@ import (
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
-	"github.com/oliread/usbdmx/ft232"
 )
 
 // FixtureReceivers are created by the sequence and are used to receive step instructions.
@@ -37,7 +37,7 @@ func FixtureReceiver(
 	switchChannels []common.SwitchChannel,
 	soundTriggers []*common.Trigger,
 	soundConfig *sound.SoundConfig,
-	dmxController *ft232.DMXController,
+	dmxController *dmx.ControllerConfig,
 	fixturesConfig *Fixtures,
 	dmxInterfacePresent bool) {
 

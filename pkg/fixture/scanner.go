@@ -22,10 +22,10 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/oliread/usbdmx/ft232"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 )
 
-func playScanner(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.FixtureColor) {
+func playScanner(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) (lastColor common.FixtureColor) {
 
 	if debug {
 		fmt.Printf("Fixture:%d playScanner\n", fixtureNumber)

@@ -24,11 +24,11 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/oliread/usbdmx/ft232"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 )
 
 // Switch On Static Scene.
-func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.FixtureColor {
+func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) common.FixtureColor {
 
 	if debug && fixtureNumber == 00 {
 		fmt.Printf("setStaticOn: Fixture %d\n", fixtureNumber)
@@ -80,7 +80,7 @@ func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 }
 
 // fadeUpStatic fade up RGB static scenes.
-func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) {
 
 	nextColor := common.FixtureColor{
 		RGBColor:   cmd.RGBStaticColors[fixtureNumber].Color,
@@ -178,7 +178,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 	}
 }
 
-func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, nextColor common.FixtureColor, stopFadeDown chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.FixtureColor {
+func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, nextColor common.FixtureColor, stopFadeDown chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) common.FixtureColor {
 
 	if debug && fixtureNumber == 0 {
 		fmt.Printf("%d fadeDown fixture number %d sequence Number %d\n", cmd.SequenceNumber, fixtureNumber, cmd.SequenceNumber)
@@ -209,16 +209,25 @@ func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fix
 			fade := applyMasterToFade(fade, cmd.Master)
 			common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, lastColor.RGBColor, fade, eventsForLaunchpad, guiButtons)
 		}
+
+		// If we are a RGB chaser used as a shutter chasser apply fade values to the scanner's master dimmer channel because
+		// scanners doesn't have a rgb color mixing capability so the wheel has to be faded using the master.
 		var iAmAChaserSequence bool
+		var master int
 		if cmd.Label == "chaser" {
 			iAmAChaserSequence = true
 			// If we are a RGB chaser used as a shutter chasser apply fade values to the scanner's master dimmer channel because
 			// scanners doesn't have a rgb color mixing capability so the wheel has to be faded using the master.
-			cmd.Master = fade
+			master = fade
 		} else {
 			iAmAChaserSequence = false
+			master = cmd.Master
 		}
-		MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, nextColor.RGBColor, nextColor.RGBColor, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, cmd.Master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+		if debug {
+			fmt.Printf("iAmAChaserSequence=%t cmd.ScannerChaser=%t\n", iAmAChaserSequence, cmd.ScannerChaser)
+			fmt.Printf("------> Fade Down%d Master %d Color %+v\n", fade, master, lastColor.RGBColor)
+		}
+		lastColor = MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, lastColor.RGBColor, lastColor.RGBColor, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 
 		// Control how long the fade take with the speed control.
 		time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse12(cmd.ProgramSpeed))))
@@ -246,7 +255,7 @@ func fadeDown(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fix
 
 }
 
-func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, nextColor common.FixtureColor, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, nextColor common.FixtureColor, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) {
 
 	if debug && fixtureNumber == 0 {
 		fmt.Printf("%d: fadeUP fixture number %d \n", cmd.SequenceNumber, fixtureNumber)
@@ -304,6 +313,10 @@ func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fixtu
 			fade := applyMasterToFade(fade, master)
 			common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, nextColor.RGBColor, fade, eventsForLaunchpad, guiButtons)
 		}
+		if debug {
+			fmt.Printf("iAmAChaserSequence=%t cmd.ScannerChaser=%t\n", iAmAChaserSequence, cmd.ScannerChaser)
+			fmt.Printf("------> Fade Up%d Master %d Color %+v\n", fade, master, nextColor.RGBColor)
+		}
 		lastColor = MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, nextColor.RGBColor, nextColor.RGBColor, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 
 		// Control how long the fade take with the speed control.
@@ -327,7 +340,7 @@ func fadeUp(fixtureNumber int, cmd common.FixtureCommand, lastColor common.Fixtu
 	}
 }
 
-func setStaticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func setStaticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.FixtureColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) {
 
 	if debug && fixtureNumber == 0 {
 		fmt.Printf("%d: staticOff() Fixture No %d lastColor %v\n", cmd.SequenceNumber, fixtureNumber, lastColor.RGBColor)

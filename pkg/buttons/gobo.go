@@ -21,11 +21,11 @@ import (
 	"fmt"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/oliread/usbdmx/ft232"
 )
 
-func selectGobo(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence, fixturesConfig *fixture.Fixtures, dmxController *ft232.DMXController) {
+func selectGobo(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence, fixturesConfig *fixture.Fixtures, dmxController *dmx.ControllerConfig) {
 
 	if debug {
 		fmt.Printf("Sequence %d Fixture %d Set Gobo %d\n", Y, this.SelectedFixture, this.SelectedGobo)

@@ -20,11 +20,11 @@ import (
 	"fmt"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/oliread/usbdmx/ft232"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 )
 
 // Now play all the values for this state.
-func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.FixtureColor) {
+func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) (lastColor common.FixtureColor) {
 
 	if debug {
 		fmt.Printf("playRGB: fixtureNumber %d", fixtureNumber)

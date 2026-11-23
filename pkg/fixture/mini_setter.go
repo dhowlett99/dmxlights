@@ -25,7 +25,7 @@ import (
 	"strings"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/oliread/usbdmx/ft232"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 )
 
 // Process settings.
@@ -34,7 +34,7 @@ import (
 // DMX universe, using SetChannel primitive directly.
 // It uses the the settings channel name to identify the channel to use in the fixture.
 func newMiniSetter(thisFixture *Fixture, override *common.Override, setting common.Setting, masterChannel int,
-	dmxController *ft232.DMXController,
+	dmxController *dmx.ControllerConfig,
 	master int,
 	dmxInterfacePresent bool) {
 

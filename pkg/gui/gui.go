@@ -37,13 +37,12 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/editor"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/override"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
-	"github.com/oliread/usbdmx"
-	"github.com/oliread/usbdmx/ft232"
 )
 
 const ColumnWidth int = 9
@@ -511,7 +510,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	this *buttons.CurrentState,
 	eventsForLaunchpad chan common.ALight,
 	guiButtons chan common.ALight,
-	dmxController *ft232.DMXController,
+	dmxController *dmx.ControllerConfig,
 	groupConfig *fixture.Groups,
 	fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command,
@@ -711,7 +710,7 @@ func AreYouSureDialog(myWindow fyne.Window, message string) *widget.PopUp {
 }
 
 // MakeToolbar generates a tool bar at the top of the main window.
-func MakeToolbar(myWindow fyne.Window, sequences []*common.Sequence, dmxController *ft232.DMXController,
+func MakeToolbar(myWindow fyne.Window, sequences []*common.Sequence, dmxController *dmx.ControllerConfig,
 	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence,
 	fixturesConfig *fixture.Fixtures, startConfig *fixture.Fixtures, this *buttons.CurrentState) *widget.Toolbar {
 
@@ -729,7 +728,7 @@ func MakeToolbar(myWindow fyne.Window, sequences []*common.Sequence, dmxControll
 
 		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
-			modal := RunSettingsPopUp(myWindow, this.SoundConfig, guiButtons, eventsForLaunchPad, this.DmxInterfacePresentConfig, this.LaunchpadName)
+			modal := RunSettingsPopUp(myWindow, this.SoundConfig, guiButtons, eventsForLaunchPad, this.DmxControllerConfig, this.LaunchpadName)
 			modal.Resize(fyne.NewSize(250, 250))
 			modal.Show()
 		}),
@@ -738,7 +737,7 @@ func MakeToolbar(myWindow fyne.Window, sequences []*common.Sequence, dmxControll
 }
 
 // Open file.
-func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, this *buttons.CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
+func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, this *buttons.CurrentState, sequences []*common.Sequence, dmxController *dmx.ControllerConfig, fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
 
 	fileOpener := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
@@ -837,7 +836,7 @@ func FileSave(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfi
 }
 
 func RunSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
-	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, config *usbdmx.ControllerConfig, launchPadName string) (modal *widget.PopUp) {
+	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, config *dmx.ControllerConfig, launchPadName string) (modal *widget.PopUp) {
 
 	selectedInput := soundConfig.GetDeviceName()
 
@@ -861,7 +860,7 @@ func RunSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
 	var dmxLabels []string
 	dmxLabels = append(dmxLabels, "Not Found")
 	if config != nil {
-		dmxLabels[0] = fmt.Sprintf("FT323:%d", config.InputInterfaceID)
+		dmxLabels[0] = fmt.Sprintf("FT323:%d", config.PortName)
 	}
 	dmxInterfaceSelect := widget.NewSelect(dmxLabels, func(value string) {
 		selectedInput = dmxLabels[0]

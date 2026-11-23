@@ -19,7 +19,9 @@ package editor
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -128,6 +130,15 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 	descriptionItem := widget.NewFormItem("Description", description)
 	formTopItems = append(formTopItems, descriptionItem)
 
+	fileName := widget.NewEntry()
+	fileName.TextStyle.Bold = true
+	fileName.SetText(convert2Filename(thisFixture.Description))
+	fileName.OnChanged = func(value string) {
+		fileName.SetText(thisFixture.Description)
+	}
+	fileNameItem := widget.NewFormItem("Config Filename", fileName)
+	formTopItems = append(formTopItems, fileNameItem)
+
 	dmxAddress := widget.NewEntry()
 	dmxAddress.TextStyle.Bold = true
 	dmxAddress.SetText(fmt.Sprintf("%d", thisFixture.Address))
@@ -191,6 +202,41 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 		modal.Hide()
 	}
 
+	var saveFixturePanel *widget.PopUp
+
+	// Layout of load fixture load panel.
+	saveFixturePanel = widget.NewModalPopUp(
+		container.NewVBox(
+			widget.NewLabel("Save Fixture"),
+			// Save fixtures.
+			container.NewHBox(layout.NewSpacer(), widget.NewButton("OK", func() {
+				saveFixturePanel.Hide()
+			})),
+		),
+		w.Canvas(),
+	)
+
+	// Load config button.
+	buttonLoadFixture := widget.NewButton("Load Fixture", func() {
+
+		selectedLabel := widget.NewLabel("No file selected")
+
+		loadFixturePanel := showDirectoryPopup("./fixturesLibrary", w, func(path string) {
+			selectedLabel.SetText(fmt.Sprintf("Selected: %s", path))
+			fmt.Printf("------> Selected %s\n", selectedLabel.Text)
+		})
+		if loadFixturePanel != nil {
+			loadFixturePanel.Resize(fyne.NewSize(600, 400))
+			loadFixturePanel.Show()
+		}
+	})
+
+	// Save config button.
+	buttonSaveFixture := widget.NewButton("Save Fixture", func() {
+		saveFixturePanel.Show()
+		WriteFixtureConfigFile(cp, fileName.Text)
+	})
+
 	// Cancel button.
 	buttonCancel := widget.NewButton("Cancel", func() {
 		// Restore any changed channels settings.
@@ -200,7 +246,7 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 		modal.Hide()
 	})
 
-	saveCancel := container.NewHBox(layout.NewSpacer(), buttonCancel, buttonSave)
+	saveCancel := container.NewHBox(layout.NewSpacer(), buttonLoadFixture, buttonSaveFixture, buttonCancel, buttonSave)
 
 	content := fyne.Container{}
 	t := container.NewBorder(title, nil, nil, nil, formTop)
@@ -215,6 +261,21 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 		w.Canvas(),
 	)
 	return modal, nil
+}
+
+// convert2Filename takes a description and creates a filename.
+func convert2Filename(description string) string {
+	// 1. Convert to lowercase
+	s := strings.ToLower(description)
+
+	// 2. Replace any non-alphanumeric characters (including spaces and special chars) with a dash
+	reg := regexp.MustCompile(`[^a-z0-9]+`)
+	s = reg.ReplaceAllString(s, "-")
+
+	// 3. Trim leading and trailing dashes
+	s = strings.Trim(s, "-")
+
+	return s
 }
 
 func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st *SettingsPanel) *ChannelPanel {

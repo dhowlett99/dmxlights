@@ -24,11 +24,11 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/oliread/usbdmx/ft232"
 )
 
-func flashOn(sequence common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *fixture.Fixtures, dmxController *ft232.DMXController) {
+func flashOn(sequence common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *fixture.Fixtures, dmxController *dmx.ControllerConfig) {
 
 	// If we press a fixture button that doesn't have a real fixture behind it, then give up.
 	if X == sequence.NumberFixtures {
@@ -97,7 +97,7 @@ func handleStatic(sequence common.Sequence, fixtureNumber int) (color.RGBA, int,
 	return fixtureColor, master, brightness
 }
 
-func flashOff(sequence common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *fixture.Fixtures, dmxController *ft232.DMXController) {
+func flashOff(sequence common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *fixture.Fixtures, dmxController *dmx.ControllerConfig) {
 
 	if debug {
 		fmt.Printf("Flash OFF Fixture Pressed X:%d Y:%d\n", X, Y)

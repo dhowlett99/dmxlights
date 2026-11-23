@@ -23,10 +23,9 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
-
-	"github.com/oliread/usbdmx/ft232"
 )
 
 const debug = false
@@ -47,7 +46,7 @@ type SequenceConfig struct {
 func StartSequence(sequence common.Sequence,
 	eventsForLaunchpad chan common.ALight,
 	guiButtons chan common.ALight,
-	dmxController *ft232.DMXController,
+	dmxController *dmx.ControllerConfig,
 	fixturesConfig *fixture.Fixtures,
 	channels common.Channels,
 	switchChannels []common.SwitchChannel,

@@ -27,10 +27,10 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/pattern"
 	"github.com/dhowlett99/dmxlights/pkg/position"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
-	"github.com/oliread/usbdmx/ft232"
 )
 
 const debug_mini bool = false
@@ -65,7 +65,7 @@ func newMiniSequencer(fixture *Fixture,
 	swiTch common.Switch,
 	override common.Override,
 	action Action,
-	dmxController *ft232.DMXController, fixturesConfig *Fixtures,
+	dmxController *dmx.ControllerConfig, fixturesConfig *Fixtures,
 	switchChannels []common.SwitchChannel, soundConfig *sound.SoundConfig,
 	blackout bool, brightness int, master int, masterChanging bool, lastColor common.FixtureColor,
 	dmxInterfacePresent bool,

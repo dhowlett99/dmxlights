@@ -22,9 +22,9 @@ import (
 	"fyne.io/fyne/v2"
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/pad"
-	"github.com/oliread/usbdmx/ft232"
 )
 
 const debug = false
@@ -42,7 +42,7 @@ func NewLaunchPad() (*pad.Pad, error) {
 
 // main thread is used to get commands from the lauchpad.
 func ReadLaunchPadButtons(guiButtons chan common.ALight, this *buttons.CurrentState, sequences []*common.Sequence,
-	eventsForLaunchpad chan common.ALight, dmxController *ft232.DMXController,
+	eventsForLaunchpad chan common.ALight, dmxController *dmx.ControllerConfig,
 	fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence, updateChannels []chan common.Sequence,
 	dmxInterfaceCardPresent bool) {

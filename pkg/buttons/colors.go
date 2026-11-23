@@ -24,8 +24,8 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/oliread/usbdmx/ft232"
 )
 
 func redButton(this *CurrentState, X int, Y int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
@@ -147,7 +147,7 @@ func selectRGBChaseColor(sequences []*common.Sequence, X int, Y int, this *Curre
 
 }
 
-func selectScannerColor(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures) {
+func selectScannerColor(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence, dmxController *dmx.ControllerConfig, fixturesConfig *fixture.Fixtures) {
 
 	if debug {
 		fmt.Printf("Set Scanner Color X:%d Y:%d\n", X, Y)

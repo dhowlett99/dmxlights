@@ -24,13 +24,12 @@ import (
 	"fyne.io/fyne/v2"
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/labels"
 	"github.com/dhowlett99/dmxlights/pkg/pad"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
-	"github.com/oliread/usbdmx"
-	"github.com/oliread/usbdmx/ft232"
 )
 
 const debug = false
@@ -114,7 +113,7 @@ type CurrentState struct {
 	SwitchChannels              []common.SwitchChannel     // Used for communicating with mini-sequencers on switches.
 	LaunchPadConnected          bool                       // Flag to indicate presence of Novation Launchpad.
 	DmxInterfacePresent         bool                       // Flag to indicate precence of DMX interface card
-	DmxInterfacePresentConfig   *usbdmx.ControllerConfig   // DMX Interface card config.
+	DmxControllerConfig         *dmx.ControllerConfig      // DMX Interface card config.
 	LaunchpadName               string                     // Storage for launchpad config.
 	ScannerChaser               map[int]bool               // Chaser is running.
 	DisplayChaserShortCut       bool                       // Flag to indicate we've taken a shortcut to the chaser display
@@ -130,7 +129,7 @@ func ProcessButtons(X int, Y int,
 	this *CurrentState,
 	eventsForLaunchpad chan common.ALight,
 	guiButtons chan common.ALight,
-	dmxController *ft232.DMXController,
+	dmxController *dmx.ControllerConfig,
 	fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence,

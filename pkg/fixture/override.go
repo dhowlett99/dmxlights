@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/oliread/usbdmx/ft232"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 )
 
 func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.SwitchChannel) {
@@ -245,7 +245,7 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 	}
 }
 
-func overrideMiniSetter(cmd common.FixtureCommand, fixturesConfig *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func overrideMiniSetter(cmd common.FixtureCommand, fixturesConfig *Fixtures, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) {
 
 	if debug {
 		fmt.Printf("overrideMiniSetter Switch=%d Override=%+v\n", cmd.CurrentSwitch, cmd.SwiTch.Override)

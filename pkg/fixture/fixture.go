@@ -32,8 +32,8 @@ import (
 	"fyne.io/fyne/v2"
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/go-yaml/yaml"
-	"github.com/oliread/usbdmx/ft232"
 )
 
 const debug = false
@@ -330,7 +330,7 @@ func SaveFixtures(filename string, fixtures *Fixtures) error {
 	return nil
 }
 
-func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *Fixtures, dmxInterfacePresent bool) {
+func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *dmx.ControllerConfig, fixturesConfig *Fixtures, dmxInterfacePresent bool) {
 
 	if debug {
 		fmt.Printf("AllFixturesOff\n")
@@ -348,7 +348,7 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 }
 
 // Clear fixture.
-func clearFixture(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool, stopFadeUp chan bool, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.FixtureColor {
+func clearFixture(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool, stopFadeUp chan bool, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixtures *Fixtures, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) common.FixtureColor {
 
 	if debug {
 		fmt.Printf("Fixture:%d clear\n", fixtureNumber)
@@ -370,7 +370,7 @@ func clearFixture(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown cha
 	return MapFixtures(false, false, false, cmd.SequenceNumber, fixtureNumber, colors.Black, colors.Black, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, common.MIN_DMX_BRIGHTNESS, common.MIN_DMX_BRIGHTNESS, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 }
 
-func MapFixturesColorOnly(sequenceNumber, selectedFixture, selectedColor int, dmxController *ft232.DMXController, fixtures *Fixtures, dmxInterfacePresent bool) {
+func MapFixturesColorOnly(sequenceNumber, selectedFixture, selectedColor int, dmxController *dmx.ControllerConfig, fixtures *Fixtures, dmxInterfacePresent bool) {
 	if debug {
 		fmt.Printf("MapFixturesColorOnly Sequence %d Fixture %d Gobo %d \n", sequenceNumber, selectedFixture, selectedColor)
 	}
@@ -452,7 +452,7 @@ func fixtureHasChannel(fixture *Fixture, channelName string) bool {
 	return false
 }
 
-func MapFixturesGoboOnly(sequenceNumber, selectedFixture, selectedGobo int, fixtures *Fixtures, dmxController *ft232.DMXController,
+func MapFixturesGoboOnly(sequenceNumber, selectedFixture, selectedGobo int, fixtures *Fixtures, dmxController *dmx.ControllerConfig,
 	dmxInterfacePresent bool) {
 
 	if debug {
@@ -509,12 +509,12 @@ func calcFinalValueBasedOnConfigAndSettingValue(configValue string, settingValue
 	}
 }
 
-func SetChannel(fixtureName string, channelName string, address int16, value byte, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func SetChannel(fixtureName string, channelName string, address int16, value byte, dmxControllerConfig *dmx.ControllerConfig, dmxInterfacePresent bool) {
 	if dmxDebug {
 		fmt.Printf("DMX Debug  %s Channel Name=%s Address=%d Value=%d\n", fixtureName, channelName, address, value)
 	}
 	if dmxInterfacePresent {
-		dmxController.SetChannel(address, value)
+		dmxControllerConfig.SetChannel(address, value)
 	}
 }
 

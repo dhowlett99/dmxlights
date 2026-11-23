@@ -22,8 +22,8 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
-	"github.com/oliread/usbdmx/ft232"
 )
 
 // MapSwitchFixture is repsonsible for playing out the state of a swicth.
@@ -32,7 +32,7 @@ func MapSwitchFixture(swiTch common.Switch,
 	state common.State,
 	override common.Override,
 	RGBFade int,
-	dmxController *ft232.DMXController,
+	dmxController *dmx.ControllerConfig,
 	fixturesConfig *Fixtures, blackout bool,
 	brightness int, master int, masterChanging bool, lastColor common.FixtureColor,
 	switchChannels []common.SwitchChannel,

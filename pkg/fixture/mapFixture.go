@@ -25,7 +25,7 @@ import (
 	"strings"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/oliread/usbdmx/ft232"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 )
 
 // When want to light a DMX fixture we need to find it in our fuxture.yaml configuration file.
@@ -37,7 +37,7 @@ func MapFixtures(iAmAChaserSequence bool, iAmARunningChaserSequence bool, scanne
 	baseColorName color.RGBA,
 	pan int, tilt int, shutter int, rotate int, program int, programSpeed int, selectedGobo int, scannerColor int,
 	fixtures *Fixtures, blackout bool, brightness int, master int, music int, strobe bool, strobeSpeed int,
-	dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.FixtureColor) {
+	dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) (lastColor common.FixtureColor) {
 
 	// We control the brightness of each color with the brightness value.
 	// The overall fixture brightness is set from the master value.
@@ -189,7 +189,7 @@ func MapFixtures(iAmAChaserSequence bool, iAmARunningChaserSequence bool, scanne
 	return lastColor
 }
 
-func SetRGBChannels(channel Channel, fixture Fixture, displayFixture int, channelNumber int, Red float64, Green float64, Blue float64, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func SetRGBChannels(channel Channel, fixture Fixture, displayFixture int, channelNumber int, Red float64, Green float64, Blue float64, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) {
 
 	if debug {
 		fmt.Printf("Set RGB as normal Channel=%s\n", channel.Name)
@@ -219,7 +219,7 @@ func SetRGBChannels(channel Channel, fixture Fixture, displayFixture int, channe
 
 }
 
-func SetPan(channel Channel, fixture Fixture, channelNumber int, pan int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func SetPan(channel Channel, fixture Fixture, channelNumber int, pan int, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) {
 
 	if channel.Offset != nil {
 		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, pan+*channel.Offset)), dmxController, dmxInterfacePresent)
@@ -229,14 +229,14 @@ func SetPan(channel Channel, fixture Fixture, channelNumber int, pan int, dmxCon
 
 }
 
-func SetTilt(channel Channel, fixture Fixture, channelNumber int, tilt int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func SetTilt(channel Channel, fixture Fixture, channelNumber int, tilt int, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) {
 	if channel.Offset != nil {
 		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, tilt+*channel.Offset)), dmxController, dmxInterfacePresent)
 	}
 	SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, tilt)), dmxController, dmxInterfacePresent)
 }
 
-func SetGobo(channel Channel, fixture Fixture, channelNumber int, gobo int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func SetGobo(channel Channel, fixture Fixture, channelNumber int, gobo int, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) {
 	for _, setting := range channel.Settings {
 		if setting.Number == gobo {
 			v, _ := strconv.Atoi(setting.Value)
@@ -245,7 +245,7 @@ func SetGobo(channel Channel, fixture Fixture, channelNumber int, gobo int, dmxC
 	}
 }
 
-func SetShutter(channel Channel, fixture Fixture, channelNumber int, shutter int, strobe bool, strobeSpeed int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func SetShutter(channel Channel, fixture Fixture, channelNumber int, shutter int, strobe bool, strobeSpeed int, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) {
 	// If we have defined settings for the shutter channel, then use them.
 	if channel.Settings != nil {
 		// Look through any settings configured for Shutter.
@@ -265,7 +265,7 @@ func SetShutter(channel Channel, fixture Fixture, channelNumber int, shutter int
 	}
 }
 
-func SetMaster(channel Channel, fixture Fixture, channelNumber int, master int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func SetMaster(channel Channel, fixture Fixture, channelNumber int, master int, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) {
 
 	if strings.Contains(channel.Name, "reverse") ||
 		strings.Contains(channel.Name, "Reverse") ||
@@ -278,7 +278,7 @@ func SetMaster(channel Channel, fixture Fixture, channelNumber int, master int, 
 
 }
 
-func SetColorByNumber(channel Channel, fixture Fixture, channelNumber int, color int, dmxController *ft232.DMXController, dmxInterfacePresent bool) (int16, int) {
+func SetColorByNumber(channel Channel, fixture Fixture, channelNumber int, color int, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) (int16, int) {
 	for _, setting := range channel.Settings {
 		if setting.Number == color {
 			v, _ := strconv.Atoi(setting.Value)
@@ -289,7 +289,7 @@ func SetColorByNumber(channel Channel, fixture Fixture, channelNumber int, color
 	return 0, 0
 }
 
-func SetColorByName(channel Channel, fixture Fixture, channelNumber int, colorName string, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func SetColorByName(channel Channel, fixture Fixture, channelNumber int, colorName string, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) {
 	for _, setting := range channel.Settings {
 		if setting.Name == colorName {
 			v, _ := strconv.Atoi(setting.Value)
@@ -298,7 +298,7 @@ func SetColorByName(channel Channel, fixture Fixture, channelNumber int, colorNa
 	}
 }
 
-func SetColorWheel(channel Channel, fixture Fixture, channelNumber int, colorWheel int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func SetColorWheel(channel Channel, fixture Fixture, channelNumber int, colorWheel int, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) {
 	for _, setting := range channel.Settings {
 		if setting.Number == colorWheel {
 			v, _ := strconv.Atoi(setting.Value)
@@ -307,7 +307,7 @@ func SetColorWheel(channel Channel, fixture Fixture, channelNumber int, colorWhe
 	}
 }
 
-func SetStrobe(channel Channel, fixture Fixture, channelNumber int, strobe bool, strobeSpeed int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func SetStrobe(channel Channel, fixture Fixture, channelNumber int, strobe bool, strobeSpeed int, dmxController *dmx.ControllerConfig, dmxInterfacePresent bool) {
 	if strobe {
 		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(strobeSpeed), dmxController, dmxInterfacePresent)
 	} else {
