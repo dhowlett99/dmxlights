@@ -183,9 +183,13 @@ func main() {
 	if err != nil {
 		fmt.Printf("dmx interface: %v\n", err)
 		this.DmxInterfacePresent = false
-	} else {
-		this.DmxInterfacePresent = true
-		this.DmxControllerConfig = dmxControllerConfig
+	}
+	this.DmxInterfacePresent = dmxControllerConfig.IsConnected()
+	this.DmxControllerConfig = dmxControllerConfig
+
+	// Automatically update the UI whenever the cable connects or disconnects
+	dmxControllerConfig.OnStatusChange = func(connected bool) {
+		this.DmxInterfacePresent = connected
 	}
 
 	// Save the presets on exit.

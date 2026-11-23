@@ -859,8 +859,15 @@ func RunSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
 	dmxInterfaceLabel := widget.NewLabel("DMX Interface Installed ")
 	var dmxLabels []string
 	dmxLabels = append(dmxLabels, "Not Found")
+	var label string
 	if config != nil {
-		dmxLabels[0] = fmt.Sprintf("FT323:%d", config.PortName)
+		if config.PortName == "" {
+			label = "Not Connected"
+		} else {
+			label = "Connected:" + config.PortName
+		}
+		dmxLabels[0] = fmt.Sprintf("%s", label)
+
 	}
 	dmxInterfaceSelect := widget.NewSelect(dmxLabels, func(value string) {
 		selectedInput = dmxLabels[0]

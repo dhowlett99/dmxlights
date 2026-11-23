@@ -513,7 +513,7 @@ func SetChannel(fixtureName string, channelName string, address int16, value byt
 	if dmxDebug {
 		fmt.Printf("DMX Debug  %s Channel Name=%s Address=%d Value=%d\n", fixtureName, channelName, address, value)
 	}
-	if dmxInterfacePresent {
+	if dmxControllerConfig != nil {
 		dmxControllerConfig.SetChannel(address, value)
 	}
 }

@@ -6,7 +6,6 @@ package dmx
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -26,8 +25,9 @@ const (
 
 // ControllerConfig holds the active port and forwards channel updates to the controller.
 type ControllerConfig struct {
-	PortName   string
-	controller *DMXController
+	PortName       string
+	controller     *DMXController
+	OnStatusChange func(connected bool)
 }
 
 // SetChannel updates a DMX channel (1-512) in memory even while disconnected.
@@ -71,6 +71,14 @@ func (c *DMXController) Connect() error {
 	port, err := findFTDIPort()
 	if err != nil {
 		return err
+	}
+
+	// Wait for macOS AppleUSBFTDI DriverKit to finish initializing the chip on hot-plug
+	// so it does not overwrite our 250,000 baud setting back to 9600 baud.
+	select {
+	case <-c.stopCh:
+		return errors.New("controller stopped")
+	case <-time.After(400 * time.Millisecond):
 	}
 
 	// Keep O_NONBLOCK enabled so Write() and Close() never stall in the macOS tty driver
@@ -185,26 +193,37 @@ func (c *DMXController) Close() error {
 	return c.closeFileLocked()
 }
 
+// IsConnected reports whether a DMX serial interface is currently active.
+func (cfg *ControllerConfig) IsConnected() bool {
+	if cfg == nil || cfg.controller == nil {
+		return false
+	}
+	cfg.controller.mu.Lock()
+	defer cfg.controller.mu.Unlock()
+	return cfg.controller.file != nil
+}
+
 func NewDmXController() (*DMXController, *ControllerConfig, error) {
 	controller := &DMXController{
 		stopCh: make(chan struct{}),
 	}
 
-	if err := controller.Connect(); err != nil {
-		return nil, nil, errors.New("failed to connect DMX Controller: " + err.Error())
-	}
-
 	config := &ControllerConfig{
-		PortName:   controller.portName,
 		controller: controller,
 	}
-	log.Printf("Connected to DMX interface on %s", controller.portName)
 
-	// Continuous DMX512 refresh loop: waits 35ms AFTER each non-blocking write so the
-	// 22.6ms frame finishes transmitting completely before the next BREAK signal.
+	// Attempt immediate connection at startup, but do not fail if unplugged
+	connected := false
+	if err := controller.Connect(); err == nil {
+		config.PortName = controller.portName
+		connected = true
+		fmt.Printf("Connected to DMX interface on %s\n", controller.portName)
+	} else {
+		fmt.Printf("No DMX interface found at startup; waiting for USB connection...\n")
+	}
+
+	// Continuous DMX512 refresh loop with auto-connect & auto-reconnect
 	go func(c *DMXController, cfg *ControllerConfig) {
-		connected := true
-
 		for {
 			select {
 			case <-c.stopCh:
@@ -216,7 +235,10 @@ func NewDmXController() (*DMXController, *ControllerConfig, error) {
 				if err := c.Connect(); err == nil {
 					cfg.PortName = c.portName
 					connected = true
-					log.Printf("Reconnected to DMX interface on %s", c.portName)
+					fmt.Printf("Connected to DMX interface on %s\n", c.portName)
+					if cfg.OnStatusChange != nil {
+						cfg.OnStatusChange(true)
+					}
 				} else {
 					select {
 					case <-c.stopCh:
@@ -228,11 +250,15 @@ func NewDmXController() (*DMXController, *ControllerConfig, error) {
 			}
 
 			if err := c.Render(); err != nil {
-				log.Printf("DMX interface disconnected (%v); attempting to reconnect...", err)
+				fmt.Printf("DMX interface disconnected (%v); waiting to reconnect...\n", err)
 				c.mu.Lock()
 				c.closeFileLocked()
 				c.mu.Unlock()
+				cfg.PortName = ""
 				connected = false
+				if cfg.OnStatusChange != nil {
+					cfg.OnStatusChange(false)
+				}
 				continue
 			}
 
