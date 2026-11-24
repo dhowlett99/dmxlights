@@ -211,7 +211,11 @@ func main() {
 		this.LaunchPadConnected = false
 		this.LaunchpadName = "Not Found"
 	} else {
-		this.LaunchPadConnected = true
+		defer this.Pad.Close()
+		this.LaunchPadConnected = this.Pad.IsConnected()
+		if !this.LaunchPadConnected {
+			this.LaunchpadName = "Not Found"
+		}
 	}
 
 	// If launchpad found, defer the close.
@@ -543,8 +547,22 @@ func main() {
 	fixture.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxControllerConfig, fixturesConfig, this.DmxInterfacePresent)
 	buttons.Clear(&this, sequences, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 
+	// Callback to reinitialise the launchpad on reconnect.
+	if this.Pad != nil {
+		this.Pad.OnReconnect = func() {
+			fmt.Println("Launchpad reconnected: restoring LED state")
+			this.LaunchPadConnected = true
+			this.LaunchpadName = "Novation Launchpad Mk3 Mini"
+
+			// Repaint the active sequence's pads, running status, and strobe status
+			buttons.InitButtons(&this, sequences[this.SelectedSequence].SequenceColors, eventsForLaunchpad, guiButtons)
+			common.ShowRunningStatus(this.Running[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+			common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+		}
+	}
+
 	// If present create a thread to listen to launchpad button events.
-	if this.LaunchPadConnected {
+	if this.Pad != nil {
 		go func(guiButtons chan common.ALight,
 			this *buttons.CurrentState,
 			sequences []*common.Sequence,

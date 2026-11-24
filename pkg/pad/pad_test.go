@@ -52,6 +52,16 @@ func (m *mockTransport) fullStream() []byte {
 	return out
 }
 
+func newTestPad(t midiTransport) *Pad {
+
+	return &Pad{
+		transport:   t,
+		online:      true,
+		checkOnline: func() bool { return true },
+		closed:      make(chan struct{}),
+	}
+}
+
 func TestProgramAndReset(t *testing.T) {
 	tests := []struct {
 		name string
@@ -73,7 +83,7 @@ func TestProgramAndReset(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			mock := newMockTransport()
-			p := &Pad{midiTransport: mock}
+			p := newTestPad(mock)
 
 			if err := tc.call(p); err != nil {
 				t.Fatalf("unexpected error: %v", err)
@@ -127,7 +137,7 @@ func TestLight(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			mock := newMockTransport()
-			p := &Pad{midiTransport: mock}
+			p := newTestPad(mock)
 
 			err := p.Light(tc.x, tc.y, tc.r, tc.g, tc.b)
 			if tc.wantError {
@@ -148,7 +158,7 @@ func TestLight(t *testing.T) {
 
 func TestFlashLight(t *testing.T) {
 	mock := newMockTransport()
-	p := &Pad{midiTransport: mock}
+	p := newTestPad(mock)
 
 	// Valid flash command at (2, 4) -> LED = (8-4)*10 + 2 + 1 = 43
 	if err := p.FlashLight(2, 4, 0x05, 0x00); err != nil {
@@ -168,7 +178,7 @@ func TestFlashLight(t *testing.T) {
 
 func TestLightBatch(t *testing.T) {
 	mock := newMockTransport()
-	p := &Pad{midiTransport: mock}
+	p := newTestPad(mock)
 
 	// Solid LED 11 color 5 + Flashing LED 12 color 9->0
 	err := p.LightBatch(
@@ -194,7 +204,7 @@ func TestLightBatch(t *testing.T) {
 func TestWriteSysExChunkedPropagatesError(t *testing.T) {
 	mock := newMockTransport()
 	mock.writeErr = errors.New("usb disconnect")
-	p := &Pad{midiTransport: mock}
+	p := newTestPad(mock)
 
 	if err := p.Program(); err == nil {
 		t.Fatal("expected write error to propagate, got nil")
@@ -203,7 +213,7 @@ func TestWriteSysExChunkedPropagatesError(t *testing.T) {
 
 func TestListen(t *testing.T) {
 	mock := newMockTransport()
-	p := &Pad{midiTransport: mock}
+	p := newTestPad(mock)
 
 	buttons := make(chan common.Button, 4)
 	done := make(chan error, 1)
@@ -217,7 +227,31 @@ func TestListen(t *testing.T) {
 		{Data: [3]byte{0x90, 43, 127}}, // Press
 		{Data: [3]byte{0x90, 43, 0}},   // Release (X offset by +100)
 	}
-	close(mock.packets)
+
+	readButton := func() common.Button {
+		t.Helper()
+		select {
+		case btn := <-buttons:
+			return btn
+		case <-time.After(time.Second):
+			t.Fatal("timed out waiting for button event")
+			return common.Button{}
+		}
+	}
+
+	press := readButton()
+	if press.X != 2 || press.Y != 4 {
+		t.Errorf("press event = (%d, %d), want (2, 4)", press.X, press.Y)
+	}
+
+	release := readButton()
+	if release.X != 102 || release.Y != 4 {
+		t.Errorf("release event = (%d, %d), want (102, 4)", release.X, release.Y)
+	}
+
+	if err := p.Close(); err != nil {
+		t.Fatalf("Close returned unexpected error: %v", err)
+	}
 
 	select {
 	case err := <-done:
@@ -227,18 +261,64 @@ func TestListen(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("timed out waiting for Listen to exit")
 	}
+}
 
-	if len(buttons) != 2 {
-		t.Fatalf("expected 2 button events, got %d", len(buttons))
+func TestAutoReconnect(t *testing.T) {
+	first := newMockTransport()
+	second := newMockTransport()
+
+	var attempts int
+	dial := func() (midiTransport, error) {
+		attempts++
+		switch attempts {
+		case 1:
+			return first, nil
+		case 2:
+			return nil, ErrNotConnected // Simulate device still unplugged for one retry tick
+		default:
+			return second, nil
+		}
 	}
 
-	press := <-buttons
-	if press.X != 2 || press.Y != 4 {
-		t.Errorf("press event = (%d, %d), want (2, 4)", press.X, press.Y)
+	p := newPad(dial, 10*time.Millisecond)
+	reconnected := make(chan struct{}, 2)
+	p.OnReconnect = func() {
+		reconnected <- struct{}{}
 	}
 
-	release := <-buttons
-	if release.X != 102 || release.Y != 4 {
-		t.Errorf("release event = (%d, %d), want (102, 4)", release.X, release.Y)
+	if err := p.connect(); err != nil {
+		p.online = true
+		t.Fatalf("initial connect failed: %v", err)
+	}
+	<-reconnected // Drain initial connect notification
+
+	buttons := make(chan common.Button, 4)
+	go p.Listen(buttons)
+	defer p.Close()
+
+	// Simulate USB unplug by closing the first packet channel
+	close(first.packets)
+
+	select {
+	case <-reconnected:
+	case <-time.After(time.Second):
+		t.Fatal("timed out waiting for auto-reconnect")
+	}
+
+	// Verify second transport received Programmer mode SysEx on reconnect
+	wantProgram := []byte{0xF0, 0x00, 0x20, 0x29, 0x02, 0x0D, 0x0E, 0x01, 0xF7}
+	if got := second.fullStream(); !bytes.Equal(got, wantProgram) {
+		t.Errorf("second transport SysEx = %X, want %X", got, wantProgram)
+	}
+
+	// Verify button presses flow again on the reconnected transport
+	second.packets <- []midi.Packet{{Data: [3]byte{0x90, 43, 127}}}
+	select {
+	case btn := <-buttons:
+		if btn.X != 2 || btn.Y != 4 {
+			t.Errorf("got button (%d, %d), want (2, 4)", btn.X, btn.Y)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("timed out waiting for button event after reconnect")
 	}
 }

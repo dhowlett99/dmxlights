@@ -87,7 +87,7 @@ func ListenAndSendToLaunchPad(eventsForLaunchpad chan common.ALight, pad *pad.Pa
 				if !ok {
 					return
 				}
-				if !launchPadConnected {
+				if pad == nil || !pad.IsConnected() {
 					continue
 				}
 				// Coalesce rapid updates to the same coordinate;
@@ -96,7 +96,18 @@ func ListenAndSendToLaunchPad(eventsForLaunchpad chan common.ALight, pad *pad.Pa
 				pending[coord] = alight
 
 			case <-ticker.C:
-				if !launchPadConnected || len(pending) == 0 {
+				if pad == nil || !pad.IsConnected() {
+					// Reset cache while unplugged so all LEDs repaint when reconnected
+					if len(launchPadMap) > 0 {
+						launchPadMap = make(map[coordinate]PrivateColorMap, 81)
+					}
+					if len(pending) > 0 {
+						pending = make(map[coordinate]common.ALight, 81)
+					}
+					continue
+				}
+
+				if len(pending) == 0 {
 					continue
 				}
 
@@ -148,7 +159,8 @@ func ListenAndSendToLaunchPad(eventsForLaunchpad chan common.ALight, pad *pad.Pa
 				if len(sysex) > 7 {
 					sysex = append(sysex, 0xF7)
 					if err := pad.WriteSysExChunked(sysex); err != nil {
-						fmt.Printf("error writing batch to launchpad: %s\n", err)
+						// Write failed (device just unplugged); reset cache so next reconnect repaints everything
+						launchPadMap = make(map[coordinate]PrivateColorMap, 81)
 					}
 				}
 			}
