@@ -5,7 +5,6 @@ package pad
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -15,165 +14,135 @@ import (
 
 type Pad struct {
 	*midi.Device
-	hits chan common.Button
 }
 
-// Open opens a connection to the Novation Launchpad.
+// Open opens a connection to the Novation Launchpad Mini MK3.
 func Open() (*Pad, error) {
 	devices, err := midi.Devices()
 	if err != nil {
 		return nil, errors.Wrap(err, "listing MIDI devices")
 	}
+
 	var device *midi.Device
 	for _, d := range devices {
-		if strings.Contains(d.Name, "MIDI") {
+		if (strings.Contains(d.Name, "Launchpad") || strings.Contains(d.Name, "LPMiniMK3")) &&
+			strings.Contains(d.Name, "MIDI") {
 			device = d
 			break
 		}
 	}
 	if device == nil {
-		return nil, errors.New("Pad not found")
+		return nil, errors.New("Launchpad MIDI device not found")
 	}
-	pad := &Pad{Device: device}
-	if err := pad.Open(); err != nil {
-		return nil, err
+
+	p := &Pad{Device: device}
+	if err := p.Open(); err != nil {
+		return nil, errors.Wrap(err, "opening Launchpad MIDI device")
 	}
-	return pad, nil
+	return p, nil
 }
 
 // Close closes the connection to the Pad.
 func (pad *Pad) Close() error {
-	if pad.hits != nil {
-		close(pad.hits)
-	}
 	return errors.Wrap(pad.Device.Close(), "closing midi device")
 }
 
-// Reset the connection to the Launchpad.
-func (pad *Pad) Reset() error {
-	_, err := pad.Write([]byte{0xf0, 0x00, 0x20})
-	if err != nil {
-		return err
-	}
-	_, err = pad.Write([]byte{0x29, 0x02, 0x18})
-	if err != nil {
-		return err
-	}
-	_, err = pad.Write([]byte{0x0e, 0x00, 0xf7})
-	if err != nil {
-		return err
-	}
-	return err
-}
-
-// Programm puts the Launchpad in Program mode.
+// Program puts the Launchpad Mini MK3 into Programmer mode.
 func (pad *Pad) Program() error {
-	_, err := pad.Write([]byte{0xf0, 0x00, 0x20})
-	if err != nil {
-		return err
-	}
-	_, err = pad.Write([]byte{0x29, 0x02, 0x0d})
-	if err != nil {
-		return err
-	}
-	_, err = pad.Write([]byte{0x0e, 0x01, 0xf7})
-	if err != nil {
-		return err
-	}
-	return nil
+	return pad.sendSysEx(0x0E, 0x01)
 }
 
-// Listen for button events from the Launchpad.
-func (pad *Pad) Listen(buttonchannel chan common.Button) error {
-	eventChannel, err := pad.Packets()
+// Reset exits Programmer mode and returns the Launchpad Mini MK3 to Live mode.
+func (pad *Pad) Reset() error {
+	return pad.sendSysEx(0x0E, 0x00)
+}
+
+// Light lights the button at x,y with the given 7-bit red, green, and blue values (0-127).
+func (pad *Pad) Light(x, y int, red, green, blue uint8) error {
+	led, err := padIndex(x, y)
 	if err != nil {
-		log.Fatal("error can't open button channel")
 		return err
 	}
+	return pad.sendSysEx(0x03, 0x03, led, red&0x7F, green&0x7F, blue&0x7F)
+}
 
-	for {
+// FlashLight flashes a specific pad LED between onColor and offColor (palette indices 0-127).
+func (pad *Pad) FlashLight(x, y int, onColor, offColor byte) error {
+	led, err := padIndex(x, y)
+	if err != nil {
+		return err
+	}
+	if onColor > 0x7F || offColor > 0x7F {
+		return fmt.Errorf("color values must be 7-bit MIDI data bytes (0x00-0x7F)")
+	}
+	return pad.sendSysEx(0x03, 0x01, led, onColor, offColor)
+}
 
-		events := <-eventChannel
+// LightBatch sends multiple solid, flashing, or RGB LED specs in a single SysEx 03h message.
+// Each entry in specs should follow Novation's 03h format (e.g. [0x00, led, color] or [0x03, led, r, g, b]).
+func (pad *Pad) LightBatch(specs ...byte) error {
+	payload := append([]byte{0x03}, specs...)
+	return pad.sendSysEx(payload...)
+}
 
-		for _, packet := range events {
-			if packet.Err != nil {
-				fmt.Printf("packet error")
-				continue
-			}
-			var x, y int
+// sendSysEx wraps payload bytes in the Mini MK3 SysEx header/footer and writes in 3-byte USB-MIDI chunks.
+func (pad *Pad) sendSysEx(payload ...byte) error {
+	msg := make([]byte, 0, len(payload)+7)
+	msg = append(msg, 0xF0, 0x00, 0x20, 0x29, 0x02, 0x0D) // Mini MK3 header
+	msg = append(msg, payload...)
+	msg = append(msg, 0xF7) // End of SysEx
 
-			// Button pressed codes.
-			if packet.Data[2] > 0 {
-				x = int(packet.Data[1])%10 - 1
-				y = 8 - (int(packet.Data[1])-x)/10
-				buttonchannel <- common.Button{X: x, Y: y}
-			}
+	return pad.WriteSysExChunked(msg)
+}
 
-			// Button released codes.
-			if packet.Data[2] == 0 {
-				x = int(packet.Data[1])%10 - 1
-				y = 8 - (int(packet.Data[1])-x)/10
-				x = x + 100
-				buttonchannel <- common.Button{X: x, Y: y}
-			}
+// WriteSysExChunked writes a complete SysEx byte slice 3 bytes at a time for USB-MIDI packet drivers.
+func (pad *Pad) WriteSysExChunked(sysex []byte) error {
+	for i := 0; i < len(sysex); i += 3 {
+		end := i + 3
+		if end > len(sysex) {
+			end = len(sysex)
+		}
+		if _, err := pad.Write(sysex[i:end]); err != nil {
+			return err
 		}
 	}
+	return nil
 }
 
-// Light lights the button at x,y with the given red, green, and blue values.
-func (pad *Pad) Light(x int, y int, red uint8, green uint8, blue uint8) error {
-	led := int64((8-y)*10 + x + 1)
-
-	_, err := pad.Write([]byte{0xF0, 0x00, 0x20})
+// Listen reads button press and release events from the Launchpad and forwards them to buttonChannel.
+func (pad *Pad) Listen(buttonChannel chan<- common.Button) error {
+	eventChannel, err := pad.Packets()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "opening MIDI packet channel")
 	}
 
-	_, err = pad.Write([]byte{0x29, 0x02, 0x0D})
-	if err != nil {
-		return err
-	}
+	for events := range eventChannel {
+		for _, packet := range events {
+			if packet.Err != nil {
+				fmt.Printf("packet error: %v\n", packet.Err)
+				continue
+			}
+			if len(packet.Data) < 3 {
+				continue
+			}
 
-	_, err = pad.Write([]byte{0x03, 0x03, byte(led)})
-	if err != nil {
-		return err
-	}
+			note := int(packet.Data[1])
+			x := note%10 - 1
+			y := 8 - (note-(x+1))/10
 
-	_, err = pad.Write([]byte{byte(red), byte(green), byte(blue)})
-	if err != nil {
-		return err
-	}
-
-	_, err = pad.Write([]byte{0xF7})
-	if err != nil {
-		return err
+			if packet.Data[2] == 0 {
+				// Button released
+				x += 100
+			}
+			buttonChannel <- common.Button{X: x, Y: y}
+		}
 	}
 	return nil
 }
 
-// FlashLight flashes the button at x,y with the on and off colors as defined in the
-// Novation Launchpad programmer guide.
-func (pad *Pad) FlashLight(x int, y int, onColor byte, offColor byte) error {
-	led := int64((8-y)*10 + x + 1)
-
-	_, err := pad.Write([]byte{0xF0, 0x00, 0x20})
-	if err != nil {
-		return err
+func padIndex(x, y int) (byte, error) {
+	if x < 0 || x > 8 || y < 0 || y > 8 {
+		return 0, fmt.Errorf("coordinates (%d, %d) out of range (0-8)", x, y)
 	}
-
-	_, err = pad.Write([]byte{0x29, 0x02, 0x0D})
-	if err != nil {
-		return err
-	}
-
-	_, err = pad.Write([]byte{0x03, 0x01, byte(led)})
-	if err != nil {
-		return err
-	}
-
-	_, err = pad.Write([]byte{onColor, offColor, 0xF7})
-	if err != nil {
-		return err
-	}
-	return nil
+	return byte((8-y)*10 + x + 1), nil
 }
