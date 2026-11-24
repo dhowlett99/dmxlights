@@ -12,8 +12,17 @@ import (
 	"github.com/scgolang/midi"
 )
 
+// midiTransport abstracts *midi.Device so Pad can be unit-tested without physical hardware.
+type midiTransport interface {
+	Open() error
+	Close() error
+	Write([]byte) (int, error)
+	Packets() (<-chan []midi.Packet, error)
+}
+
+// Pad represents a connection to a Novation Launchpad Mini MK3.
 type Pad struct {
-	*midi.Device
+	midiTransport
 }
 
 // Open opens a connection to the Novation Launchpad Mini MK3.
@@ -35,7 +44,7 @@ func Open() (*Pad, error) {
 		return nil, errors.New("Launchpad MIDI device not found")
 	}
 
-	p := &Pad{Device: device}
+	p := &Pad{midiTransport: device}
 	if err := p.Open(); err != nil {
 		return nil, errors.Wrap(err, "opening Launchpad MIDI device")
 	}
@@ -44,7 +53,7 @@ func Open() (*Pad, error) {
 
 // Close closes the connection to the Pad.
 func (pad *Pad) Close() error {
-	return errors.Wrap(pad.Device.Close(), "closing midi device")
+	return errors.Wrap(pad.midiTransport.Close(), "closing midi device")
 }
 
 // Program puts the Launchpad Mini MK3 into Programmer mode.
@@ -78,8 +87,8 @@ func (pad *Pad) FlashLight(x, y int, onColor, offColor byte) error {
 	return pad.sendSysEx(0x03, 0x01, led, onColor, offColor)
 }
 
-// LightBatch sends multiple solid, flashing, or RGB LED specs in a single SysEx 03h message.
-// Each entry in specs should follow Novation's 03h format (e.g. [0x00, led, color] or [0x03, led, r, g, b]).
+// LightBatch sends multiple solid, flashing, or RGB LED updates in a single SysEx 03h message.
+// Each entry in specs must follow Novation's 03h format (e.g., [0x00, led, color] or [0x03, led, r, g, b]).
 func (pad *Pad) LightBatch(specs ...byte) error {
 	payload := append([]byte{0x03}, specs...)
 	return pad.sendSysEx(payload...)
@@ -127,10 +136,12 @@ func (pad *Pad) Listen(buttonChannel chan<- common.Button) error {
 			}
 
 			note := int(packet.Data[1])
+			velocity := packet.Data[2]
+
 			x := note%10 - 1
 			y := 8 - (note-(x+1))/10
 
-			if packet.Data[2] == 0 {
+			if velocity == 0 {
 				// Button released
 				x += 100
 			}
