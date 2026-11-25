@@ -44,7 +44,11 @@ type Pad struct {
 // If the device is not plugged in yet, Listen will continue polling and connect automatically.
 func Open() (*Pad, error) {
 	p := newPad(discoverLaunchpad, time.Second)
-	if err := p.connect(); err != nil && !errors.Is(err, ErrNotConnected) {
+	if err := p.connect(); err != nil {
+		if errors.Is(err, ErrNotConnected) {
+			fmt.Println("No Launchpad found at startup; waiting for USB connection...")
+			return p, nil
+		}
 		return nil, err
 	}
 	return p, nil
